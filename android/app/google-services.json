@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1036791968983",
+    "firebase_url": "https://emart-utem-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "emart-utem",
+    "storage_bucket": "emart-utem.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1036791968983:android:ac195e1adb9fcd0cc86c92",
+        "android_client_info": {
+          "package_name": "com.example.emart"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1036791968983-j4t4a6tbhd89n5feg704b7jp1ikpal1i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDom8qPvTAoT0fs80s3K4G8CGd2hCcteIc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1036791968983-j4t4a6tbhd89n5feg704b7jp1ikpal1i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
