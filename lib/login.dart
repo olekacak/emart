@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:emartsystem/home.dart';
+import 'package:emartsystem/signup.dart';
 
 void main() {
-  runApp(LoginPage());
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: LoginPage(),
+    );
+  }
 }
 
 class LoginPage extends StatelessWidget {
@@ -10,17 +20,19 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Center(
-            child: Text("Welcome Back",style: TextStyle(fontSize: 24,
-              fontWeight: FontWeight.bold,),),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Center(
+          child: Text(
+            "Log In",
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
-          centerTitle: true,
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -34,6 +46,7 @@ class LoginPage extends StatelessWidget {
                 const TextField(
                   decoration: InputDecoration(
                     labelText: 'Username',
+                    hintText: 'Enter your username',
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -41,52 +54,41 @@ class LoginPage extends StatelessWidget {
                   obscureText: true,
                   decoration: InputDecoration(
                     labelText: 'Password',
+                    hintText: 'Enter your password',
                   ),
                 ),
-                Builder(
-                  builder: (context) => ElevatedButton(
-                    onPressed: () {
-                      // Handle login logic here
-                      // Navigate to the HomePage on successful login
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const Homepage()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple,
-                      padding: const EdgeInsets.all(16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: const Text(
-                      "Login",
-                      style: TextStyle(
-                          fontSize: 18,color: Colors.white
-                      ),
-                    ),
-                  ),
-                ),
-
                 const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        // Add your "Forgot Password" logic here
-                      },
-                      child: const Text("Forgot Password?"),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        // Add your "Create Account" logic here
-                      },
-                      child: const Text("Create Account"),
-                    ),
-                  ],
+                ElevatedButton(
+                  onPressed: () {
+                    // Handle log in logic here
+                    // After log in logic, navigate to HomePage
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Homepage()),
+                    );
+                  },
+                  child: const Text('Log In'),
                 ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () {
+                    // Handle "Forgot Password" logic here
+                  },
+                  child: const Text('Forgot Password?'),
+                ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () {
+                    // Handle "Create Account" logic here
+                    // After clicking, navigate to SignUpPage
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const SignUpPage()),
+                    );
+                  },
+                  child: const Text('Create Account'),
+                ),
+                const SizedBox(height: 16),
               ],
             ),
           ),
