@@ -3,7 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:emartsystem/cart.dart';
 import 'package:emartsystem/filter.dart';
 import 'package:emartsystem/inbox.dart';
-import 'package:emartsystem/profile.dart';
+import 'package:emartsystem/dashboard.dart';
 import 'package:emartsystem/search.dart';
 
 void main() {
@@ -27,7 +27,7 @@ class _HomepageState extends State<Homepage> {
     const Homepage(),
     const SearchPage(),
     const InboxPage(),
-    const ProfilePage(),
+    const DashboardPage(),
   ];
 
   @override
@@ -59,7 +59,7 @@ class _HomepageState extends State<Homepage> {
             icon: const Icon(Icons.account_circle, color: Colors.white),
             onPressed: () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const ProfilePage()));
+                  MaterialPageRoute(builder: (context) => const DashboardPage()));
             },
           ),
         ],
