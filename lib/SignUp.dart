@@ -1,9 +1,18 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:emartsystem/CustomerLogin.dart';
+import 'Model/CustomerLoginModel.dart';
 
 class SignUpPage extends StatelessWidget {
-  const SignUpPage({super.key});
+  final usernameController = TextEditingController();
+  final passwordController = TextEditingController();
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final phoneNoController = TextEditingController();
+  final addressController = TextEditingController();
+  final statusController = TextEditingController();
+
+  SignUpPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,87 +32,201 @@ class SignUpPage extends StatelessWidget {
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.lock,
-                    size: 100,
-                    color: Colors.deepPurple,
-                  ),
-                  const SizedBox(height: 16),
-                  const TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Name',
-                      hintText: 'Enter your name',
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Username',
-                      hintText: 'Create username',
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      hintText: 'email@gmail.com',
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const TextField(
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      hintText: 'Enter minimum 8 characters',
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Handle sign up logic here
-                      // Navigate to the LoginPage on successful sign up
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) =>  CustomerLoginPage()),
-                      );
-                    },
-                    child: const Text('Sign Up'),
-                  ),
-                  const SizedBox(height: 16),
-                  RichText(
-                    text: TextSpan(
-                      text: 'Already have an account? ',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                      ),
-                      children: <TextSpan>[
-                        TextSpan(
-                          text: 'Log in',
-                          style: TextStyle(
-                            color: Colors.blue,
-                            fontSize: 16,
-                          ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              // Navigate to the LoginPage when 'Log in' is tapped
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => CustomerLoginPage()),
-                              );
-                            },
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+          child: ListView(
+            children: [
+              const Icon(
+                Icons.lock,
+                size: 100,
+                color: Colors.deepPurple,
               ),
-            ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: usernameController,
+                decoration: InputDecoration(
+                  labelText: 'Username',
+                  hintText: 'Create username',
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  hintText: 'Enter minimum 8 characters',
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                  hintText: 'Enter your name',
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  hintText: 'email@gmail.com',
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: phoneNoController,
+                decoration: InputDecoration(
+                  labelText: 'Phone Number',
+                  hintText: 'Enter your phone number',
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: addressController,
+                decoration: InputDecoration(
+                  labelText: 'Address',
+                  hintText: 'Enter your address',
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: statusController,
+                decoration: InputDecoration(
+                  labelText: 'Status',
+                  hintText: 'Enter your status',
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () async {
+                  // Get values from controllers
+                  String username = usernameController.text;
+                  String password = passwordController.text;
+                  String name = nameController.text;
+                  String email = emailController.text;
+                  String phoneNo = phoneNoController.text;
+                  String address = addressController.text;
+                  String status = statusController.text;
+
+                  // Create an instance of CustomerLoginModel
+                  CustomerLoginModel customer = CustomerLoginModel(
+                    username,
+                    password,
+                    name,
+                    email,
+                    phoneNo,
+                    address,
+                    status,
+                  );
+
+                  try {
+                    // Call the signUp method to send data to the server
+                    bool signUpResult = await customer.signUp(
+                      username,
+                      password,
+                      name,
+                      email,
+                      phoneNo,
+                      address,
+                      status,
+                    );
+
+                    if (signUpResult) {
+                      // If sign up is successful, show a success message
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text('Successful Sign Up'),
+                            content: const Text('You have successfully signed up.'),
+                            actions: [
+                              TextButton(
+                                child: const Text('OK'),
+                                onPressed: () {
+                                  // Navigate to the login page
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => CustomerLoginPage()),
+                                  );
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    } else {
+                      // If sign up fails, show an error message
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text('Sign Up Failed'),
+                            content: const Text('Failed to sign up. Please try again.'),
+                            actions: [
+                              TextButton(
+                                child: const Text('OK'),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  } catch (error) {
+                    // Handle server errors
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('Server Error'),
+                          content: const Text('There was an error connecting to the server.'),
+                          actions: [
+                            TextButton(
+                              child: const Text('OK'),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }
+                },
+                child: const Text('Sign Up'),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: RichText(
+                  text: TextSpan(
+                    text: 'Already have an account? ',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                    ),
+                    children: <TextSpan>[
+                      TextSpan(
+                        text: 'Log in',
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: 16,
+                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            // Navigate to the LoginPage when 'Log in' is tapped
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => CustomerLoginPage()),
+                            );
+                          },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

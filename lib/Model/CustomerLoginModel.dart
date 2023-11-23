@@ -1,7 +1,7 @@
 import '../Controller/CustomerLoginController.dart';
 
 class CustomerLoginModel {
-  int customerId;
+  int? customerId;
   String username;
   String password;
   String name;
@@ -11,7 +11,6 @@ class CustomerLoginModel {
   String status;
 
   CustomerLoginModel(
-      this.customerId,
       this.username,
       this.password,
       this.name,
@@ -20,14 +19,16 @@ class CustomerLoginModel {
       this.address,
       this.status);
 
-  CustomerLoginModel.withCustomerId(this.customerId,
+  CustomerLoginModel.withCustomerId(
+      this.customerId,
       this.username,
       this.password,
       this.name,
       this.email,
       this.phoneNo,
       this.address,
-      this.status);
+      this.status,
+      );
 
   CustomerLoginModel.fromJson(Map<String, dynamic> json)
       : customerId = json['customerId'] as int? ?? 0,
@@ -39,7 +40,6 @@ class CustomerLoginModel {
         address = json['address'] as String? ?? '',
         status = json['status'] as String? ?? '';
 
-  // Method for converting a CustomerLoginModel to a JSON map
   Map<String, dynamic> toJson() => {
     'customerId': customerId,
     'username': username,
@@ -83,7 +83,6 @@ class CustomerLoginModel {
     return false;
   }
 
-
   static Future<List<CustomerLoginModel>> loadAll() async {
     List<CustomerLoginModel> result = [];
     CustomerLoginController customer = CustomerLoginController(
@@ -99,27 +98,53 @@ class CustomerLoginModel {
   }
 
   Future<bool> login(String username, String password) async {
-    // Create a new instance of CustomerLoginController
-    CustomerLoginController controller = CustomerLoginController(path: "/api/workshop2/customer_login.php");
+    CustomerLoginController controller =
+    CustomerLoginController(path: "/api/workshop2/customer_login.php");
 
-    // Perform the login using the provided username and password
     await controller.login(username, password);
 
-    // Check the response status code
     if (controller.status() == 200) {
-      // If the server returns a 200 OK response, the login was successful
-      // Update the model's properties if needed
-      // For example, you might want to update the customerId:
       if (controller.result()['customerId'] != null) {
         customerId = controller.result()['customerId'];
       }
       return true;
     } else {
-      // If the server returns an error response, the login was unsuccessful
       return false;
     }
   }
 
+  Future<bool> signUp(
+      String username,
+      String password,
+      String name,
+      String email,
+      String phoneNo,
+      String address,
+      String status,
+      ) async {
+    CustomerLoginController controller = CustomerLoginController(
+      path: "/api/workshop2/customer_signup.php",
+    );
 
+    controller.setBody({
+      'username': username,
+      'password': password,
+      'name': name,
+      'email': email,
+      'phoneNo': phoneNo,
+      'address': address,
+      'status': status,
+    });
 
+    await controller.postCustomerLogin();
+
+    if (controller.status() == 200) {
+      if (controller.result()['customerId'] != null) {
+        customerId = controller.result()['customerId'];
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
