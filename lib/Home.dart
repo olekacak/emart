@@ -6,27 +6,20 @@ import 'package:emartsystem/Inbox.dart';
 import 'package:emartsystem/Dashboard.dart';
 import 'package:emartsystem/Search.dart';
 
-void main() {
-  runApp( MaterialApp(
-    home: Homepage(username: "YourUsernameHere"),
-  ));
-}
+class HomePage extends StatefulWidget {
 
-class Homepage extends StatefulWidget {
-  final String username;
-
-  Homepage({required this.username, Key? key}) : super(key: key);
+  HomePage({ Key? key}) : super(key: key);
 
   @override
   _HomepageState createState() => _HomepageState();
 }
 
-class _HomepageState extends State<Homepage> {
+class _HomepageState extends State<HomePage> {
   final int _currentIndex = 0;
 
   // Define a list of pages to navigate to when bottom navigation items are tapped
   final List<Widget> _pages = [
-    Homepage(username: 'someUsername'),
+    HomePage(),
     const SearchPage(),
     const InboxPage(),
     const DashboardPage(),

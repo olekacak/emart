@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:emartsystem/Profile.dart';
 import 'package:emartsystem/CustomerLogin.dart';
 
-void main() {
-  runApp(DashboardPage());
-}
-
 class DashboardPage extends StatelessWidget {
   const DashboardPage({Key? key});
   // User-provided image URL

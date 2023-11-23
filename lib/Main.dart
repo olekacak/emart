@@ -3,7 +3,7 @@ import 'package:emartsystem/CustomerLogin.dart';
 
 void main() async{
 
-  runApp( CustomerLoginPage());
+  runApp( MyApp());
 }
 
 class MyApp extends StatelessWidget {

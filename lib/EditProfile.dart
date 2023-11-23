@@ -1,11 +1,5 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(MaterialApp(
-    home: EditProfilePage(),
-  ));
-}
-
 class EditProfilePage extends StatelessWidget {
   const EditProfilePage({super.key});
 

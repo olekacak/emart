@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:emartsystem/EditProfile.dart';
 
-void main() {
-  runApp(ProfilePage());
-}
-
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 

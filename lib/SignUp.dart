@@ -2,10 +2,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:emartsystem/CustomerLogin.dart';
 
-void main() {
-  runApp(SignUpPage());
-}
-
 class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key});
 

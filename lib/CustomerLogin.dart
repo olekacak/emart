@@ -4,10 +4,6 @@ import 'package:emartsystem/SignUp.dart';
 import '../Model/CustomerLoginModel.dart';
 import '../Controller/CustomerLoginController.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -80,7 +76,7 @@ class CustomerLoginPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Homepage(username: username),
+                            builder: (context) => HomePage(),
                           ),
                         );
                       } else {
