@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:emartsystem/home.dart';
+import 'package:emartsystem/Home.dart';
 
 void main() {
-  runApp(const MaterialApp(
-    home: Homepage(),
+  runApp( MaterialApp(
+    home: Homepage(username: "YourUsernameHere"),
   ));
 }
 
@@ -31,7 +31,7 @@ class _FilterPageState extends State<FilterPage> {
             IconButton(
               icon: const Icon(Icons.filter_list_sharp, color: Colors.blueGrey),
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const Homepage()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => Homepage(username: "YourUsernameHere")));
               },
             ),
             const Text(

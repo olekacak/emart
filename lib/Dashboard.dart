@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:emartsystem/profile.dart';
-import 'package:emartsystem/login.dart';
+import 'package:emartsystem/Profile.dart';
+import 'package:emartsystem/CustomerLogin.dart';
 
 void main() {
   runApp(DashboardPage());
@@ -150,7 +150,7 @@ class DashboardPage extends StatelessWidget {
                                   // Logout button, navigate back to the login page
                                   Navigator.pushAndRemoveUntil(
                                     context,
-                                    MaterialPageRoute(builder: (context) => LoginPage()),
+                                    MaterialPageRoute(builder: (context) => CustomerLoginPage()),
                                         (route) => false, // Remove all existing routes
                                   );
                                 },

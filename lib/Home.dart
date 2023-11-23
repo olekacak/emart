@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:emartsystem/cart.dart';
-import 'package:emartsystem/filter.dart';
-import 'package:emartsystem/inbox.dart';
-import 'package:emartsystem/dashboard.dart';
-import 'package:emartsystem/search.dart';
+import 'package:emartsystem/Cart.dart';
+import 'package:emartsystem/Filter.dart';
+import 'package:emartsystem/Inbox.dart';
+import 'package:emartsystem/Dashboard.dart';
+import 'package:emartsystem/Search.dart';
 
 void main() {
-  runApp(const MaterialApp(
-    home: Homepage(),
+  runApp( MaterialApp(
+    home: Homepage(username: "YourUsernameHere"),
   ));
 }
 
 class Homepage extends StatefulWidget {
-  const Homepage({super.key});
+  final String username;
+
+  Homepage({required this.username, Key? key}) : super(key: key);
 
   @override
   _HomepageState createState() => _HomepageState();
@@ -24,11 +26,22 @@ class _HomepageState extends State<Homepage> {
 
   // Define a list of pages to navigate to when bottom navigation items are tapped
   final List<Widget> _pages = [
-    const Homepage(),
+    Homepage(username: 'someUsername'),
     const SearchPage(),
     const InboxPage(),
     const DashboardPage(),
   ];
+
+  void _showMessage(String msg) {
+    if (mounted) {
+      // Make sure this context is still mounted/exist
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(msg),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

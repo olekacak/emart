@@ -1,6 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:emartsystem/login.dart';
+import 'package:emartsystem/CustomerLogin.dart';
 
 void main() {
   runApp(SignUpPage());
@@ -73,7 +73,7 @@ class SignUpPage extends StatelessWidget {
                       // Navigate to the LoginPage on successful sign up
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const LoginPage()),
+                        MaterialPageRoute(builder: (context) =>  CustomerLoginPage()),
                       );
                     },
                     child: const Text('Sign Up'),
@@ -98,7 +98,7 @@ class SignUpPage extends StatelessWidget {
                               // Navigate to the LoginPage when 'Log in' is tapped
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const LoginPage()),
+                                MaterialPageRoute(builder: (context) => CustomerLoginPage()),
                               );
                             },
                         ),

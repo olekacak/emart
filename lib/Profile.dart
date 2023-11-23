@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:emartsystem/editprofile.dart';
+import 'package:emartsystem/EditProfile.dart';
 
 void main() {
   runApp(ProfilePage());
