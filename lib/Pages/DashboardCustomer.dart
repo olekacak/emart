@@ -18,6 +18,7 @@ class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
 
   @override
   Widget build(BuildContext context) {
+
     UserLoginModel user = widget.user;
 
     return Scaffold(

@@ -79,6 +79,7 @@ class UserLoginPage extends StatelessWidget {
 
                     // Create an instance of UserLoginModel with only username and password
                     UserLoginModel user = UserLoginModel(
+                    0,
                       username,
                       password,
                       '',
@@ -90,6 +91,7 @@ class UserLoginPage extends StatelessWidget {
                       '',
                       '',
                       '',
+
                     );
 
                     // Call the saveUser method

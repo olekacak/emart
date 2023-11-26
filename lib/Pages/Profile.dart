@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 import 'EditProfile.dart';
 import '../Model/UserLoginModel.dart';
+import 'DashboardCustomer.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   final UserLoginModel user;
 
-  // Constructor to receive the user information
   const ProfilePage({Key? key, required this.user}) : super(key: key);
 
   @override
+  _ProfilePageState createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  @override
   Widget build(BuildContext context) {
+
+    UserLoginModel user = widget.user;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
@@ -39,14 +47,14 @@ class ProfilePage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      user.name ?? 'Name',
+                      widget.user.name ?? 'Name',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      user.email ?? 'user@email.com',
+                      widget.user.email ?? 'user@email.com',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.grey,
@@ -57,7 +65,7 @@ class ProfilePage extends StatelessWidget {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => EditProfilePage()),
+                          MaterialPageRoute(builder: (context) => EditProfilePage(user: widget.user)),
                         );
                       },
                       child: Text('Edit Profile'),
@@ -69,22 +77,22 @@ class ProfilePage extends StatelessWidget {
             SizedBox(height: 20),
             Card(
               child: ListTile(
-                title: Text('Phone Number: +1234567890'),
+                title: Text(widget.user.phoneNo),
               ),
             ),
             Card(
               child: ListTile(
-                title: Text('Location: City, Country'),
+                title: Text(widget.user.address),
               ),
             ),
             Card(
               child: ListTile(
-                title: Text('Birthday: January 1, 2000'),
+                title: Text(widget.user.birthDate),
               ),
             ),
             Card(
               child: ListTile(
-                title: Text('Gender: Male'),
+                title: Text(widget.user.gender),
               ),
             ),
           ],

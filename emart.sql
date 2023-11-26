@@ -71,7 +71,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'ali','123','ali','ali@gmail.com','123456789','melaka','2011-1-12','Male','true','active',2),(2,'abu','123','abu','abu@gmail.com','123456789','abu@gmail.com','2016-12-19','Male','false','active',2);
+INSERT INTO `user` VALUES (1,'ali','123','ali','ali@gmail.com','123456789','melaka','2011-1-12','Male','true','active',2),(2,'abu','123','abujahat','abu123@gmail.com','123456789','johor','2016-12-19','Male','false','active',2);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -84,4 +84,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-11-26 10:53:14
+-- Dump completed on 2023-11-27  3:44:22
