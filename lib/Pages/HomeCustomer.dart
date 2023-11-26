@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
+import '../Model/UserLoginModel.dart';
 import 'Cart.dart';
 import 'DashboardCustomer.dart';
 import 'Filter.dart';
@@ -8,27 +9,34 @@ import 'Inbox.dart';
 import 'Search.dart';
 
 class HomeCustomerPage extends StatefulWidget {
+  final UserLoginModel user;
 
-  HomeCustomerPage({ Key? key}) : super(key: key);
+  HomeCustomerPage({required this.user, Key? key}) : super(key: key);
 
   @override
   _HomeCustomerpageState createState() => _HomeCustomerpageState();
 }
 
 class _HomeCustomerpageState extends State<HomeCustomerPage> {
-  final int _currentIndex = 0;
+  late int _currentIndex;
+  late List<Widget> _pages;
 
-  // Define a list of pages to navigate to when bottom navigation items are tapped
-  final List<Widget> _pages = [
-    HomeCustomerPage(),
-    const SearchPage(),
-    const InboxPage(),
-    const DashboardCustomerPage(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+
+    _currentIndex = 0;
+
+    _pages = [
+      HomeCustomerPage(user: widget.user),
+      const SearchPage(),
+      const InboxPage(),
+      DashboardCustomerPage(user: widget.user),
+    ];
+  }
 
   void _showMessage(String msg) {
     if (mounted) {
-      // Make sure this context is still mounted/exist
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(msg),
@@ -66,56 +74,55 @@ class _HomeCustomerpageState extends State<HomeCustomerPage> {
             icon: const Icon(Icons.account_circle, color: Colors.white),
             onPressed: () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const DashboardCustomerPage()));
+                  MaterialPageRoute(builder: (context) => DashboardCustomerPage(user: widget.user)));
             },
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Row(
-            children: [
-              const Expanded(
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: "Search for a product",
-                    prefixIcon: Icon(Icons.search),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: "Search for a product",
+                      prefixIcon: Icon(Icons.search),
+                    ),
                   ),
                 ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.filter_list_sharp, color: Colors.blueGrey),
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const FilterPage()));
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          CarouselSlider(
-            options: CarouselOptions(height: 150.0),
-            items: [1, 2, 3, 4, 5].map((i) {
-              return Builder(
-                builder: (BuildContext context) {
-                  return Container(
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .width,
-                    margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                    decoration: const BoxDecoration(color: Colors.pinkAccent),
-                    child: Text('Banner $i', style: const TextStyle(fontSize: 16.0)),
-                  );
-                },
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 10),
-          const CategorySection(),
-          const SizedBox(height: 10),
-          const FeaturedProductsSection(),
-        ],
+                IconButton(
+                  icon: Icon(Icons.filter_list_sharp, color: Colors.blueGrey),
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => FilterPage(user: widget.user)));
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            CarouselSlider(
+              options: CarouselOptions(height: 150.0),
+              items: [1, 2, 3, 4, 5].map((i) {
+                return Builder(
+                  builder: (BuildContext context) {
+                    return Container(
+                      width: MediaQuery.of(context).size.width,
+                      margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                      decoration: const BoxDecoration(color: Colors.pinkAccent),
+                      child: Text('Banner $i', style: const TextStyle(fontSize: 16.0)),
+                    );
+                  },
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 10),
+            const CategorySection(),
+            const SizedBox(height: 10),
+            const FeaturedProductsSection(),
+          ],
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
@@ -123,7 +130,6 @@ class _HomeCustomerpageState extends State<HomeCustomerPage> {
         unselectedItemColor: Colors.blueGrey,
         currentIndex: _currentIndex,
         onTap: (index) {
-          // Use Navigator to push the respective page onto the navigation stack
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => _pages[index]));
         },
@@ -151,7 +157,7 @@ class _HomeCustomerpageState extends State<HomeCustomerPage> {
 }
 
 class CategorySection extends StatelessWidget {
-  const CategorySection({super.key});
+  const CategorySection({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -173,7 +179,7 @@ class CategorySection extends StatelessWidget {
 }
 
 class CategoryItem extends StatelessWidget {
-  const CategoryItem({super.key});
+  const CategoryItem({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -190,7 +196,7 @@ class CategoryItem extends StatelessWidget {
 }
 
 class FeaturedProductsSection extends StatelessWidget {
-  const FeaturedProductsSection({super.key});
+  const FeaturedProductsSection({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -212,7 +218,7 @@ class FeaturedProductsSection extends StatelessWidget {
 }
 
 class ProductCard extends StatelessWidget {
-  const ProductCard({super.key});
+  const ProductCard({Key? key});
 
   @override
   Widget build(BuildContext context) {

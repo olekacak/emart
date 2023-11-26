@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
+import '../Model/UserLoginModel.dart';
 import 'Cart.dart';
 import 'DashboardSeller.dart';
 import 'Filter.dart';
@@ -8,27 +9,34 @@ import 'Inbox.dart';
 import 'Search.dart';
 
 class HomeSellerPage extends StatefulWidget {
+  final UserLoginModel user;
 
-  HomeSellerPage({ Key? key}) : super(key: key);
+  HomeSellerPage({required this.user, Key? key}) : super(key: key);
 
   @override
-  _HomeSellerpageState createState() => _HomeSellerpageState();
+  _HomeSellerPageState createState() => _HomeSellerPageState();
 }
 
-class _HomeSellerpageState extends State<HomeSellerPage> {
-  final int _currentIndex = 0;
+class _HomeSellerPageState extends State<HomeSellerPage> {
+  late int _currentIndex;
+  late List<Widget> _pages;
 
-  // Define a list of pages to navigate to when bottom navigation items are tapped
-  final List<Widget> _pages = [
-    HomeSellerPage(),
-    const SearchPage(),
-    const InboxPage(),
-    const DashboardSellerPage(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+
+    _currentIndex = 0;
+
+    _pages = [
+      HomeSellerPage(user: widget.user),
+      const SearchPage(),
+      const InboxPage(),
+      DashboardSellerPage(user: widget.user),
+    ];
+  }
 
   void _showMessage(String msg) {
     if (mounted) {
-      // Make sure this context is still mounted/exist
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(msg),
@@ -59,63 +67,69 @@ class _HomeSellerpageState extends State<HomeSellerPage> {
             icon: const Icon(Icons.shopping_cart, color: Colors.white),
             onPressed: () {
               Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => const CartPage()));
+                context,
+                MaterialPageRoute(builder: (context) => const CartPage()),
+              );
             },
           ),
           IconButton(
             icon: const Icon(Icons.account_circle, color: Colors.white),
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const DashboardSellerPage()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => DashboardSellerPage(user: widget.user)),
+              );
             },
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Row(
-            children: [
-              const Expanded(
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: "Search for a product",
-                    prefixIcon: Icon(Icons.search),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Row(
+              children: [
+                const Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: "Search for a product",
+                      prefixIcon: Icon(Icons.search),
+                    ),
                   ),
                 ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.filter_list_sharp, color: Colors.blueGrey),
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const FilterPage()));
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          CarouselSlider(
-            options: CarouselOptions(height: 150.0),
-            items: [1, 2, 3, 4, 5].map((i) {
-              return Builder(
-                builder: (BuildContext context) {
-                  return Container(
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .width,
-                    margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                    decoration: const BoxDecoration(color: Colors.pinkAccent),
-                    child: Text('Banner $i', style: const TextStyle(fontSize: 16.0)),
-                  );
-                },
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 10),
-          const CategorySection(),
-          const SizedBox(height: 10),
-          const FeaturedProductsSection(),
-        ],
+                IconButton(
+                  icon: const Icon(Icons.filter_list_sharp, color: Colors.blueGrey),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => FilterPage(user: widget.user)));
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            CarouselSlider(
+              options: CarouselOptions(height: 150.0),
+              items: [1, 2, 3, 4, 5].map((i) {
+                return Builder(
+                  builder: (BuildContext context) {
+                    return Container(
+                      width: MediaQuery.of(context).size.width,
+                      margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                      decoration: const BoxDecoration(color: Colors.pinkAccent),
+                      child: Text('Banner $i', style: const TextStyle(fontSize: 16.0)),
+                    );
+                  },
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 10),
+            const CategorySection(),
+            const SizedBox(height: 10),
+            const FeaturedProductsSection(),
+          ],
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
@@ -123,14 +137,13 @@ class _HomeSellerpageState extends State<HomeSellerPage> {
         unselectedItemColor: Colors.blueGrey,
         currentIndex: _currentIndex,
         onTap: (index) {
-          // Use Navigator to push the respective page onto the navigation stack
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => _pages[index]));
         },
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: "ANJAIABU",
+            label: "Home",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
@@ -151,7 +164,7 @@ class _HomeSellerpageState extends State<HomeSellerPage> {
 }
 
 class CategorySection extends StatelessWidget {
-  const CategorySection({super.key});
+  const CategorySection({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -173,7 +186,7 @@ class CategorySection extends StatelessWidget {
 }
 
 class CategoryItem extends StatelessWidget {
-  const CategoryItem({super.key});
+  const CategoryItem({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -190,7 +203,7 @@ class CategoryItem extends StatelessWidget {
 }
 
 class FeaturedProductsSection extends StatelessWidget {
-  const FeaturedProductsSection({super.key});
+  const FeaturedProductsSection({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -212,7 +225,7 @@ class FeaturedProductsSection extends StatelessWidget {
 }
 
 class ProductCard extends StatelessWidget {
-  const ProductCard({super.key});
+  const ProductCard({Key? key});
 
   @override
   Widget build(BuildContext context) {

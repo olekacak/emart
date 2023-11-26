@@ -1,4 +1,5 @@
 import 'package:emartsystem/Model/UserLoginModel.dart';
+import 'package:emartsystem/Pages/UserSignUp.dart';
 import 'package:flutter/material.dart';
 
 import 'DashboardCustomer.dart';
@@ -65,17 +66,30 @@ class UserLoginPage extends StatelessWidget {
                     String username = usernameController.text;
                     String password = passwordController.text;
 
-                    // Create an instance of UserLoginModel with all required arguments
+                    // Validate that the username and password are not empty
+                    if (username.isEmpty || password.isEmpty) {
+                      // Show an error message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Please enter both username and password.'),
+                        ),
+                      );
+                      return;
+                    }
+
+                    // Create an instance of UserLoginModel with only username and password
                     UserLoginModel user = UserLoginModel(
                       username,
                       password,
-                      'name',
-                      'email',
-                      'phoneNo',
-                      'address',
-                      'sellerAccount',
-                      'status',
-                      'roleId',
+                      '',
+                      '',
+                      '',
+                      '',
+                      '',
+                      '',
+                      '',
+                      '',
+                      '',
                     );
 
                     // Call the saveUser method
@@ -85,24 +99,29 @@ class UserLoginPage extends StatelessWidget {
                       // Check if the user is a seller based on the role or any other criteria
                       if (user.sellerAccount == 'true') {
                         // Navigate to HomeSellerPage
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => HomeSellerPage(),
+                            builder: (context) => HomeSellerPage(user: user),
                           ),
                         );
                       } else {
                         // Navigate to HomeCustomerPage
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => HomeCustomerPage(),
+                            builder: (context) => HomeCustomerPage(user: user),
                           ),
                         );
                       }
                     } else {
                       // Handle unsuccessful login
                       // You can show an error message or take other actions
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Invalid username or password. Please try again.'),
+                        ),
+                      );
                     }
                   },
                   child: Text('Log In'),
@@ -121,7 +140,7 @@ class UserLoginPage extends StatelessWidget {
                     // After clicking, navigate to SignUpPage
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => DashboardCustomerPage()),
+                      MaterialPageRoute(builder: (context) => UserSignUpPage()),
                     );
                   },
                   child: Text('Create Account'),

@@ -8,6 +8,8 @@ class UserSignUpModel {
   String email;
   String phoneNo;
   String address;
+  String birthDate;
+  String gender;
   String status;
   String sellerAccount;
   String roleId;
@@ -19,6 +21,8 @@ class UserSignUpModel {
       this.email,
       this.phoneNo,
       this.address,
+      this.birthDate,
+      this.gender,
       this.status,
       this.sellerAccount,
       this.roleId);
@@ -31,6 +35,8 @@ class UserSignUpModel {
       'email': email,
       'phoneNo': phoneNo,
       'address': address,
+      'birthDate': birthDate,
+      'gender': gender,
       'status': status,
       'sellerAccount': sellerAccount,
       'roleId': roleId,

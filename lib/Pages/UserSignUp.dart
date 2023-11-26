@@ -11,6 +11,10 @@ class UserSignUpPage extends StatelessWidget {
   final emailController = TextEditingController();
   final phoneNoController = TextEditingController();
   final addressController = TextEditingController();
+  final birthYearController = TextEditingController();
+  final birthMonthController = TextEditingController();
+  final birthDayController = TextEditingController();
+  final genderController = TextEditingController();
 
   UserSignUpPage({Key? key}) : super(key: key);
 
@@ -89,6 +93,72 @@ class UserSignUpPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      hint: Text('Year'),
+                      onChanged: (String? newValue) {
+                        birthYearController.text = newValue!;
+                      },
+                      items: List.generate(30, (index) => (2023 - index).toString())
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      hint: Text('Month'),
+                      onChanged: (String? newValue) {
+                        birthMonthController.text = newValue!;
+                      },
+                      items: List.generate(12, (index) => (index + 1).toString())
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      hint: Text('Day'),
+                      onChanged: (String? newValue) {
+                        birthDayController.text = newValue!;
+                      },
+                      items: List.generate(31, (index) => (index + 1).toString())
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: null,
+                hint: Text('Gender'),
+                onChanged: (String? newValue) {
+                  genderController.text = newValue!;
+                },
+                items: <String>['Male', 'Female'].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () async {
                   // Get values from controllers
@@ -98,6 +168,8 @@ class UserSignUpPage extends StatelessWidget {
                   String email = emailController.text;
                   String phoneNo = phoneNoController.text;
                   String address = addressController.text;
+                  String birthDate = '${birthYearController.text}-${birthMonthController.text}-${birthDayController.text}';
+                  String gender = genderController.text;
 
                   // Create an instance of UserSignUpModel
                   UserSignUpModel userSignUpModel = UserSignUpModel(
@@ -107,6 +179,8 @@ class UserSignUpPage extends StatelessWidget {
                     email,
                     phoneNo,
                     address,
+                    birthDate,
+                    gender,
                     '',
                     '',
                     '',

@@ -9,6 +9,8 @@ class UserLoginModel {
   String email;
   String phoneNo;
   String address;
+  String birthDate;
+  String gender;
   String sellerAccount;
   String status;
   String roleId;
@@ -21,6 +23,8 @@ class UserLoginModel {
     this.email,
     this.phoneNo,
     this.address,
+    this.birthDate,
+    this.gender,
     this.sellerAccount,
     this.status,
     this.roleId,
@@ -34,6 +38,8 @@ class UserLoginModel {
       'email': email,
       'phoneNo': phoneNo,
       'address': address,
+      'birthDate': birthDate,
+      'gender': gender,
       'status': status,
       'sellerAccount': sellerAccount,
       'roleId': roleId,
@@ -49,7 +55,8 @@ class UserLoginModel {
     if (userLoginController.status() == 200) {
       if (userLoginController.result()['userId'] != null) {
         sellerAccount = userLoginController.result()['sellerAccount'];
-        print(sellerAccount);
+        name = userLoginController.result()['name'];
+        email = userLoginController.result()['email'];
       }
       return true;
     }

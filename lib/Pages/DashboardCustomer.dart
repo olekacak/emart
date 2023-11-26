@@ -1,186 +1,166 @@
 import 'package:flutter/material.dart';
-
+import '../Model/UserLoginModel.dart';
 import 'Profile.dart';
 import 'UserLogin.dart';
 
-class DashboardCustomerPage extends StatelessWidget {
-  const DashboardCustomerPage({Key? key});
-  // User-provided image URL
+class DashboardCustomerPage extends StatefulWidget {
+  final UserLoginModel user;
+
+  DashboardCustomerPage({required this.user, Key? key}) : super(key: key);
+
+  @override
+  _DashboardCustomerPageState createState() => _DashboardCustomerPageState();
+}
+
+class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
   final String userImageUrl =
       'https://wallpapers.com/images/hd/profile-picture-f67r1m9y562wdtin.jpg';
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Dashboard'),
+    UserLoginModel user = widget.user;
+
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
-        body: SingleChildScrollView(
-          child: Align(
-            alignment: Alignment.topLeft,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundImage: NetworkImage(userImageUrl),
+        title: Text('Dashboard'),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        child: Align(
+          alignment: Alignment.topLeft,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundImage: NetworkImage(userImageUrl),
+                    ),
+                    SizedBox(width: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.user.name ?? 'Loading...',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          widget.user.email ?? 'Loading...',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Container(
+                      width: double.infinity,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => ProfilePage(user: widget.user)),
+                              );
+                            },
+                            child: ListTile(
+                              leading: Icon(Icons.account_circle),
+                              title: Text('My Profile'),
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          ListTile(
+                            leading: Icon(Icons.favorite),
+                            title: Text('Wishlist'),
+                          ),
+                          SizedBox(height: 10),
+                          ListTile(
+                            leading: Icon(Icons.swap_horiz),
+                            title: Text('Start Selling'),
+                          ),
+                        ],
                       ),
-                      SizedBox(width: 16),
-                      Column(
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Container(
+                      width: double.infinity,
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Your Name',
+                            'More information',
                             style: TextStyle(
-                              fontSize: 24,
+                              fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 8),
-                          Text(
-                            'youremail@example.com',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.normal,
+                          SizedBox(height: 16),
+                          Container(
+                            width: double.infinity,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ListTile(
+                                  leading: Icon(Icons.info),
+                                  title: Text('About'),
+                                ),
+                                SizedBox(height: 10),
+                                ListTile(
+                                  leading: Icon(Icons.help),
+                                  title: Text('Help'),
+                                ),
+                                SizedBox(height: 10),
+                                ListTile(
+                                  leading: Icon(Icons.settings),
+                                  title: Text('Setting'),
+                                ),
+                                SizedBox(height: 16),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => UserLoginPage()),
+                                          (route) => false,
+                                    );
+                                  },
+                                  child: Text('Logout'),
+                                ),
+                              ],
                             ),
                           ),
-                          // Add any additional information here
                         ],
                       ),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Container(
-                        width: double.infinity,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const ProfilePage()),
-                                );
-                              },
-                              child: ListTile(
-                                leading: Icon(Icons.account_circle),
-                                title: ElevatedButton(
-                                  onPressed: () {},
-                                  child: Text('My Profile'),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            InkWell(
-                              onTap: () {},
-                              child: ListTile(
-                                leading: Icon(Icons.favorite),
-                                title: ElevatedButton(
-                                  onPressed: () {},
-                                  child: Text('Wishlist'),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            InkWell(
-                              onTap: () {},
-                              child: ListTile(
-                                leading: Icon(Icons.swap_horiz),
-                                title: ElevatedButton(
-                                  onPressed: () {},
-                                  child: Text('Switch Hosting'),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ),
                   ),
-                  SizedBox(height: 20),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Container(
-                        width: double.infinity,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'More information',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 16),
-                            Container(
-                              width: double.infinity,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  InkWell(
-                                    onTap: () {},
-                                    child: ListTile(
-                                      leading: Icon(Icons.info),
-                                      title: ElevatedButton(
-                                        onPressed: () {},
-                                        child: Text('About'),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 10),
-                                  InkWell(
-                                    onTap: () {},
-                                    child: ListTile(
-                                      leading: Icon(Icons.help),
-                                      title: ElevatedButton(
-                                        onPressed: () {},
-                                        child: Text('Help'),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 10),
-                                  InkWell(
-                                    onTap: () {},
-                                    child: ListTile(
-                                      leading: Icon(Icons.settings),
-                                      title: ElevatedButton(
-                                        onPressed: () {},
-                                        child: Text('Setting'),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 16),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      // Logout button, navigate back to the login page
-                                      Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => UserLoginPage()),
-                                            (route) => false, // Remove all existing routes
-                                      );
-                                    },
-                                    child: Text('Logout'),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
