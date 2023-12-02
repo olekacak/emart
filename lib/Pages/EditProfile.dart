@@ -18,27 +18,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController _birthDateController;
   late TextEditingController _genderController;
 
-  // Check for changes method
-  bool hasChanges() {
-    return _nameController.text != widget.user.name ||
-        _emailController.text != widget.user.email ||
-        _phoneNoController.text != widget.user.phoneNo ||
-        _addressController.text != widget.user.address ||
-        _birthDateController.text != widget.user.birthDate ||
-        _genderController.text != widget.user.gender;
-  }
-
-  // Method to update the user object with the latest values
-  void updateUserObject() {
-    widget.user.name = _nameController.text ?? '';
-    widget.user.email = _emailController.text ?? '';
-    widget.user.phoneNo = _phoneNoController.text ?? '';
-    widget.user.address = _addressController.text ?? '';
-    widget.user.birthDate = _birthDateController.text ?? '';
-    widget.user.gender = _genderController.text ?? '';
-  }
-
-
   @override
   void initState() {
     super.initState();
@@ -61,45 +40,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
           IconButton(
             icon: Icon(Icons.save),
             onPressed: () async {
-              print('Save button pressed!');
+              // Update the user object with the latest values
+              updateUserObject();
 
-              // Check for changes before making the update request
-              if (hasChanges()) {
-                print('Changes detected. Updating user...');
+              // Save changes to the database
+              bool success = await widget.user.updateUser();
 
-                // Update the user object with the latest values
-                updateUserObject();
-
-                // Save changes to the database
-                print('Before updating user...');
-                print('Request JSON: ${widget.user.toJson()}');
-
-                bool success = await widget.user.updateUser();
-
-                if (success) {
-                  // Update the SnackBar content to show the success message
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Profile updated successfully.'),
-                    ),
-                  );
-
-                  // Show log to verify success message
-                  print('After updating user, success: $success');
-
-                  // Navigate back after showing the success message
-                  Navigator.pop(context);
-                } else {
-                  // Show an error message
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Failed to update profile. Please try again.'),
-                    ),
-                  );
-                }
+              if (success) {
+                _showMessage("Profile updated successfully.");
               } else {
-                // No changes, display a message or handle accordingly
-                print('No changes detected. Update not performed.');
+                _showMessage("Failed to update profile. Please try again.");
               }
             },
           ),
@@ -108,8 +58,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // ... other widgets ...
-
             buildTextFormField(controller: _nameController, label: 'Name'),
             buildTextFormField(controller: _emailController, label: 'Email'),
             buildTextFormField(controller: _phoneNoController, label: 'Phone Number'),
@@ -141,13 +89,33 @@ class _EditProfilePageState extends State<EditProfilePage> {
           ),
         ),
         onChanged: (value) {
-          // Update the controller as the user types
-          setState(() {
-            controller.text = value;
-          });
+          // No need to update the controller as the user types
+          // The controller will be automatically updated by the TextFormField
         },
       ),
     );
+  }
+
+  // Method to update the user object with the latest values
+  void updateUserObject() {
+    widget.user.name = _nameController.text ?? '';
+    widget.user.email = _emailController.text ?? '';
+    widget.user.phoneNo = _phoneNoController.text ?? '';
+    widget.user.address = _addressController.text ?? '';
+    widget.user.birthDate = _birthDateController.text ?? '';
+    widget.user.gender = _genderController.text ?? '';
+  }
+
+
+  void _showMessage(String msg) {
+    if (mounted) {
+      // Make sure this context is still mounted/exist
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(msg),
+        ),
+      );
+    }
   }
 
   @override

@@ -4,7 +4,14 @@ import 'package:flutter/material.dart';
 import '../Model/UserSignUpModel.dart';
 import 'UserLogin.dart';
 
-class UserSignUpPage extends StatelessWidget {
+class UserSignUpPage extends StatefulWidget {
+  UserSignUpPage({Key? key}) : super(key: key);
+
+  @override
+  _UserSignUpPageState createState() => _UserSignUpPageState();
+}
+
+class _UserSignUpPageState extends State<UserSignUpPage> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   final nameController = TextEditingController();
@@ -15,8 +22,6 @@ class UserSignUpPage extends StatelessWidget {
   final birthMonthController = TextEditingController();
   final birthDayController = TextEditingController();
   final genderController = TextEditingController();
-
-  UserSignUpPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -99,9 +104,12 @@ class UserSignUpPage extends StatelessWidget {
                     child: DropdownButtonFormField<String>(
                       hint: Text('Year'),
                       onChanged: (String? newValue) {
-                        birthYearController.text = newValue!;
+                        setState(() {
+                          birthYearController.text = newValue!;
+                        });
                       },
-                      items: List.generate(30, (index) => (2023 - index).toString())
+                      items: List.generate(
+                              30, (index) => (2023 - index).toString())
                           .map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
@@ -115,10 +123,13 @@ class UserSignUpPage extends StatelessWidget {
                     child: DropdownButtonFormField<String>(
                       hint: Text('Month'),
                       onChanged: (String? newValue) {
-                        birthMonthController.text = newValue!;
+                        setState(() {
+                          birthMonthController.text = newValue!;
+                        });
                       },
-                      items: List.generate(12, (index) => (index + 1).toString())
-                          .map<DropdownMenuItem<String>>((String value) {
+                      items:
+                          List.generate(12, (index) => (index + 1).toString())
+                              .map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),
@@ -131,10 +142,13 @@ class UserSignUpPage extends StatelessWidget {
                     child: DropdownButtonFormField<String>(
                       hint: Text('Day'),
                       onChanged: (String? newValue) {
-                        birthDayController.text = newValue!;
+                        setState(() {
+                          birthDayController.text = newValue!;
+                        });
                       },
-                      items: List.generate(31, (index) => (index + 1).toString())
-                          .map<DropdownMenuItem<String>>((String value) {
+                      items:
+                          List.generate(31, (index) => (index + 1).toString())
+                              .map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),
@@ -149,9 +163,12 @@ class UserSignUpPage extends StatelessWidget {
                 value: null,
                 hint: Text('Gender'),
                 onChanged: (String? newValue) {
-                  genderController.text = newValue!;
+                  setState(() {
+                    genderController.text = newValue!;
+                  });
                 },
-                items: <String>['Male', 'Female'].map<DropdownMenuItem<String>>((String value) {
+                items: <String>['Male', 'Female']
+                    .map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
@@ -168,44 +185,46 @@ class UserSignUpPage extends StatelessWidget {
                   String email = emailController.text;
                   String phoneNo = phoneNoController.text;
                   String address = addressController.text;
-                  String birthDate = '${birthYearController.text}-${birthMonthController.text}-${birthDayController.text}';
+                  String birthDate =
+                      '${birthYearController.text}-${birthMonthController.text}-${birthDayController.text}';
                   String gender = genderController.text;
 
                   // Create an instance of UserSignUpModel
-                  UserSignUpModel userSignUpModel = UserSignUpModel(
-                    username,
-                    password,
-                    name,
-                    email,
-                    phoneNo,
-                    address,
-                    birthDate,
-                    gender,
-                    '',
-                    '',
-                    '',
+                  UserSignUpModel user = UserSignUpModel(
+                    username: username,
+                    password: password,
+                    name: name,
+                    email: email,
+                    phoneNo: phoneNo,
+                    address: address,
+                    birthDate: birthDate,
+                    gender: gender,
+                    status: '',
+                    sellerAccount: '',
+                    roleId: '',
                   );
 
                   try {
                     // Call the saveUserSignUp method to send data to the server
-                    bool signUpResult = await userSignUpModel.saveUserSignUp();
+                    int signUpResult = await user.saveUserSignUp();
 
-                    if (signUpResult) {
-                      // If sign up is successful, show a success message
+                    if (signUpResult == 0) {
+                      // Successful signup
                       showDialog(
                         context: context,
                         builder: (context) {
                           return AlertDialog(
-                            title: const Text('Successful Sign Up'),
-                            content: const Text('You have successfully signed up.'),
+                            title: Text('Successful Sign Up'),
+                            content: Text('You have successfully signed up.'),
                             actions: [
                               TextButton(
-                                child: const Text('OK'),
+                                child: Text('OK'),
                                 onPressed: () {
                                   // Navigate to the login page
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => UserLoginPage()),
+                                    MaterialPageRoute(
+                                        builder: (context) => UserLoginPage()),
                                   );
                                 },
                               ),
@@ -213,17 +232,58 @@ class UserSignUpPage extends StatelessWidget {
                           );
                         },
                       );
-                    } else {
-                      // If sign up fails, show an error message
+                    } else if (signUpResult == 1) {
+                      // Username already in use
                       showDialog(
                         context: context,
                         builder: (context) {
                           return AlertDialog(
-                            title: const Text('Sign Up Failed'),
-                            content: const Text('Failed to sign up. Please try again.'),
+                            title: Text('Username Exists'),
+                            content: Text(
+                                'The username already exists. Please choose another one.'),
                             actions: [
                               TextButton(
-                                child: const Text('OK'),
+                                child: Text('OK'),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    } else if (signUpResult == 2) {
+                      // Email already in use
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text('Email Exists'),
+                            content: Text(
+                                'The email already exists. Please use another one.'),
+                            actions: [
+                              TextButton(
+                                child: Text('OK'),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    } else {
+                      // Other errors
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text('Sign Up Failed'),
+                            content:
+                                Text('Failed to sign up. Please try again.'),
+                            actions: [
+                              TextButton(
+                                child: Text('OK'),
                                 onPressed: () {
                                   Navigator.pop(context);
                                 },
@@ -239,11 +299,12 @@ class UserSignUpPage extends StatelessWidget {
                       context: context,
                       builder: (context) {
                         return AlertDialog(
-                          title: const Text('Server Error'),
-                          content: const Text('There was an error connecting to the server.'),
+                          title: Text('Server Error'),
+                          content: Text(
+                              'There was an error connecting to the server.'),
                           actions: [
                             TextButton(
-                              child: const Text('OK'),
+                              child: Text('OK'),
                               onPressed: () {
                                 Navigator.pop(context);
                               },
@@ -254,7 +315,7 @@ class UserSignUpPage extends StatelessWidget {
                     );
                   }
                 },
-                child: const Text('Sign Up'),
+                child: Text('Sign Up'),
               ),
               const SizedBox(height: 16),
               Center(
@@ -277,7 +338,8 @@ class UserSignUpPage extends StatelessWidget {
                             // Navigate to the LoginPage when 'Log in' is tapped
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => UserLoginPage()),
+                              MaterialPageRoute(
+                                  builder: (context) => UserLoginPage()),
                             );
                           },
                       ),

@@ -145,8 +145,7 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                                   onPressed: () {
                                     Navigator.pushAndRemoveUntil(
                                       context,
-                                      MaterialPageRoute(
-                                          builder: (context) => UserLoginPage()),
+                                      MaterialPageRoute(builder: (context) => UserLoginPage()),
                                           (route) => false,
                                     );
                                   },

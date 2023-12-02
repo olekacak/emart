@@ -146,8 +146,7 @@ class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
                                   onPressed: () {
                                     Navigator.pushAndRemoveUntil(
                                       context,
-                                      MaterialPageRoute(
-                                          builder: (context) => UserLoginPage()),
+                                      MaterialPageRoute(builder: (context) => UserLoginPage()),
                                           (route) => false,
                                     );
                                   },
