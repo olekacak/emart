@@ -1,6 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-
+import 'package:hovering/hovering.dart';
 import '../Model/UserSignUpModel.dart';
 import 'UserLogin.dart';
 
@@ -22,6 +22,29 @@ class _UserSignUpPageState extends State<UserSignUpPage> {
   final birthMonthController = TextEditingController();
   final birthDayController = TextEditingController();
   final genderController = TextEditingController();
+
+  String? errorText;
+
+  // Validate password
+  String? validatePassword(String password) {
+    if (password.length < 8) {
+      return 'Password must be at least 8 characters long';
+    }
+
+    // Check for a mix of special characters, numbers, and uppercase and lowercase letters
+    RegExp regex = RegExp(r'^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
+    if (!regex.hasMatch(password)) {
+      return '''
+      Minimum length of 8 characters.
+      At least one uppercase letter.
+      At least one lowercase letter.
+      At least one digit.
+      At least one special character (!@#\$&*~).
+      ''';
+    }
+
+    return ''; // Return null if the password is valid
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,12 +80,17 @@ class _UserSignUpPageState extends State<UserSignUpPage> {
                 ),
               ),
               const SizedBox(height: 16),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  hintText: 'Enter minimum 8 characters',
+              Tooltip(
+                message: validatePassword(passwordController.text) ?? '',
+                child: TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    hintText: 'Enter minimum 8 characters',
+                    errorText: errorText,
+                    errorMaxLines: 5,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -185,9 +213,10 @@ class _UserSignUpPageState extends State<UserSignUpPage> {
                   String email = emailController.text;
                   String phoneNo = phoneNoController.text;
                   String address = addressController.text;
-                  String birthDate =
-                      '${birthYearController.text}-${birthMonthController.text}-${birthDayController.text}';
+                  String birthDate = '${birthYearController.text}-${birthMonthController.text}-${birthDayController.text}';
                   String gender = genderController.text;
+
+                  String? passwordError = validatePassword(passwordController.text);
 
                   // Create an instance of UserSignUpModel
                   UserSignUpModel user = UserSignUpModel(
@@ -203,6 +232,14 @@ class _UserSignUpPageState extends State<UserSignUpPage> {
                     sellerAccount: '',
                     roleId: '',
                   );
+
+                  if (passwordError != null && passwordError.isNotEmpty) {
+                    // Display the password error
+                    setState(() {
+                      errorText = passwordError;
+                    });
+                    return;
+                  }
 
                   try {
                     // Call the saveUserSignUp method to send data to the server
