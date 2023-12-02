@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import '../Model/UserLoginModel.dart';
 import 'Profile.dart';
@@ -13,8 +16,6 @@ class DashboardCustomerPage extends StatefulWidget {
 }
 
 class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
-  final String userImageUrl =
-      'https://wallpapers.com/images/hd/profile-picture-f67r1m9y562wdtin.jpg';
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +45,9 @@ class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
                   children: [
                     CircleAvatar(
                       radius: 50,
-                      backgroundImage: NetworkImage(userImageUrl),
+                      backgroundImage: widget.user.image != null
+                          ? MemoryImage(base64Decode(widget.user.image!))
+                          : null,
                     ),
                     SizedBox(width: 16),
                     Column(

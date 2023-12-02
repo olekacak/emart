@@ -12,7 +12,7 @@ class UserLoginController{
   dynamic _resultData;
 
   UserLoginController({required this.path, this.server =
-  "http://192.168.0.121"});
+  "http://10.132.6.160"});
   setBody(Map<String, dynamic> data){
     _body.clear();
     _body.addAll(data);

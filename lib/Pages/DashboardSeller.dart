@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../Model/UserLoginModel.dart';
 import 'Profile.dart';
@@ -43,7 +45,9 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                   children: [
                     CircleAvatar(
                       radius: 50,
-                      backgroundImage: NetworkImage(userImageUrl),
+                      backgroundImage: widget.user.image != null
+                          ? MemoryImage(base64Decode(widget.user.image!))
+                          : null,
                     ),
                     SizedBox(width: 16),
                     Column(

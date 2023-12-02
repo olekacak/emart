@@ -1,7 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'EditProfile.dart';
 import '../Model/UserLoginModel.dart';
-import 'DashboardCustomer.dart';
 
 class ProfilePage extends StatefulWidget {
   final UserLoginModel user;
@@ -13,11 +13,9 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+
   @override
   Widget build(BuildContext context) {
-
-    UserLoginModel user = widget.user;
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
@@ -29,73 +27,78 @@ class _ProfilePageState extends State<ProfilePage> {
           },
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundImage: NetworkImage(
-                    'https://wallpapers.com/images/hd/profile-picture-f67r1m9y562wdtin.jpg',
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundImage: widget.user.image != null
+                        ? MemoryImage(base64Decode(widget.user.image!))
+                        : null,
                   ),
-                ),
-                SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.user.name ?? 'Name',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                  SizedBox(width: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.user.name ?? 'Name',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    Text(
-                      widget.user.email ?? 'user@email.com',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
+                      Text(
+                        widget.user.email ?? 'user@email.com',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => EditProfilePage(user: widget.user)),
-                        );
-                      },
-                      child: Text('Edit Profile'),
-                    ),
-                  ],
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EditProfilePage(user: widget.user),
+                            ),
+                          );
+                        },
+                        child: Text('Edit Profile'),
+                      ),
+
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
+              Card(
+                child: ListTile(
+                  title: Text(widget.user.phoneNo),
                 ),
-              ],
-            ),
-            SizedBox(height: 20),
-            Card(
-              child: ListTile(
-                title: Text(widget.user.phoneNo),
               ),
-            ),
-            Card(
-              child: ListTile(
-                title: Text(widget.user.address),
+              Card(
+                child: ListTile(
+                  title: Text(widget.user.address),
+                ),
               ),
-            ),
-            Card(
-              child: ListTile(
-                title: Text(widget.user.birthDate),
+              Card(
+                child: ListTile(
+                  title: Text(widget.user.birthDate),
+                ),
               ),
-            ),
-            Card(
-              child: ListTile(
-                title: Text(widget.user.gender),
+              Card(
+                child: ListTile(
+                  title: Text(widget.user.gender),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
