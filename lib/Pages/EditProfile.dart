@@ -20,7 +20,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController _addressController;
   late TextEditingController _birthDateController;
   late TextEditingController _genderController;
-  Uint8List? selectedImage;
   String base64String = '';
 
   @override

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:emartsystem/Pages/MyShop.dart';
 import 'package:flutter/material.dart';
 import '../Model/UserLoginModel.dart';
 import 'Profile.dart';
@@ -15,12 +16,8 @@ class DashboardSellerPage extends StatefulWidget {
 }
 
 class _DashboardSellerPageState extends State<DashboardSellerPage> {
-  final String userImageUrl =
-      'https://wallpapers.com/images/hd/profile-picture-f67r1m9y562wdtin.jpg';
-
   @override
   Widget build(BuildContext context) {
-    UserLoginModel user = widget.user;
 
     return Scaffold(
       appBar: AppBar(
@@ -100,6 +97,12 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                           ),
                           SizedBox(height: 10),
                           ListTile(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => MyShopPage(user: widget.user)),
+                              );
+                            },
                             leading: Icon(Icons.swap_horiz),
                             title: Text('Switch Hosting'),
                           ),
@@ -108,6 +111,7 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                     ),
                   ),
                 ),
+                SizedBox(height: 20),
                 SizedBox(height: 20),
                 Card(
                   child: Padding(

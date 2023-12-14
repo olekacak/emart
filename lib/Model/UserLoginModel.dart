@@ -33,25 +33,12 @@ class UserLoginModel {
 
   // Json method
   Map<String, dynamic> toJson() {
-    print('Image before encoding: $image');
     return {
-      'adminId': adminId,
-      'userId': userId,
       'username': username,
       'password': password,
-      'name': name,
-      'email': email,
-      'phoneNo': phoneNo,
-      'address': address,
-      'birthDate': birthDate,
-      'gender': gender,
-      'status': status,
-      'sellerAccount': sellerAccount,
-      'image': image,
     };
   }
 
-  // Constructor for creating an instance from JSON
   UserLoginModel.fromJson(Map<String, dynamic> json)
       : adminId = json['adminId'] as int? ?? 0,
         userId = json['userId'] as int? ?? 0,
@@ -73,7 +60,7 @@ class UserLoginModel {
     userLoginController.setBody(toJson());
     await userLoginController.postUserLogin();
     if (userLoginController.status() == 200) {
-      Map<String, dynamic> result = userLoginController.result();
+        Map<String, dynamic> result = await userLoginController.result();
 
       if (result.containsKey('adminId')) {
         userId = result['adminId'];
