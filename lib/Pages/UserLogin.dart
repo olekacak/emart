@@ -1,5 +1,5 @@
 import 'dart:typed_data';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:emartsystem/Model/UserLoginModel.dart';
 import 'package:emartsystem/Pages/UserSignUp.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +33,7 @@ class _UserLoginPageState extends State<UserLoginPage> {
       appBar: AppBar(
         title: Center(
           child: Text(
-            "Log In",
+            "Welcome Back",
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
         ),
@@ -46,10 +46,25 @@ class _UserLoginPageState extends State<UserLoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.lock,
-                  size: 100,
-                  color: Colors.deepPurple,
+                Container(
+                  width: 200,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: ClipOval(
+                    child: Image.asset(
+                      'assets/logo.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
                 SizedBox(height: 16),
                 TextField(
