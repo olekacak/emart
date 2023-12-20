@@ -31,7 +31,7 @@ class _MyShopPageState extends State<MyShopPage>
   }
 
   _loadProducts() async {
-    List<ProductModel> loadedProducts = await ProductModel.loadAll();
+    List<ProductModel> loadedProducts = await ProductModel.loadAll(category: '');
     setState(() {
       products = loadedProducts;
     });

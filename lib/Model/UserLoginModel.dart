@@ -34,8 +34,17 @@ class UserLoginModel {
   // Json method
   Map<String, dynamic> toJson() {
     return {
+      'userId': userId,
       'username': username,
       'password': password,
+      'name': name,
+      'email': email,
+      'phoneNo': phoneNo,
+      'address': address,
+      'birthDate': birthDate,
+      'gender': gender,
+      'image': image,
+
     };
   }
 

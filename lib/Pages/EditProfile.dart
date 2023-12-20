@@ -84,27 +84,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Edit Profile'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.save),
-            onPressed: () async {
-              // Update the user object with the latest values
-              updateUserObject();
-
-              // Save changes to the database
-              bool success = await widget.user.updateUser();
-
-              if (success) {
-                _showMessage("Profile updated successfully.");
-
-                Navigator.pop(context,);
-              } else {
-                _showMessage("Failed to update profile. Please try again.");
-              }
-            },
-
-          ),
-        ],
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -118,6 +98,28 @@ class _EditProfilePageState extends State<EditProfilePage> {
             buildTextFormField(controller: _birthDateController, label: 'Birth Date'),
             buildTextFormField(controller: _genderController, label: 'Gender'),
           ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: ElevatedButton(
+          onPressed: () async {
+            // Update the user object with the latest values
+            updateUserObject();
+
+            // Save changes to the database
+            bool success = await widget.user.updateUser();
+
+            if (success) {
+              _showMessage("Profile updated successfully.");
+              Navigator.pop(context);
+            } else {
+              _showMessage("Failed to update profile. Please try again.");
+            }
+          },
+          child: Text(
+            'Save',
+            style: TextStyle(fontSize: 16), // Set the text style
+          ),
         ),
       ),
     );
@@ -140,7 +142,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ],
     );
   }
-
 
   Widget buildTextFormField({
     required TextEditingController controller,

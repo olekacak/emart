@@ -23,8 +23,8 @@
       required this.address,
       required this.birthDate,
       required this.gender,
-      required this.status,
-      required this.sellerAccount,
+      this.sellerAccount = 'false',
+      this.status = 'active',
       required this.roleId});
 
     Map<String, dynamic> toJson() {

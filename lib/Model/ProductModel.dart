@@ -46,7 +46,7 @@ class ProductModel {
     };
   }
 
-  static Future<List<ProductModel>> loadAll() async {
+  static Future<List<ProductModel>> loadAll({required String category}) async {
     List<ProductModel> result = [];
     ProductController productController = ProductController(path: "/api/workshop2/product.php");
     await productController.get();
