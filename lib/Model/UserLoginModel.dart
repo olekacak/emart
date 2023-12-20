@@ -43,6 +43,7 @@ class UserLoginModel {
       'address': address,
       'birthDate': birthDate,
       'gender': gender,
+      'sellerAccount' : sellerAccount,
       'image': image,
 
     };
@@ -113,13 +114,13 @@ class UserLoginModel {
       Map<String, dynamic> result = userLoginController.result();
       if (result.containsKey('message') && result['message'] == 'User information updated successfully') {
         userId = result['userId'] as int?;
-        sellerAccount = result['sellerAccount'] as String? ?? '';
         name = result['name'] as String? ?? '';
         email = result['email'] as String? ?? '';
         phoneNo = result['phoneNo'] as String? ?? '';
         address = result['address'] as String? ?? '';
         birthDate = result['birthDate'] as String? ?? '';
         gender = result['gender'] as String? ?? '';
+        sellerAccount = result['sellerAccount'] as String? ?? '';
         image = result['image'];
 
         return true;
@@ -131,6 +132,24 @@ class UserLoginModel {
     return false;
   }
 
+  Future<bool> deleteUser() async {
+    if (userId == null) {
+      // Cannot delete an expense without an ID
+      return false;
+    }
+
+    UserLoginController userLoginController = UserLoginController(path: "/api/workshop2/user_login.php");
+    userLoginController.setBody(toJson());
+
+    await userLoginController.delete();
+
+    if (userLoginController.status() == 200) {
+      return true;
+    } else {
+      // Print the error message in case of failure
+      print('Delete failed. Error: ${userLoginController.result()}');
+      return false;
+    }
+  }
+
 }
-
-

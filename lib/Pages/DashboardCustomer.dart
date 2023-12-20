@@ -4,16 +4,51 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../Model/UserLoginModel.dart';
 import 'Profile.dart';
+import 'Setting.dart';
 import 'UserLogin.dart';
 
 class DashboardCustomerPage extends StatefulWidget {
   final UserLoginModel user;
-
   DashboardCustomerPage({required this.user, Key? key}) : super(key: key);
 
   @override
   _DashboardCustomerPageState createState() => _DashboardCustomerPageState();
 }
+
+class RegisterSeller extends StatelessWidget {
+  final UserLoginModel user;
+
+  RegisterSeller({required this.user});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text("Register as Seller"),
+      content: Text("Do you want to register as a seller?"),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () {
+            print("Current sellerAccount value: ${user.sellerAccount}");
+            user.sellerAccount = "true";
+            print("New sellerAccount value: ${user.sellerAccount}");
+            user.updateUser();
+            Navigator.of(context).pop();
+          },
+          child: Text("Yes"),
+        ),
+        TextButton(
+          onPressed: () {
+            // Handle the "No" button press here.
+            // You can simply close the dialog in this case.
+            Navigator.of(context).pop(); // Close the dialog
+          },
+          child: Text("No"),
+        ),
+      ],
+    );
+  }
+}
+
 
 class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
 
@@ -102,6 +137,15 @@ class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
                           ListTile(
                             leading: Icon(Icons.swap_horiz),
                             title: Text('Start Selling'),
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  // Return the RegisterAsSellerDialog widget here
+                                  return RegisterSeller(user: widget.user);
+                                },
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -141,6 +185,12 @@ class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
                                 ),
                                 SizedBox(height: 10),
                                 ListTile(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => SettingPage(user: widget.user)),
+                                    );
+                                  },
                                   leading: Icon(Icons.settings),
                                   title: Text('Setting'),
                                 ),

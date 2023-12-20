@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:emartsystem/Pages/MyShop.dart';
+import 'package:emartsystem/Pages/Setting.dart';
 import 'package:flutter/material.dart';
 import '../Model/UserLoginModel.dart';
 import 'MyShop.dart';
@@ -146,6 +147,12 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                                 ),
                                 SizedBox(height: 10),
                                 ListTile(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => SettingPage(user: widget.user)),
+                                    );
+                                  },
                                   leading: Icon(Icons.settings),
                                   title: Text('Setting'),
                                 ),
