@@ -62,99 +62,114 @@ class _MyShopPageState extends State<MyShopPage>
       appBar: AppBar(
         title: Text('My Shop'),
       ),
-      body: Column(
-        children: <Widget>[
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            elevation: 5.0,
-            margin: EdgeInsets.symmetric(vertical: 8.0),
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.grey[200],
-                    backgroundImage: widget.user.image != null
-                        ? MemoryImage(base64Decode(widget.user.image!))
-                        : null,
-                  ),
-                  SizedBox(width: 16.0),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Seller: ${widget.user.username}',
-                          style: TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
               ),
-            ),
-          ),
-          SizedBox(height: 16.0),
-          Container(
-            child: TabBar(
-              controller: _tabController,
-              tabs: [
-                Tab(text: 'Listing'),
-                Tab(text: 'Review'),
-              ],
-            ),
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, // Number of columns in the grid
-                    crossAxisSpacing: 8.0, // Spacing between columns
-                    mainAxisSpacing: 8.0, // Spacing between rows
-                  ),
-                  itemCount: products.length,
-                  itemBuilder: (context, index) {
-                    ProductModel product = products[index];
-                    // Ensure the Base64 string is a multiple of 4 in length
-                    String base64Image = product.image!;
-                    if (base64Image.length % 4 != 0) {
-                      base64Image = base64Image.padRight(base64Image.length + 4 - base64Image.length % 4, '=');
-                    }
-                    // Decode the Base64 string to bytes
-                    Uint8List imageBytes = base64.decode(base64Image);
-                    return Card(
+              elevation: 5.0,
+              margin: EdgeInsets.symmetric(vertical: 8.0),
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundColor: Colors.grey[200],
+                      backgroundImage: widget.user.image != null
+                          ? MemoryImage(base64Decode(widget.user.image!))
+                          : null,
+                    ),
+                    SizedBox(width: 16.0),
+                    Expanded(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          Image.memory(imageBytes, fit: BoxFit.cover), // Product image
-                          Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text(product.productName), // Product name
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Text('\RM ${product.price}'), // Product price
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Seller: ${widget.user.username}',
+                            style: TextStyle(
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ],
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
-                // Content for Review Tab
-                Center(child: Text('Content for Review Tab')),
-              ],
+              ),
             ),
-          ),
-        ],
+            SizedBox(height: 16.0),
+            Container(
+              child: TabBar(
+                controller: _tabController,
+                tabs: [
+                  Tab(text: 'Listing'),
+                  Tab(text: 'Review'),
+                ],
+              ),
+            ),
+            // Removed Expanded around TabBarView
+            Container(
+              height: 500, // Set a fixed height or calculate dynamically
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  GridView.builder(
+                    // Ensure you have enough space for GridView
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(), // Since it's inside SingleChildScrollView
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 8.0,
+                      mainAxisSpacing: 8.0,
+                    ),
+                    itemCount: products.length,
+                    itemBuilder: (context, index) {
+                      ProductModel product = products[index];
+                      Uint8List? imageBytes;
+                      try {
+                        String base64Image = product.image!;
+                        base64Image = base64Image.padRight((base64Image.length + 3) & ~3, '=');
+                        imageBytes = base64.decode(base64Image);
+                      } catch (e) {
+                        print('Error decoding Base64 string: $e');
+                        // Optionally set imageBytes to a placeholder image
+                      }
+
+                      return Card(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            Expanded(
+                              child: (imageBytes != null) ? Image.memory(imageBytes, fit: BoxFit.cover) : Container(),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                product.productName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Text('\RM ${product.price}'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  Center(child: Text('Content for Review Tab')),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
