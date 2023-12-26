@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:emartsystem/Pages/AddProductPage.dart';
+import 'package:emartsystem/Pages/ProductDetailSeller.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import '../Model/ProductModel.dart';
 import '../Model/UserLoginModel.dart';
 
@@ -140,7 +140,17 @@ class _MyShopPageState extends State<MyShopPage>
                         // Optionally set imageBytes to a placeholder image
                       }
 
-                      return Card(
+                      return GestureDetector(
+                          onTap: () {
+                        // Navigate to ProductDetailSellerPage when a product is clicked
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProductDetailSellerPage(product: product, user: widget.user), // Pass the selected product
+                          ),
+                        );
+                      },
+                      child: Card(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: <Widget>[
@@ -161,6 +171,7 @@ class _MyShopPageState extends State<MyShopPage>
                             ),
                           ],
                         ),
+                      )
                       );
                     },
                   ),

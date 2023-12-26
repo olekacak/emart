@@ -44,6 +44,14 @@ class ProductController{
     _parseResult();
   }
 
+  Future<void> delete() async {
+    _res = await http.delete(
+      Uri.parse(server + path),
+      headers: _headers,
+      body: jsonEncode(_body),
+    );
+    _parseResult();
+  }
 
   void _parseResult(){
     // parse result into json structure if possible

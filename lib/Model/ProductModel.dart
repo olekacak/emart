@@ -79,10 +79,43 @@ class ProductModel {
     ProductController productController = ProductController(path: "/api/workshop2/product.php");
     productController.setBody(toJson());
     await productController.put();
+
     if (productController.status() == 200) {
       Map<String, dynamic> result = productController.result();
-      return true;
+      if (result.containsKey('message') && result['message'] == 'Product information updated successfully') {
+        productId = result['productId'] as int?;
+        productName = result['productName'] as String? ?? '';
+        description = result['description'] as String? ?? '';
+        price = (result['price'] as num?)?.toDouble() ?? 0.0;
+        category = result['category'] as String? ?? '';
+        stockQuantity = result['stockQuantity'] as String? ?? '';
+        image = result['image'] as String? ?? '';
+
+        return true;
+      }
     }
     return false;
   }
+
+  Future<bool> deleteProduct() async {
+    if (productId == null) {
+      // Cannot delete a product without an ID
+      return false;
+    }
+
+    ProductController productController = ProductController(path: "/api/workshop2/product.php");
+    // Set the necessary body or parameters for deletion. Often, this is just the ID.
+    productController.setBody({'productId': productId});
+
+    await productController.delete();
+
+    if (productController.status() == 200) {
+      return true;
+    } else {
+      // Print the error message in case of failure
+      print('Delete failed. Error: ${productController.result()}');
+      return false;
+    }
+  }
+
 }

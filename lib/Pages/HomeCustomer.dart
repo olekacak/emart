@@ -8,7 +8,6 @@ import 'Cart.dart';
 import 'DashboardCustomer.dart';
 import 'Filter.dart';
 import 'Inbox.dart';
-import 'Product.dart';
 import 'ProductDetails.dart';
 import 'Search.dart';
 
