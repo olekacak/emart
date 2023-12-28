@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import '../Controller/Stripe/StripeController.dart';
 import '../Model/CartModel.dart';
+import '../Model/Stripe/StripeModel.dart';
+import '../Model/Transaction/TransactionModel.dart';
 import '../Model/UserLoginModel.dart';
 
 class CartPage extends StatefulWidget {
@@ -15,11 +18,25 @@ class _CartPageState extends State<CartPage> {
   List<CartModel> cartItems = [];
   String checkoutButtonText = 'Checkout';
   double totalPrice = 0; // Store the total price here
+  final StripeModel stripeModel = StripeModel();
+  final StripeController stripeController = StripeController();
+  Map<String, dynamic>? paymentIntent;
 
   @override
   void initState() {
     super.initState();
     _loadCartItems();
+  }
+
+  Future<void> makePayment() async {
+    try {
+      int totalPriceStripe = (totalPrice * 100).toInt();
+      paymentIntent = await stripeModel.createPaymentIntent(totalPriceStripe.toString(), 'MYR');
+      await stripeController.initializePaymentSheet(paymentIntent!);
+      await stripeController.displayPaymentSheet();
+    } catch (err) {
+      print(err);
+    }
   }
 
   void _loadCartItems() async {
@@ -30,6 +47,37 @@ class _CartPageState extends State<CartPage> {
         cartItems = items;
         checkoutButtonText = 'Checkout RM${totalPrice.toStringAsFixed(2)}';
       });
+    } catch (error) {
+      print("Error: $error");
+    }
+  }
+
+  void _handleCheckout() async {
+    try {
+
+      await makePayment();
+
+      // Get the current date as a string
+      final DateTime now = DateTime.now();
+      final String formattedDate = "${now.year}-${now.month}-${now.day}";
+
+      // Create a new TransactionModel object
+      TransactionModel transaction = TransactionModel(
+        transactionId: 0,
+        transactionDate: formattedDate,
+        status: "Completed",
+        deliveryStatus: "Pending",
+        cartId: 0, // You may need to set this value appropriately based on your data
+      );
+
+      // Save the transaction data
+      bool success = await transaction.saveTransaction();
+
+      if (success) {
+        // Transaction saved successfully, you can show a success message or navigate to a confirmation page.
+      } else {
+        // Transaction failed to save, you can show an error message.
+      }
     } catch (error) {
       print("Error: $error");
     }
@@ -153,9 +201,7 @@ class _CartPageState extends State<CartPage> {
             padding: EdgeInsets.all(10),
             color: Colors.white,
             child: ElevatedButton(
-              onPressed: () {
-                // Implement checkout functionality here
-              },
+              onPressed: _handleCheckout, // Call the checkout function
               child: Text(checkoutButtonText),
             ),
           ),
