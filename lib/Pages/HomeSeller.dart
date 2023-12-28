@@ -69,7 +69,7 @@ class _HomeSellerPageState extends State<HomeSellerPage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const CartPage()),
+                MaterialPageRoute(builder: (context) => CartPage(user: widget.user)),
               );
             },
           ),
