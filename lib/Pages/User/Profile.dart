@@ -1,18 +1,40 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'EditProfile.dart';
-import '../Model/UserLoginModel.dart';
+import '../../Model/UserLoginModel.dart';
 
 class ProfilePage extends StatefulWidget {
-  final UserLoginModel user;
+  UserLoginModel user;
 
-  const ProfilePage({Key? key, required this.user}) : super(key: key);
+   ProfilePage({Key? key, required this.user}) : super(key: key);
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  late UserLoginModel loadUserData; // Declare a local variable
+
+
+  @override
+  void initState() {
+    super.initState();
+    loadUser();
+  }
+
+  void loadUser() async {
+    await widget.user.loadByUserId();
+    setState(() {
+      loadUserData = widget.user;
+      print(widget.user.userId);
+    });
+  }
+
+  @override
+  void dispose() {
+    widget.user;
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,17 +83,19 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       SizedBox(height: 20),
                       ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
+                        onPressed: () async {
+                          final result = await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => EditProfilePage(user: widget.user),
                             ),
                           );
+                          if (result == true) {
+                            loadUser();
+                          }
                         },
                         child: Text('Edit Profile'),
                       ),
-
                     ],
                   ),
                 ],

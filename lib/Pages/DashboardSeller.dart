@@ -1,12 +1,11 @@
 import 'dart:convert';
 
-import 'package:emartsystem/Pages/MyShop.dart';
-import 'package:emartsystem/Pages/Setting.dart';
+import 'package:emartsystem/Pages/Cart%20and%20Product/MyShop.dart';
+import 'package:emartsystem/Pages/User/Setting.dart';
 import 'package:flutter/material.dart';
 import '../Model/UserLoginModel.dart';
-import 'MyShop.dart';
-import 'Profile.dart';
-import 'UserLogin.dart';
+import 'User/Profile.dart';
+import 'User/UserLogin.dart';
 
 class DashboardSellerPage extends StatefulWidget {
   final UserLoginModel user;
@@ -18,6 +17,11 @@ class DashboardSellerPage extends StatefulWidget {
 }
 
 class _DashboardSellerPageState extends State<DashboardSellerPage> {
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
 
@@ -81,10 +85,12 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           InkWell(
-                            onTap: () {
-                              Navigator.push(
+                            onTap: () async {
+                              final result = await Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => ProfilePage(user: widget.user)),
+                                MaterialPageRoute(
+                                  builder: (context) => ProfilePage(user: widget.user),
+                                ),
                               );
                             },
                             child: ListTile(

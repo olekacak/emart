@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 
 import '../Model/ProductModel.dart';
 import '../Model/UserLoginModel.dart';
-import 'Cart.dart';
+import 'Cart and Product/Cart.dart';
 import 'DashboardCustomer.dart';
 import 'Filter.dart';
 import 'Inbox.dart';
-import 'ProductDetails.dart';
+import 'Cart and Product/ProductDetails.dart';
 import 'Search.dart';
 
 class MyTab extends StatelessWidget {

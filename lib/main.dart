@@ -1,9 +1,6 @@
-import 'package:emartsystem/Pages/DashboardCustomer.dart';
-import 'package:emartsystem/Pages/HomeCustomer.dart';
-import 'package:emartsystem/Pages/HomeSeller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-import 'Pages/UserLogin.dart';
+import 'Pages/User/UserLogin.dart';
 
 
 void main() async{

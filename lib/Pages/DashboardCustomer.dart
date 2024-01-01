@@ -3,9 +3,9 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import '../Model/UserLoginModel.dart';
-import 'Profile.dart';
-import 'Setting.dart';
-import 'UserLogin.dart';
+import 'User/Profile.dart';
+import 'User/Setting.dart';
+import 'User/UserLogin.dart';
 
 class DashboardCustomerPage extends StatefulWidget {
   final UserLoginModel user;
@@ -51,6 +51,10 @@ class RegisterSeller extends StatelessWidget {
 
 
 class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

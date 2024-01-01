@@ -1,15 +1,22 @@
 import 'dart:convert';
 import 'package:emartsystem/Model/UserLoginModel.dart';
-import 'package:emartsystem/Pages/EditProductPage.dart';
+import 'package:emartsystem/Pages/Cart%20and%20Product/EditProductPage.dart';
 import 'package:flutter/material.dart';
-import '../Model/ProductModel.dart';
+import '../../Model/ProductModel.dart';
 
-class ProductDetailSellerPage extends StatelessWidget {
+class ProductDetailSellerPage extends StatefulWidget {
   final UserLoginModel user;
   final ProductModel product;
 
   const ProductDetailSellerPage({Key? key, required this.product, required this.user})
       : super(key: key);
+
+  @override
+  _ProductDetailSellerPageState createState() => _ProductDetailSellerPageState();
+}
+
+class _ProductDetailSellerPageState extends State<ProductDetailSellerPage> {
+  // Add any necessary state variables here
 
   // Function to handle product deletion
   void _deleteProduct(BuildContext context) async {
@@ -27,7 +34,7 @@ class ProductDetailSellerPage extends StatelessWidget {
             child: Text('Delete'),
             onPressed: () async {
               // Call the deleteProduct method to delete the product
-              final deleted = await product.deleteProduct();
+              final deleted = await widget.product.deleteProduct();
 
               if (deleted) {
                 // Product deleted successfully, show a success message
@@ -62,17 +69,27 @@ class ProductDetailSellerPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(''),
+        title: Text('Product Detail'),
         actions: [
           IconButton(
             icon: Icon(Icons.edit),
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              // Navigate to the EditProductPage and wait for it to complete
+              final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EditProductPage(product: product, user: user),
+                  builder: (context) => EditProductPage(product: widget.product, user: widget.user),
                 ),
               );
+
+              // Check if the result is true (indicating a successful update)
+              if (result == true) {
+                // Fetch the updated product data and update the UI
+                await widget.product.loadProductById(); // Implement a method in your ProductModel to reload the data from the database
+                setState(() {
+                  // Update the UI with the latest product data
+                });
+              }
             },
           ),
           IconButton(
@@ -86,7 +103,7 @@ class ProductDetailSellerPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Image.memory(
-              base64.decode(product.image),
+              base64.decode(widget.product.image),
               height: 150,
               width: double.infinity,
               fit: BoxFit.contain,
@@ -94,7 +111,7 @@ class ProductDetailSellerPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                product.productName,
+                widget.product.productName,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -104,7 +121,7 @@ class ProductDetailSellerPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Text(
-                '\RM${product.price.toString()}',
+                '\RM${widget.product.price.toString()}',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.green,
@@ -114,7 +131,7 @@ class ProductDetailSellerPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Text(
-                'Description: ${product.description}',
+                'Description: ${widget.product.description}',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.black,
@@ -124,7 +141,7 @@ class ProductDetailSellerPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Text(
-                'Quantity: ${product.stockQuantity}',
+                'Quantity: ${widget.product.stockQuantity}',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.black,

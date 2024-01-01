@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../Model/UserLoginModel.dart';
+import '../../Model/UserLoginModel.dart';
 import 'DeleteAccount.dart';
 
 class SettingPage extends StatefulWidget {

@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:emartsystem/Pages/AddProductPage.dart';
-import 'package:emartsystem/Pages/ProductDetailSeller.dart';
+import 'package:emartsystem/Pages/Cart%20and%20Product/AddProductPage.dart';
+import 'package:emartsystem/Pages/Cart%20and%20Product/ProductDetailSeller.dart';
 import 'package:flutter/material.dart';
-import '../Model/ProductModel.dart';
-import '../Model/UserLoginModel.dart';
+import '../../Model/ProductModel.dart';
+import '../../Model/UserLoginModel.dart';
 
 class MyShopPage extends StatefulWidget {
   final UserLoginModel user;
@@ -27,7 +27,7 @@ class _MyShopPageState extends State<MyShopPage>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     products = [];
-    _loadProducts();
+    _loadProducts(); // Initial data load when the page is created
   }
 
   _loadProducts() async {
@@ -36,8 +36,6 @@ class _MyShopPageState extends State<MyShopPage>
       products = loadedProducts;
     });
   }
-
-
 
   void _showMessage(String msg) {
     if (mounted) {
@@ -141,16 +139,18 @@ class _MyShopPageState extends State<MyShopPage>
                       }
 
                       return GestureDetector(
-                          onTap: () {
-                        // Navigate to ProductDetailSellerPage when a product is clicked
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ProductDetailSellerPage(product: product, user: widget.user), // Pass the selected product
-                          ),
-                        );
-                      },
-                      child: Card(
+                          onTap: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProductDetailSellerPage(product: product, user: widget.user),
+                              ),
+                            );
+
+                            // Reload the data when the user navigates back to this page
+                            _loadProducts();
+                          },
+                          child: Card(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: <Widget>[

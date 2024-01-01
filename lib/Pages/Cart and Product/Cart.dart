@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../Controller/Stripe/StripeController.dart';
-import '../Model/CartModel.dart';
-import '../Model/Stripe/StripeModel.dart';
-import '../Model/Transaction/TransactionModel.dart';
-import '../Model/UserLoginModel.dart';
+import '../../Controller/Stripe/StripeController.dart';
+import '../../Model/Cart and Product/CartModel.dart';
+import '../../Model/Stripe/StripeModel.dart';
+import '../../Model/Transaction/TransactionModel.dart';
+import '../../Model/UserLoginModel.dart';
 
 class CartPage extends StatefulWidget {
   final UserLoginModel user;

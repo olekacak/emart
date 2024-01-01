@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../Model/UserLoginModel.dart';
+import '../../Model/UserLoginModel.dart';
 
 class EditProfilePage extends StatefulWidget {
   final UserLoginModel user;
@@ -111,10 +111,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
             if (success) {
               _showMessage("Profile updated successfully.");
-              Navigator.pop(context);
+              Navigator.pop(context,true);
             } else {
               _showMessage("Failed to update profile. Please try again.");
             }
+
           },
           child: Text(
             'Save',

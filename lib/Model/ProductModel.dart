@@ -1,4 +1,4 @@
-import 'package:emartsystem/Controller/ProductController.dart';
+import 'package:emartsystem/Controller/Cart%20and%20Product/ProductController.dart';
 
 import '../Controller/UserLoginController.dart';
 
@@ -58,13 +58,31 @@ class ProductModel {
     return result;
   }
 
+  Future<void> loadProductById() async {
+    ProductController productController = ProductController(path: "/api/workshop2/product.php");
+    productController.setBody({'productId': productId});
+    await productController.get();
+
+    if (productController.status() == 200 && productController.result() != null) {
+      final updatedData = productController.result()[0] as Map<String, dynamic>;
+      // Update the properties of this instance with the updated data
+      productId = updatedData['productId'] as int?;
+      productName = updatedData['productName'] as String? ?? '';
+      description = updatedData['description'] as String? ?? '';
+      price = (updatedData['price'] as num?)?.toDouble() ?? 0.0;
+      category = updatedData['category'] as String? ?? '';
+      stockQuantity = updatedData['stockQuantity'] as String? ?? '';
+      image = updatedData['image'] as String? ?? '';
+    }
+  }
+
   Future<bool> saveProduct() async {
     ProductController productController = ProductController(path: "/api/workshop2/product.php");
     productController.setBody(toJson());
     await productController.post();
 
     if (productController.status() == 200) {
-        return true;
+      return true;
     }
     return false;
   }

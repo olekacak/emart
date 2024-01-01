@@ -1,6 +1,6 @@
 import 'dart:convert'; //json encode/decode
 import 'package:http/http.dart' as http;
-import '../Model/UserLoginModel.dart';
+import '../../Model/UserLoginModel.dart';
 
 
 class ProductController{

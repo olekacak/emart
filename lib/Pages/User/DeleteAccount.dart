@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../Model/UserLoginModel.dart';
+import '../../Model/UserLoginModel.dart';
 import 'UserLogin.dart';
 
 class DeleteAccountPage extends StatefulWidget {

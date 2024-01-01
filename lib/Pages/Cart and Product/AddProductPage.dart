@@ -1,22 +1,21 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:emartsystem/Model/UserLoginModel.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../Model/ProductModel.dart';
+import '../../Model/ProductModel.dart';
+import '../../Model/UserLoginModel.dart';
 
-class EditProductPage extends StatefulWidget {
-  final ProductModel product;
+class AddProductPage extends StatefulWidget {
   final UserLoginModel user;
 
-  const EditProductPage({ required this.product, required this.user});
+  const AddProductPage({required this.user});
 
   @override
-  _EditProductPageState createState() => _EditProductPageState();
+  _AddProductPageState createState() => _AddProductPageState();
 }
 
-class _EditProductPageState extends State<EditProductPage> {
+class _AddProductPageState extends State<AddProductPage> {
   TextEditingController productNameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController priceController = TextEditingController();
@@ -25,17 +24,16 @@ class _EditProductPageState extends State<EditProductPage> {
   Uint8List? selectedImage;
   String base64String = '';
 
-  @override
-  void initState() {
-    super.initState();
-    // Initialize text controllers and image from the product data
-    productNameController.text = widget.product.productName;
-    descriptionController.text = widget.product.description;
-    priceController.text = widget.product.price.toString();
-    categoryController.text = widget.product.category;
-    stockQuantityController.text = widget.product.stockQuantity;
-    base64String = widget.product.image;
-  }
+  ProductModel newProduct = ProductModel(
+    productName: '',
+    description: '',
+    price: 0.0,
+    category: '',
+    stockQuantity: '',
+    image: '',
+    userId: 0,
+  );
+
 
   pickImage() async {
     final picker = ImagePicker();
@@ -47,8 +45,11 @@ class _EditProductPageState extends State<EditProductPage> {
         base64String = base64Encode(imageBytes);
 
         setState(() {
-          // Update the base64String when a new image is picked
+          // Update the ProductModel instance's image property
+          newProduct.image = base64String;
         });
+
+        _showMessage("Image picked successfully");
       }
     } catch (e) {
       print('Error picking image: $e');
@@ -56,11 +57,22 @@ class _EditProductPageState extends State<EditProductPage> {
     }
   }
 
+  void _showMessage(String msg) {
+    if (mounted) {
+      // Make sure this context is still mounted/exist
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(msg),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Product'),
+        title: Text('Add Product'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -69,10 +81,15 @@ class _EditProductPageState extends State<EditProductPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Image.memory(
-                base64.decode(widget.product.image),
+                selectedImage ?? Uint8List(0), // Use a placeholder image or empty bytes if no image is selected
                 height: 150,
                 width: double.infinity,
                 fit: BoxFit.contain,
+              ),
+              SizedBox(height: 16.0),
+              ElevatedButton(
+                onPressed: pickImage, // Use the pickImage method as the onPressed callback
+                child: Text('Pick Image'),
               ),
               TextField(
                 controller: productNameController,
@@ -97,13 +114,8 @@ class _EditProductPageState extends State<EditProductPage> {
               ),
               SizedBox(height: 16.0),
               ElevatedButton(
-                onPressed: pickImage,
-                child: Text('Pick Image'),
-              ),
-              SizedBox(height: 16.0),
-              ElevatedButton(
                 onPressed: () {
-                  // Call the updateProduct method to update the product
+                  // Call the saveProduct method to save the product
                   saveProduct();
                 },
                 child: Text('Save Product'),
@@ -115,48 +127,34 @@ class _EditProductPageState extends State<EditProductPage> {
     );
   }
 
-  // UpdateProduct method
+
+  // AddProduct method
   void saveProduct() async {
+    print('saveProduct method called');
     if (base64String.isEmpty) {
       _showMessage('Please pick an image.');
       return;
     }
 
-    // Create a new ProductModel instance with the updated values
-    ProductModel product = ProductModel(
-      productId: widget.product.productId,
-      productName: productNameController.text,
-      description: descriptionController.text,
-      price: double.parse(priceController.text),
-      category: categoryController.text,
-      stockQuantity: stockQuantityController.text,
-      image: base64String,
-      userId: widget.user.userId,
-    );
+    // Update the existing ProductModel instance with the entered values
+    newProduct.productName = productNameController.text;
+    newProduct.description = descriptionController.text;
+    newProduct.price = double.parse(priceController.text);
+    newProduct.category = categoryController.text;
+    newProduct.stockQuantity = stockQuantityController.text;
+    newProduct.image = base64String;
+    newProduct.userId = widget.user.userId;
 
-    bool updated = await product.updateProduct();
-
-    if (updated) {
-      // Product updated successfully, show a success message
-      _showMessage('Product updated successfully');
-      // Navigate back to the previous screen after a delay
-      Future.delayed(Duration(seconds: 2), () {
-        Navigator.pop(context);
-      });
+    // Save the product
+    bool saved = await newProduct.saveProduct();
+    print('Product saved: $saved');
+    if (saved) {
+      // Product saved successfully, navigate back to the previous screen
+      Navigator.pop(context);
     } else {
       // Handle error or show an error message
-      _showMessage('Failed to update the product.');
+      _showMessage('Failed to save the product.');
     }
   }
 
-  void _showMessage(String msg) {
-    if (mounted) {
-      // Make sure this context is still mounted/exist
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(msg),
-        ),
-      );
-    }
-  }
 }

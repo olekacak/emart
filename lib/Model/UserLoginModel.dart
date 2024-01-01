@@ -64,6 +64,38 @@ class UserLoginModel {
         status = json['status'] as String? ?? '',
         image = json['image'] as String? ?? '';
 
+  static Future<List<UserLoginModel>> loadUser() async {
+    List<UserLoginModel> result = [];
+    UserLoginController userLoginController = UserLoginController(path: "/api/workshop2/user_login.php");
+    await userLoginController.get();
+    if (userLoginController.status() == 200 && userLoginController.result() != null) {
+      for (var item in userLoginController.result()) {
+        result.add(UserLoginModel.fromJson(item));
+      }
+    }
+    return result;
+  }
+
+  Future<void> loadByUserId() async {
+    UserLoginController userLoginController = UserLoginController(path: "/api/workshop2/user_login.php");
+    userLoginController.setBody({'userId': userId.toString()});
+    await userLoginController.get();
+
+    if (userLoginController.status() == 200 && userLoginController.result() != null) {
+      final updatedData = userLoginController.result()[0] as Map<String, dynamic>;
+      // Update the properties of this instance with the updated data
+      userId = updatedData['userId'] as int?;
+      name = updatedData['name'] as String? ?? '';
+      email = updatedData['email'] as String? ?? '';
+      phoneNo = updatedData['phoneNo'] as String? ?? '';
+      address = updatedData['address'] as String? ?? '';
+      birthDate = updatedData['birthDate'] as String? ?? '';
+      gender = updatedData['gender'] as String? ?? '';
+      sellerAccount = updatedData['sellerAccount'] as String? ?? '';
+      image = updatedData['image'] as String? ?? '';
+    }
+  }
+
   // Save user method
   Future<bool> saveUser() async {
     UserLoginController userLoginController = UserLoginController(path: "/api/workshop2/user_login.php");

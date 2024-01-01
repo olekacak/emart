@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../Controller/CartController.dart';
+import '../../Controller/Cart and Product/CartController.dart';
 
 class CartModel {
   int? cartId;

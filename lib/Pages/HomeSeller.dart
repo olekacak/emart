@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
 import '../Model/UserLoginModel.dart';
-import 'Cart.dart';
+import 'Cart and Product/Cart.dart';
 import 'DashboardSeller.dart';
 import 'Filter.dart';
 import 'Inbox.dart';

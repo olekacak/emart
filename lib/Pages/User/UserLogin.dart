@@ -1,13 +1,13 @@
 import 'dart:typed_data';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:emartsystem/Model/UserLoginModel.dart';
-import 'package:emartsystem/Pages/UserSignUp.dart';
+import 'package:emartsystem/Pages/User/UserSignUp.dart';
 import 'package:flutter/material.dart';
 
 import 'Admin.dart';
-import 'DashboardCustomer.dart';
-import 'HomeCustomer.dart';
-import 'HomeSeller.dart';
+import '../DashboardCustomer.dart';
+import '../HomeCustomer.dart';
+import '../HomeSeller.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -116,6 +116,8 @@ class _UserLoginPageState extends State<UserLoginPage> {
                       '',
                       '',
                     );
+
+                    print("userId is equal ${user.userId}");
 
                     // Call the saveUser method
                     bool loginSuccessful = await user.saveUser();
