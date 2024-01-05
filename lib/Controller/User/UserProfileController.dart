@@ -1,8 +1,8 @@
 import 'dart:convert'; //json encode/decode
 import 'package:http/http.dart' as http;
-import '../Model/UserSignUpModel.dart';
 
-class UserSignUpController{
+
+class UserProfileController{
   String path;
   String server;
   http.Response? _res;
@@ -10,15 +10,41 @@ class UserSignUpController{
   final Map<String,String> _headers = {};
   dynamic _resultData;
 
-  UserSignUpController({required this.path, this.server =
-  "http://10.131.76.235"});
+  UserProfileController({required this.path, this.server =
+  "http://192.168.0.121"}); // lab 10.131.77.206   //phone 172.20.10.9 // rumah 192.168.32.1 // library 10.132.6.160
   setBody(Map<String, dynamic> data){
     _body.clear();
     _body.addAll(data);
     _headers["Content-Type"] = "application/json; charset=UTF-8";
   }
-  Future<void> postUserSignUp() async {
+  Future<void> post() async {
     _res = await http.post(
+      Uri.parse(server + path),
+      headers: _headers,
+      body: jsonEncode(_body),
+    );
+    _parseResult();
+  }
+
+  Future<void> get() async {
+    _res = await http.get(
+      Uri.parse(server + path),
+      headers: _headers,
+    );
+    _parseResult();
+  }
+
+  Future<void> put() async {
+    _res = await http.put(
+      Uri.parse(server + path),
+      headers: _headers,
+      body: jsonEncode(_body),
+    );
+    _parseResult();
+  }
+
+  Future<void> delete() async {
+    _res = await http.delete(
       Uri.parse(server + path),
       headers: _headers,
       body: jsonEncode(_body),

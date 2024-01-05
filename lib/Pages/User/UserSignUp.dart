@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:hovering/hovering.dart';
-import '../Model/UserSignUpModel.dart';
+import '../../Model/User/UserSignUpModel.dart';
 import 'UserLogin.dart';
 
 class UserSignUpPage extends StatefulWidget {
@@ -18,9 +18,7 @@ class _UserSignUpPageState extends State<UserSignUpPage> {
   final emailController = TextEditingController();
   final phoneNoController = TextEditingController();
   final addressController = TextEditingController();
-  final birthYearController = TextEditingController();
-  final birthMonthController = TextEditingController();
-  final birthDayController = TextEditingController();
+  final birthDateController = TextEditingController();
   final genderController = TextEditingController();
 
   String? errorText;
@@ -44,6 +42,20 @@ class _UserSignUpPageState extends State<UserSignUpPage> {
     }
 
     return ''; // Return null if the password is valid
+  }
+
+  Future<void> _selectBirthDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != DateTime.now()) {
+      setState(() {
+        birthDateController.text = "${picked.toLocal()}".split(' ')[0];
+      });
+    }
   }
 
   @override
@@ -126,67 +138,16 @@ class _UserSignUpPageState extends State<UserSignUpPage> {
                 ),
               ),
               const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      hint: Text('Year'),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          birthYearController.text = newValue!;
-                        });
-                      },
-                      items: List.generate(
-                              30, (index) => (2023 - index).toString())
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      hint: Text('Month'),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          birthMonthController.text = newValue!;
-                        });
-                      },
-                      items:
-                          List.generate(12, (index) => (index + 1).toString())
-                              .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      hint: Text('Day'),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          birthDayController.text = newValue!;
-                        });
-                      },
-                      items:
-                          List.generate(31, (index) => (index + 1).toString())
-                              .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ],
+              TextField(
+                controller: birthDateController,
+                decoration: InputDecoration(
+                  labelText: 'Birth Date',
+                  hintText: 'Select your birth date',
+                ),
+                onTap: () {
+                  _selectBirthDate(context);
+                },
               ),
-              const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: null,
                 hint: Text('Gender'),
@@ -213,7 +174,7 @@ class _UserSignUpPageState extends State<UserSignUpPage> {
                   String email = emailController.text;
                   String phoneNo = phoneNoController.text;
                   String address = addressController.text;
-                  String birthDate = '${birthYearController.text}-${birthMonthController.text}-${birthDayController.text}';
+                  String birthDate = birthDateController.text;
                   String gender = genderController.text;
 
                   String? passwordError = validatePassword(passwordController.text);
@@ -228,8 +189,8 @@ class _UserSignUpPageState extends State<UserSignUpPage> {
                     address: address,
                     birthDate: birthDate,
                     gender: gender,
-                    status: '',
                     sellerAccount: '',
+                    status: '',
                     roleId: '',
                   );
 

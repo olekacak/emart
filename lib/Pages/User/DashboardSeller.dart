@@ -1,32 +1,75 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
+import 'package:emartsystem/Pages/Cart%20and%20Product/MyShop.dart';
+import 'package:emartsystem/Pages/User/Setting.dart';
 import 'package:flutter/material.dart';
-import '../Model/UserLoginModel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../Model/User/UserLoginModel.dart';
+import '../../Model/User/UserProfileModel.dart';
 import 'Profile.dart';
 import 'UserLogin.dart';
 
-class DashboardCustomerPage extends StatefulWidget {
-  final UserLoginModel user;
-
-  DashboardCustomerPage({required this.user, Key? key}) : super(key: key);
-
+class DashboardSellerPage extends StatefulWidget {
   @override
-  _DashboardCustomerPageState createState() => _DashboardCustomerPageState();
+  _DashboardSellerPageState createState() => _DashboardSellerPageState();
 }
 
-class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
+class _DashboardSellerPageState extends State<DashboardSellerPage> {
+  int userId = -1;
+  UserProfileModel? user;
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+    loadUser();
+  }
 
-    UserLoginModel user = widget.user;
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  loadUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getInt('userId') ?? -1;
+
+    if (userId != -1) {
+      user = UserProfileModel(
+        -1,
+        userId = userId,
+        -1,
+        null,
+        null,
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        null,
+        null,
+      );
+      try {
+        await user?.loadByUserId();
+        if (mounted) {
+          setState(() {});
+        }
+      } catch (e) {
+        // Handle errors during user loading
+        print("Error loading user: $e");
+      }
+    }
+  }
+  @override
+  Widget build(BuildContext context) {
 
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
+            loadUser();
             Navigator.pop(context);
           },
         ),
@@ -45,8 +88,8 @@ class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
                   children: [
                     CircleAvatar(
                       radius: 50,
-                      backgroundImage: widget.user.image != null
-                          ? MemoryImage(base64Decode(widget.user.image!))
+                      backgroundImage: user?.image != null
+                          ? MemoryImage(base64Decode(user!.image!))
                           : null,
                     ),
                     SizedBox(width: 16),
@@ -54,7 +97,7 @@ class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.user.name ?? 'Loading...',
+                          user!.name,
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -62,7 +105,7 @@ class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          widget.user.email ?? 'Loading...',
+                          user!.email,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.normal,
@@ -82,11 +125,16 @@ class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           InkWell(
-                            onTap: () {
+                            onTap: () async {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => ProfilePage(user: widget.user)),
-                              );
+                                MaterialPageRoute(
+                                  builder: (context) => ProfilePage(),
+                                ),
+                              ).then((value) {
+                                // This callback runs when the ProfilePage is popped and you're back in DashboardSellerPage.
+                                loadUser(); // Fetch fresh data after navigating back.
+                              });
                             },
                             child: ListTile(
                               leading: Icon(Icons.account_circle),
@@ -100,14 +148,21 @@ class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
                           ),
                           SizedBox(height: 10),
                           ListTile(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => MyShopPage()),
+                              );
+                            },
                             leading: Icon(Icons.swap_horiz),
-                            title: Text('Start Selling'),
+                            title: Text('Switch Hosting'),
                           ),
                         ],
                       ),
                     ),
                   ),
                 ),
+                SizedBox(height: 20),
                 SizedBox(height: 20),
                 Card(
                   child: Padding(
@@ -141,6 +196,12 @@ class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
                                 ),
                                 SizedBox(height: 10),
                                 ListTile(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => SettingPage()),
+                                    );
+                                  },
                                   leading: Icon(Icons.settings),
                                   title: Text('Setting'),
                                 ),

@@ -1,12 +1,13 @@
-import 'package:emartsystem/Pages/DashboardCustomer.dart';
-import 'package:emartsystem/Pages/HomeCustomer.dart';
-import 'package:emartsystem/Pages/HomeSeller.dart';
 import 'package:flutter/material.dart';
-import 'UserLogin.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'Pages/User/UserLogin.dart';
 
 
 void main() async{
-
+  //Initialize Flutter Binding
+  WidgetsFlutterBinding.ensureInitialized();
+  Stripe.publishableKey =
+  "pk_test_51OPqlnKJ0LDtdxZsOBoO8I7uVmHBBBKnoGEsAr7OMZVm2A0yb6aEjhH7EAvriK4JvsmO6oQ5ipGftSCVIrKCiUbd0007MojtuV";
   runApp( MyApp());
 }
 

@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../Model/UserLoginModel.dart';
-import 'HomeCustomer.dart';
+import '../../Model/User/UserLoginModel.dart';
+import '../HomeCustomer.dart';
 
 class FilterPage extends StatefulWidget {
-  final UserLoginModel user;
-
-  const FilterPage({required this.user, Key? key}) : super(key: key);
-
   @override
   _FilterPageState createState() => _FilterPageState();
 }
@@ -29,7 +25,7 @@ class _FilterPageState extends State<FilterPage> {
             IconButton(
               icon: const Icon(Icons.filter_list_sharp, color: Colors.blueGrey),
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => HomeCustomerPage(user: widget.user)));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => HomeCustomerPage()));
               },
             ),
             const Text(

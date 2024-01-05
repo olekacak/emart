@@ -1,25 +1,98 @@
 import 'dart:convert';
-
-import 'package:emartsystem/Pages/MyShop.dart';
 import 'package:flutter/material.dart';
-import '../Model/UserLoginModel.dart';
-import 'MyShop.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../Model/User/UserProfileModel.dart';
 import 'Profile.dart';
+import 'Setting.dart';
 import 'UserLogin.dart';
 
-class DashboardSellerPage extends StatefulWidget {
-  final UserLoginModel user;
-
-  DashboardSellerPage({required this.user, Key? key}) : super(key: key);
-
+class DashboardCustomerPage extends StatefulWidget {
   @override
-  _DashboardSellerPageState createState() => _DashboardSellerPageState();
+  _DashboardCustomerPageState createState() => _DashboardCustomerPageState();
 }
 
-class _DashboardSellerPageState extends State<DashboardSellerPage> {
+class RegisterSeller extends StatelessWidget {
+  final Function(bool) onSellerStatusChanged;
+
+  RegisterSeller({required this.onSellerStatusChanged});
+
   @override
   Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text("Register as Seller"),
+      content: Text("Do you want to register as a seller?"),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () {
+            // Update the seller status and notify the parent widget
+            onSellerStatusChanged(true);
+            Navigator.of(context).pop();
+          },
+          child: Text("Yes"),
+        ),
+        TextButton(
+          onPressed: () {
+            // Handle the "No" button press here.
+            Navigator.of(context).pop(); // Close the dialog
+          },
+          child: Text("No"),
+        ),
+      ],
+    );
+  }
+}
 
+
+class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
+  int userId = -1;
+  UserProfileModel? user;
+
+  @override
+  void initState() {
+    super.initState();
+    loadUser();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  loadUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getInt('userId') ?? -1;
+
+    if (userId != -1) {
+      user = UserProfileModel(
+        -1,
+        userId = userId,
+        -1,
+        null,
+        null,
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        null,
+        null,
+      );
+      try {
+        await user?.loadByUserId();
+        if (mounted) {
+          setState(() {});
+        }
+      } catch (e) {
+        // Handle errors during user loading
+        print("Error loading user: $e");
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -43,8 +116,8 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                   children: [
                     CircleAvatar(
                       radius: 50,
-                      backgroundImage: widget.user.image != null
-                          ? MemoryImage(base64Decode(widget.user.image!))
+                      backgroundImage: user?.image != null
+                          ? MemoryImage(base64Decode(user!.image!))
                           : null,
                     ),
                     SizedBox(width: 16),
@@ -52,7 +125,7 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.user.name,
+                          user?.name ?? 'Loading...',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -60,7 +133,7 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          widget.user.email,
+                          user?.email ?? 'Loading...',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.normal,
@@ -80,17 +153,22 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           InkWell(
-                            onTap: () {
-                              Navigator.push(
+                            onTap: () async {
+                              await Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => ProfilePage(user: widget.user)),
+                                MaterialPageRoute(
+                                  builder: (context) => ProfilePage(),
+                                ),
                               );
+                              // After returning from ProfilePage, reload the user data
+                              loadUser();
                             },
                             child: ListTile(
                               leading: Icon(Icons.account_circle),
                               title: Text('My Profile'),
                             ),
                           ),
+
                           SizedBox(height: 10),
                           ListTile(
                             leading: Icon(Icons.favorite),
@@ -98,21 +176,23 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                           ),
                           SizedBox(height: 10),
                           ListTile(
+                            leading: Icon(Icons.swap_horiz),
+                            title: Text('Start Selling'),
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => MyShopPage(user: widget.user)),
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  // Return the RegisterAsSellerDialog widget here
+                                  return RegisterSeller(onSellerStatusChanged: (bool ) {  },);
+                                },
                               );
                             },
-                            leading: Icon(Icons.swap_horiz),
-                            title: Text('Switch Hosting'),
                           ),
                         ],
                       ),
                     ),
                   ),
                 ),
-                SizedBox(height: 20),
                 SizedBox(height: 20),
                 Card(
                   child: Padding(
@@ -146,6 +226,12 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                                 ),
                                 SizedBox(height: 10),
                                 ListTile(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => SettingPage()),
+                                    );
+                                  },
                                   leading: Icon(Icons.settings),
                                   title: Text('Setting'),
                                 ),

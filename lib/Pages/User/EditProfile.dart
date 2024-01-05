@@ -1,14 +1,12 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:emartsystem/Model/User/EditProfileModel.dart';
+import 'package:emartsystem/Model/User/UserProfileModel.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../Model/UserLoginModel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EditProfilePage extends StatefulWidget {
-  final UserLoginModel user;
-
-  const EditProfilePage({required this.user});
-
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
 }
@@ -21,18 +19,64 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController _birthDateController;
   late TextEditingController _genderController;
   String base64String = '';
+  late UserProfileModel user;
+  int userId = -1;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+      await loadUser();
+    });
+  }
+
+  // Method to load user data from shared preferences
+  Future<void> loadUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getInt('userId') ?? -1;
 
     // Initialize controllers with the current user data
-    _nameController = TextEditingController(text: widget.user.name);
-    _emailController = TextEditingController(text: widget.user.email);
-    _phoneNoController = TextEditingController(text: widget.user.phoneNo);
-    _addressController = TextEditingController(text: widget.user.address);
-    _birthDateController = TextEditingController(text: widget.user.birthDate);
-    _genderController = TextEditingController(text: widget.user.gender);
+    _nameController = TextEditingController();
+    _emailController = TextEditingController();
+    _phoneNoController = TextEditingController();
+    _addressController = TextEditingController();
+    _birthDateController = TextEditingController();
+    _genderController = TextEditingController();
+
+    // Initialize _user with an empty instance
+    user = UserProfileModel(
+      -1,
+      userId,
+      -1,
+      null,
+      null,
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      null,
+      '',
+      null,
+    );
+
+    if (userId != -1) {
+      await user.loadByUserId();
+
+      // Trigger a rebuild of the widget to reflect the loaded data
+      setState(() {
+        // Update controllers when the widget is updated
+        _nameController.text = user.name;
+        _emailController.text = user.email;
+        _phoneNoController.text = user.phoneNo;
+        _addressController.text = user.address;
+        _birthDateController.text = user.birthDate;
+        _genderController.text = user.gender;
+      });
+    } else {
+      print('userId not found in SharedPreferences');
+    }
   }
 
   pickImage() async {
@@ -45,14 +89,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
         base64String = base64Encode(imageBytes);
 
         setState(() {
-          widget.user.image = base64String;
+          user.image = base64String;
         });
 
         // Update the user object with the latest values
         updateUserObject();
 
         // Save changes to the database
-        bool success = await widget.user.updateUser();
+        bool success = await user.updateProfile();
 
         if (success) {
           _showMessage("Profile updated successfully.");
@@ -71,12 +115,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
     super.didUpdateWidget(oldWidget);
 
     // Update controllers when the widget is updated
-    _nameController.text = widget.user.name;
-    _emailController.text = widget.user.email;
-    _phoneNoController.text = widget.user.phoneNo;
-    _addressController.text = widget.user.address;
-    _birthDateController.text = widget.user.birthDate;
-    _genderController.text = widget.user.gender;
+    _nameController.text = user.name;
+    _emailController.text = user.email;
+    _phoneNoController.text = user.phoneNo;
+    _addressController.text = user.address;
+    _birthDateController.text = user.birthDate;
+    _genderController.text = user.gender;
   }
 
   @override
@@ -84,27 +128,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Edit Profile'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.save),
-            onPressed: () async {
-              // Update the user object with the latest values
-              updateUserObject();
-
-              // Save changes to the database
-              bool success = await widget.user.updateUser();
-
-              if (success) {
-                _showMessage("Profile updated successfully.");
-
-                Navigator.pop(context,);
-              } else {
-                _showMessage("Failed to update profile. Please try again.");
-              }
-            },
-
-          ),
-        ],
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            // Reload user data when navigating back
+            loadUser();
+            Navigator.pop(context, user);
+          },
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -120,6 +152,28 @@ class _EditProfilePageState extends State<EditProfilePage> {
           ],
         ),
       ),
+      bottomNavigationBar: BottomAppBar(
+        child: ElevatedButton(
+          onPressed: () async {
+            // Update the user object with the latest values
+            updateUserObject();
+
+            // Save changes to the database
+            bool success = await user.updateProfile();
+
+            if (success) {
+              _showMessage("Profile updated successfully.");
+              Navigator.pop(context, user);
+            } else {
+              _showMessage("Failed to update profile. Please try again.");
+            }
+          },
+          child: Text(
+            'Save',
+            style: TextStyle(fontSize: 16),
+          ),
+        ),
+      ),
     );
   }
 
@@ -128,8 +182,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       children: [
         CircleAvatar(
           radius: 60,
-          backgroundImage: widget.user.image != null
-              ? MemoryImage(base64Decode(widget.user.image!))
+          backgroundImage: user.image != null
+              ? MemoryImage(base64Decode(user.image!))
               : null,
         ),
         SizedBox(height: 10),
@@ -140,7 +194,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ],
     );
   }
-
 
   Widget buildTextFormField({
     required TextEditingController controller,
@@ -170,20 +223,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   // Method to update the user object with the latest values
   void updateUserObject() {
-    widget.user.name = _nameController.text ?? '';
-    widget.user.email = _emailController.text ?? '';
-    widget.user.phoneNo = _phoneNoController.text ?? '';
-    widget.user.address = _addressController.text ?? '';
-    widget.user.birthDate = _birthDateController.text ?? '';
-    widget.user.gender = _genderController.text ?? '';
-    if (base64String.isNotEmpty) {
-      widget.user.image = base64String;
+    user.name = _nameController.text ?? '';
+    user.email = _emailController.text ?? '';
+    user.phoneNo = _phoneNoController.text ?? '';
+    user.address = _addressController.text ?? '';
+    user.birthDate = _birthDateController.text ?? '';
+    user.gender = _genderController.text ?? '';
+
+    // Check if base64String is not null before assigning it to user.image
+    if (base64String != null && base64String.isNotEmpty) {
+      user.image = base64String;
     }
   }
 
   void _showMessage(String msg) {
     if (mounted) {
-      // Make sure this context is still mounted/exist
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(msg),
@@ -194,7 +248,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   void dispose() {
-    // Dispose controllers to avoid memory leaks
     _nameController.dispose();
     _emailController.dispose();
     _phoneNoController.dispose();

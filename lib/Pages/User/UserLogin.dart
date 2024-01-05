@@ -1,13 +1,11 @@
-import 'dart:typed_data';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:emartsystem/Model/UserLoginModel.dart';
-import 'package:emartsystem/Pages/UserSignUp.dart';
+import 'package:emartsystem/Model/User/UserLoginModel.dart';
+import 'package:emartsystem/Pages/User/UserSignUp.dart';
 import 'package:flutter/material.dart';
 
 import 'Admin.dart';
-import 'DashboardCustomer.dart';
-import 'HomeCustomer.dart';
-import 'HomeSeller.dart';
+import '../HomeCustomer.dart';
+import '../HomeSeller.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -102,8 +100,9 @@ class _UserLoginPageState extends State<UserLoginPage> {
 
                     // Create an instance of UserLoginModel with only username and password
                     UserLoginModel user = UserLoginModel(
-                      0,
-                      0,
+                      -1,
+                      -1,
+                      -1,
                       username,
                       password,
                       '',
@@ -117,26 +116,33 @@ class _UserLoginPageState extends State<UserLoginPage> {
                       '',
                     );
 
-                    // Call the saveUser method
                     bool loginSuccessful = await user.saveUser();
-                    setState(() {
-                      if (loginSuccessful) {
-                        print(user.username);
-                        if (user.adminId != 0) {
-                          // Navigate to AdminPage
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AdminPage(),
-                            ),
-                          );
-                        } else if (user.sellerAccount == 'true') {
-                          print(user.sellerAccount);
+
+                    if (loginSuccessful) {
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+                      //await prefs.clear();
+
+                      int? adminId = prefs.getInt('adminId');
+                      int? userId = prefs.getInt('userId');
+
+                      print("userId login pref ${userId}");
+
+                      if (adminId != null && adminId > 0) {
+                        // Navigate to AdminPage
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AdminPage(),
+                          ),
+                        );
+                      } else if (userId != null && userId > 0) {
+                        if (user.sellerAccount != null) {
                           // Navigate to HomeSellerPage
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => HomeSellerPage(user: user),
+                              builder: (context) => HomeSellerPage(),
                             ),
                           );
                         } else {
@@ -144,22 +150,20 @@ class _UserLoginPageState extends State<UserLoginPage> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => HomeCustomerPage(user: user),
+                              builder: (context) => HomeCustomerPage(),
                             ),
                           );
                         }
-                      } else {
-                        // Handle unsuccessful login
-                        // You can show an error message or take other actions
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Invalid username or password. Please try again.'),
-                          ),
-                        );
                       }
-                    });
-                    print(user.userId);
-                    print(user.image);
+                    } else {
+                      // Handle unsuccessful login
+                      // You can show an error message or take other actions
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Invalid username or password. Please try again.'),
+                        ),
+                      );
+                    }
                   },
                   child: Text('Log In'),
                 ),

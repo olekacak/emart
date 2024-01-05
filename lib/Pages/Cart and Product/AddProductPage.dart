@@ -3,14 +3,11 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../Model/ProductModel.dart';
-import '../Model/UserLoginModel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../Model/Cart and Product/ProductModel.dart';
+import '../../Model/User/UserLoginModel.dart';
 
 class AddProductPage extends StatefulWidget {
-  final UserLoginModel user;
-
-  const AddProductPage({required this.user});
-
   @override
   _AddProductPageState createState() => _AddProductPageState();
 }
@@ -23,6 +20,18 @@ class _AddProductPageState extends State<AddProductPage> {
   TextEditingController stockQuantityController = TextEditingController();
   Uint8List? selectedImage;
   String base64String = '';
+  int userId = -1;
+
+  void initState() {
+    super.initState();
+    _loadUserId();
+  }
+
+  void _loadUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getInt('userId') ?? -1;
+    setState(() {});
+  }
 
   ProductModel newProduct = ProductModel(
     productName: '',
@@ -33,7 +42,6 @@ class _AddProductPageState extends State<AddProductPage> {
     image: '',
     userId: 0,
   );
-
 
   pickImage() async {
     final picker = ImagePicker();
@@ -80,44 +88,79 @@ class _AddProductPageState extends State<AddProductPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextField(
-                controller: productNameController,
-                decoration: InputDecoration(labelText: 'Product Name'),
+              // Image and Pick Image button wrapped in a Stack
+              Stack(
+                children: [
+                  buildImageSection(),
+                  buildPickImageButton(),
+                ],
               ),
-              TextField(
-                controller: descriptionController,
-                decoration: InputDecoration(labelText: 'Description'),
-              ),
-              TextField(
-                controller: priceController,
-                decoration: InputDecoration(labelText: 'Price'),
-                keyboardType: TextInputType.number,
-              ),
-              TextField(
-                controller: categoryController,
-                decoration: InputDecoration(labelText: 'Category'),
-              ),
-              TextField(
-                controller: stockQuantityController,
-                decoration: InputDecoration(labelText: 'Stock Quantity'),
-              ),
-              SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: pickImage, // Use the pickImage method as the onPressed callback
-                child: Text('Pick Image'),
-              ),
-              SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: () {
-                  // Call the saveProduct method to save the product
-                  saveProduct();
-                },
-                child: Text('Save Product'),
-              ),
+              // Text fields
+              buildTextFields(),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  // Separate method to build the image display section
+  Widget buildImageSection() {
+    return Image.memory(
+      selectedImage ?? Uint8List(0),
+      height: 150,
+      width: double.infinity,
+      fit: BoxFit.contain,
+    );
+  }
+
+  // Separate method to build the "Pick Image" button
+  Widget buildPickImageButton() {
+    return Positioned(
+      bottom: 10, // Adjust the position as needed
+      right: 10, // Adjust the position as needed
+      child: ElevatedButton(
+        onPressed: pickImage,
+        child: Text('Pick Image'),
+      ),
+    );
+  }
+
+  // Separate method to build the text fields
+  Widget buildTextFields() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextField(
+          controller: productNameController,
+          decoration: InputDecoration(labelText: 'Product Name'),
+        ),
+        TextField(
+          controller: descriptionController,
+          decoration: InputDecoration(labelText: 'Description'),
+        ),
+        TextField(
+          controller: priceController,
+          decoration: InputDecoration(labelText: 'Price'),
+          keyboardType: TextInputType.number,
+        ),
+        TextField(
+          controller: categoryController,
+          decoration: InputDecoration(labelText: 'Category'),
+        ),
+        TextField(
+          controller: stockQuantityController,
+          decoration: InputDecoration(labelText: 'Stock Quantity'),
+        ),
+        SizedBox(height: 16.0),
+        ElevatedButton(
+          onPressed: () {
+            // Call the saveProduct method to save the product
+            saveProduct();
+          },
+          child: Text('Save Product'),
+        ),
+      ],
     );
   }
 
@@ -136,7 +179,7 @@ class _AddProductPageState extends State<AddProductPage> {
     newProduct.category = categoryController.text;
     newProduct.stockQuantity = stockQuantityController.text;
     newProduct.image = base64String;
-    newProduct.userId = widget.user.userId;
+    newProduct.userId = userId;
 
     // Save the product
     bool saved = await newProduct.saveProduct();
@@ -149,5 +192,4 @@ class _AddProductPageState extends State<AddProductPage> {
       _showMessage('Failed to save the product.');
     }
   }
-
 }
