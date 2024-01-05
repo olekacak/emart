@@ -3,14 +3,11 @@ import 'dart:typed_data';
 import 'package:emartsystem/Pages/Cart%20and%20Product/AddProductPage.dart';
 import 'package:emartsystem/Pages/Cart%20and%20Product/ProductDetailSeller.dart';
 import 'package:flutter/material.dart';
-import '../../Model/ProductModel.dart';
-import '../../Model/UserLoginModel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../Model/Cart and Product/ProductModel.dart';
+import '../../Model/User/UserLoginModel.dart';
 
 class MyShopPage extends StatefulWidget {
-  final UserLoginModel user;
-
-  MyShopPage({required this.user, Key? key}) : super(key: key);
-
   @override
   _MyShopPageState createState() => _MyShopPageState();
 }
@@ -21,6 +18,10 @@ class _MyShopPageState extends State<MyShopPage>
   late List<ProductModel> products;
   Uint8List? selectedImage;
   String base64String = '';
+  int userId = -1;
+  String name = '';
+  String email = '';
+  String image = '';
 
   @override
   void initState() {
@@ -32,6 +33,14 @@ class _MyShopPageState extends State<MyShopPage>
 
   _loadProducts() async {
     List<ProductModel> loadedProducts = await ProductModel.loadAll(category: '');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getInt('userId') ?? -1;
+
+    if (userId != -1) {
+      name = prefs.getString('name') ?? '';
+      email = prefs.getString('email') ?? '';
+      image = prefs.getString('image') ?? '';
+    }
     setState(() {
       products = loadedProducts;
     });
@@ -77,8 +86,8 @@ class _MyShopPageState extends State<MyShopPage>
                     CircleAvatar(
                       radius: 30,
                       backgroundColor: Colors.grey[200],
-                      backgroundImage: widget.user.image != null
-                          ? MemoryImage(base64Decode(widget.user.image!))
+                      backgroundImage: image != null
+                          ? MemoryImage(base64Decode(image!))
                           : null,
                     ),
                     SizedBox(width: 16.0),
@@ -87,7 +96,7 @@ class _MyShopPageState extends State<MyShopPage>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Seller: ${widget.user.username}',
+                            'Seller: ${name}',
                             style: TextStyle(
                               fontSize: 18.0,
                               fontWeight: FontWeight.bold,
@@ -143,7 +152,7 @@ class _MyShopPageState extends State<MyShopPage>
                             await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => ProductDetailSellerPage(product: product, user: widget.user),
+                                builder: (context) => ProductDetailSellerPage(product: product),
                               ),
                             );
 
@@ -186,7 +195,7 @@ class _MyShopPageState extends State<MyShopPage>
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddProductPage(user: widget.user)),
+            MaterialPageRoute(builder: (context) => AddProductPage()),
           );
         },
         child: Icon(Icons.add),

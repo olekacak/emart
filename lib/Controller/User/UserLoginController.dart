@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../../Model/User/UserLoginModel.dart';
 
 
-class ProductController{
+class UserLoginController{
   String path;
   String server;
   http.Response? _res;
@@ -11,14 +11,14 @@ class ProductController{
   final Map<String,String> _headers = {};
   dynamic _resultData;
 
-  ProductController({required this.path, this.server =
-  "http://192.168.0.121"}); // phone 172.20.10.9 // rumah 192.168.32.1 // library 10.132.6.160
+  UserLoginController({required this.path, this.server =
+  "http://192.168.0.121"}); // lab 10.131.77.206   //phone 172.20.10.9 // rumah 192.168.32.1 // library 10.132.6.160
   setBody(Map<String, dynamic> data){
     _body.clear();
     _body.addAll(data);
     _headers["Content-Type"] = "application/json; charset=UTF-8";
   }
-  Future<void> post() async {
+  Future<void> postUserLogin() async {
     _res = await http.post(
       Uri.parse(server + path),
       headers: _headers,

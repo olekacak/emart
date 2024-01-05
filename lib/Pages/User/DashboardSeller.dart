@@ -3,24 +3,63 @@ import 'dart:convert';
 import 'package:emartsystem/Pages/Cart%20and%20Product/MyShop.dart';
 import 'package:emartsystem/Pages/User/Setting.dart';
 import 'package:flutter/material.dart';
-import '../Model/UserLoginModel.dart';
-import 'User/Profile.dart';
-import 'User/UserLogin.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../Model/User/UserLoginModel.dart';
+import '../../Model/User/UserProfileModel.dart';
+import 'Profile.dart';
+import 'UserLogin.dart';
 
 class DashboardSellerPage extends StatefulWidget {
-  final UserLoginModel user;
-
-  DashboardSellerPage({required this.user, Key? key}) : super(key: key);
-
   @override
   _DashboardSellerPageState createState() => _DashboardSellerPageState();
 }
 
 class _DashboardSellerPageState extends State<DashboardSellerPage> {
+  int userId = -1;
+  UserProfileModel? user;
+
+  @override
+  void initState() {
+    super.initState();
+    loadUser();
+  }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  loadUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getInt('userId') ?? -1;
+
+    if (userId != -1) {
+      user = UserProfileModel(
+        -1,
+        userId = userId,
+        -1,
+        null,
+        null,
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        null,
+        null,
+      );
+      try {
+        await user?.loadByUserId();
+        if (mounted) {
+          setState(() {});
+        }
+      } catch (e) {
+        // Handle errors during user loading
+        print("Error loading user: $e");
+      }
+    }
   }
   @override
   Widget build(BuildContext context) {
@@ -30,6 +69,7 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
+            loadUser();
             Navigator.pop(context);
           },
         ),
@@ -48,8 +88,8 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                   children: [
                     CircleAvatar(
                       radius: 50,
-                      backgroundImage: widget.user.image != null
-                          ? MemoryImage(base64Decode(widget.user.image!))
+                      backgroundImage: user?.image != null
+                          ? MemoryImage(base64Decode(user!.image!))
                           : null,
                     ),
                     SizedBox(width: 16),
@@ -57,7 +97,7 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.user.name,
+                          user!.name,
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -65,7 +105,7 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          widget.user.email,
+                          user!.email,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.normal,
@@ -86,12 +126,15 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                         children: [
                           InkWell(
                             onTap: () async {
-                              final result = await Navigator.push(
+                              Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => ProfilePage(user: widget.user),
+                                  builder: (context) => ProfilePage(),
                                 ),
-                              );
+                              ).then((value) {
+                                // This callback runs when the ProfilePage is popped and you're back in DashboardSellerPage.
+                                loadUser(); // Fetch fresh data after navigating back.
+                              });
                             },
                             child: ListTile(
                               leading: Icon(Icons.account_circle),
@@ -108,7 +151,7 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => MyShopPage(user: widget.user)),
+                                MaterialPageRoute(builder: (context) => MyShopPage()),
                               );
                             },
                             leading: Icon(Icons.swap_horiz),
@@ -156,7 +199,7 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                                   onTap: () {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => SettingPage(user: widget.user)),
+                                      MaterialPageRoute(builder: (context) => SettingPage()),
                                     );
                                   },
                                   leading: Icon(Icons.settings),

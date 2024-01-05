@@ -1,24 +1,20 @@
 import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-import '../Model/UserLoginModel.dart';
-import 'User/Profile.dart';
-import 'User/Setting.dart';
-import 'User/UserLogin.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../Model/User/UserProfileModel.dart';
+import 'Profile.dart';
+import 'Setting.dart';
+import 'UserLogin.dart';
 
 class DashboardCustomerPage extends StatefulWidget {
-  final UserLoginModel user;
-  DashboardCustomerPage({required this.user, Key? key}) : super(key: key);
-
   @override
   _DashboardCustomerPageState createState() => _DashboardCustomerPageState();
 }
 
 class RegisterSeller extends StatelessWidget {
-  final UserLoginModel user;
+  final Function(bool) onSellerStatusChanged;
 
-  RegisterSeller({required this.user});
+  RegisterSeller({required this.onSellerStatusChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +24,8 @@ class RegisterSeller extends StatelessWidget {
       actions: <Widget>[
         TextButton(
           onPressed: () {
-            print("Current sellerAccount value: ${user.sellerAccount}");
-            user.sellerAccount = "true";
-            print("New sellerAccount value: ${user.sellerAccount}");
-            user.updateUser();
+            // Update the seller status and notify the parent widget
+            onSellerStatusChanged(true);
             Navigator.of(context).pop();
           },
           child: Text("Yes"),
@@ -39,7 +33,6 @@ class RegisterSeller extends StatelessWidget {
         TextButton(
           onPressed: () {
             // Handle the "No" button press here.
-            // You can simply close the dialog in this case.
             Navigator.of(context).pop(); // Close the dialog
           },
           child: Text("No"),
@@ -51,16 +44,55 @@ class RegisterSeller extends StatelessWidget {
 
 
 class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
+  int userId = -1;
+  UserProfileModel? user;
+
+  @override
+  void initState() {
+    super.initState();
+    loadUser();
+  }
+
   @override
   void dispose() {
     super.dispose();
   }
 
+  loadUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getInt('userId') ?? -1;
+
+    if (userId != -1) {
+      user = UserProfileModel(
+        -1,
+        userId = userId,
+        -1,
+        null,
+        null,
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        null,
+        null,
+      );
+      try {
+        await user?.loadByUserId();
+        if (mounted) {
+          setState(() {});
+        }
+      } catch (e) {
+        // Handle errors during user loading
+        print("Error loading user: $e");
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    UserLoginModel user = widget.user;
-
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -84,8 +116,8 @@ class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
                   children: [
                     CircleAvatar(
                       radius: 50,
-                      backgroundImage: widget.user.image != null
-                          ? MemoryImage(base64Decode(widget.user.image!))
+                      backgroundImage: user?.image != null
+                          ? MemoryImage(base64Decode(user!.image!))
                           : null,
                     ),
                     SizedBox(width: 16),
@@ -93,7 +125,7 @@ class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.user.name ?? 'Loading...',
+                          user?.name ?? 'Loading...',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -101,7 +133,7 @@ class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          widget.user.email ?? 'Loading...',
+                          user?.email ?? 'Loading...',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.normal,
@@ -121,17 +153,22 @@ class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           InkWell(
-                            onTap: () {
-                              Navigator.push(
+                            onTap: () async {
+                              await Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => ProfilePage(user: widget.user)),
+                                MaterialPageRoute(
+                                  builder: (context) => ProfilePage(),
+                                ),
                               );
+                              // After returning from ProfilePage, reload the user data
+                              loadUser();
                             },
                             child: ListTile(
                               leading: Icon(Icons.account_circle),
                               title: Text('My Profile'),
                             ),
                           ),
+
                           SizedBox(height: 10),
                           ListTile(
                             leading: Icon(Icons.favorite),
@@ -146,7 +183,7 @@ class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   // Return the RegisterAsSellerDialog widget here
-                                  return RegisterSeller(user: widget.user);
+                                  return RegisterSeller(onSellerStatusChanged: (bool ) {  },);
                                 },
                               );
                             },
@@ -192,7 +229,7 @@ class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
                                   onTap: () {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => SettingPage(user: widget.user)),
+                                      MaterialPageRoute(builder: (context) => SettingPage()),
                                     );
                                   },
                                   leading: Icon(Icons.settings),

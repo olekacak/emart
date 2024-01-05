@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../Model/UserLoginModel.dart';
+import '../../Model/User/UserLoginModel.dart';
 import 'UserLogin.dart';
 
 class DeleteAccountPage extends StatefulWidget {
-  final UserLoginModel user;
-  DeleteAccountPage({required this.user, Key? key}) : super(key: key);
   @override
   _DeleteAccountPageState createState() => _DeleteAccountPageState();
 }
@@ -14,6 +13,18 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
   bool _isAgreed = false;
   String _selectedReason = 'I no longer want to use eMart';
   TextEditingController _customReasonController = TextEditingController();
+  int userId = -1;
+
+  void initState() {
+    super.initState();
+    _loadUserId();
+  }
+
+  void _loadUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getInt('userId') ?? -1;
+    setState(() {});
+  }
 
   @override
   void dispose() {
@@ -131,8 +142,26 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
       print('Custom Reason: $customReason');
     }
 
-    // Attempt to delete the user account regardless of the reason
-    bool success = await widget.user.deleteUser();
+    // Create an instance of UserLoginModel and set the userId
+    UserLoginModel user = UserLoginModel(
+        -1,
+        -1,
+        userId,
+        null,
+        null,
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        null,
+        null,
+        null);
+
+    // Attempt to delete the user account using the deleteUser method
+    bool success = await user.deleteUser();
+
     if (success) {
       print('Account deleted successfully');
       Navigator.pushAndRemoveUntil(

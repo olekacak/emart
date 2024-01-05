@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../Model/UserLoginModel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../Model/User/UserLoginModel.dart';
 import 'DeleteAccount.dart';
 
 class SettingPage extends StatefulWidget {
-  final UserLoginModel user;
-
-  SettingPage({required this.user, Key? key}) : super(key: key);
 
   @override
   _SettingPageState createState() => _SettingPageState();
@@ -16,6 +14,19 @@ class _SettingPageState extends State<SettingPage> {
   int _selectedLanguage = 0;
 
   List<String> _languages = ['English', 'Spanish', 'French', 'German'];
+
+  int userId = -1;
+
+  void initState() {
+    super.initState();
+    _loadUserId();
+  }
+
+  void _loadUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getInt('userId') ?? -1;
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +46,7 @@ class _SettingPageState extends State<SettingPage> {
                 // Navigate to the Delete Account page
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => DeleteAccountPage(user: widget.user,)),
+                  MaterialPageRoute(builder: (context) => DeleteAccountPage()),
                 );
               },
               child: Text(

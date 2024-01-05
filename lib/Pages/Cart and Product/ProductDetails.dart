@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import '../../Model/ProductModel.dart';
+import '../../Model/Cart and Product/ProductModel.dart';
 
 class ProductDetailsPage extends StatelessWidget {
   final ProductModel product;

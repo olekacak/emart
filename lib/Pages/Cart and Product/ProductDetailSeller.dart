@@ -1,14 +1,13 @@
 import 'dart:convert';
-import 'package:emartsystem/Model/UserLoginModel.dart';
+import 'package:emartsystem/Model/User/UserLoginModel.dart';
 import 'package:emartsystem/Pages/Cart%20and%20Product/EditProductPage.dart';
 import 'package:flutter/material.dart';
-import '../../Model/ProductModel.dart';
+import '../../Model/Cart and Product/ProductModel.dart';
 
 class ProductDetailSellerPage extends StatefulWidget {
-  final UserLoginModel user;
   final ProductModel product;
 
-  const ProductDetailSellerPage({Key? key, required this.product, required this.user})
+  const ProductDetailSellerPage({Key? key, required this.product})
       : super(key: key);
 
   @override
@@ -78,7 +77,7 @@ class _ProductDetailSellerPageState extends State<ProductDetailSellerPage> {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EditProductPage(product: widget.product, user: widget.user),
+                  builder: (context) => EditProductPage(product: widget.product),
                 ),
               );
 

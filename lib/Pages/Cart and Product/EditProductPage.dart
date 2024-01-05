@@ -1,16 +1,16 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:emartsystem/Model/UserLoginModel.dart';
+import 'package:emartsystem/Model/User/UserLoginModel.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../Model/ProductModel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../Model/Cart and Product/ProductModel.dart';
 
 class EditProductPage extends StatefulWidget {
   final ProductModel product;
-  final UserLoginModel user;
 
-  const EditProductPage({ required this.product, required this.user});
+  const EditProductPage({ required this.product});
 
   @override
   _EditProductPageState createState() => _EditProductPageState();
@@ -24,6 +24,7 @@ class _EditProductPageState extends State<EditProductPage> {
   TextEditingController stockQuantityController = TextEditingController();
   Uint8List? selectedImage;
   String base64String = '';
+  int userId = -1;
 
   @override
   void initState() {
@@ -35,6 +36,13 @@ class _EditProductPageState extends State<EditProductPage> {
     categoryController.text = widget.product.category;
     stockQuantityController.text = widget.product.stockQuantity;
     base64String = widget.product.image;
+    _loadUserId();
+  }
+
+  void _loadUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getInt('userId') ?? -1;
+    setState(() {});
   }
 
   pickImage() async {
@@ -131,7 +139,7 @@ class _EditProductPageState extends State<EditProductPage> {
       category: categoryController.text,
       stockQuantity: stockQuantityController.text,
       image: base64String,
-      userId: widget.user.userId,
+      userId: userId,
     );
 
     bool updated = await product.updateProduct();

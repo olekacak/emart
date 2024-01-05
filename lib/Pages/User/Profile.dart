@@ -1,39 +1,49 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../Model/User/UserProfileModel.dart';
 import 'EditProfile.dart';
-import '../../Model/UserLoginModel.dart';
 
 class ProfilePage extends StatefulWidget {
-  UserLoginModel user;
-
-   ProfilePage({Key? key, required this.user}) : super(key: key);
-
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  late UserLoginModel loadUserData; // Declare a local variable
-
+  late UserProfileModel user;
+  int userId = -1;
 
   @override
   void initState() {
     super.initState();
-    loadUser();
   }
 
-  void loadUser() async {
-    await widget.user.loadByUserId();
-    setState(() {
-      loadUserData = widget.user;
-      print(widget.user.userId);
-    });
-  }
+  Future<void> loadUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getInt('userId') ?? -1;
 
-  @override
-  void dispose() {
-    widget.user;
-    super.dispose();
+    if (userId != -1) {
+      user = UserProfileModel(
+        -1,
+        userId,
+        -1,
+        null,
+        null,
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        null,
+        null,
+      );
+
+      // Fetch user data from the server
+      await user.loadByUserId();
+    }
+    print("userIf from pref: ${userId}");
   }
 
   @override
@@ -45,85 +55,106 @@ class _ProfilePageState extends State<ProfilePage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
+            // Reload user data when navigating back
+            loadUser();
             Navigator.pop(context);
           },
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundImage: widget.user.image != null
-                        ? MemoryImage(base64Decode(widget.user.image!))
-                        : null,
-                  ),
-                  SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.user.name ?? 'Name',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+      body: FutureBuilder(
+        future: loadUser(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundImage: user.image != null
+                              ? MemoryImage(base64Decode(user.image!))
+                              : null,
                         ),
-                      ),
-                      Text(
-                        widget.user.email ?? 'user@email.com',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () async {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => EditProfilePage(user: widget.user),
+                        SizedBox(width: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              user.name ?? 'Name',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          );
-                          if (result == true) {
-                            loadUser();
-                          }
-                        },
-                        child: Text('Edit Profile'),
+                            Text(
+                              user.email ?? 'user@email.com',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: () async {
+                                final updatedUser = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EditProfilePage(),
+                                  ),
+                                );
+                                if (updatedUser != null) {
+                                  // Update the state or reload the data
+                                  setState(() {
+                                    user = updatedUser;
+                                  });
+
+                                  // Reload data from the database
+                                  await loadUser();
+                                }
+
+                              },
+                              child: Text('Edit Profile'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    Card(
+                      child: ListTile(
+                        title: Text(user.phoneNo),
                       ),
-                    ],
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
-              Card(
-                child: ListTile(
-                  title: Text(widget.user.phoneNo),
+                    ),
+                    Card(
+                      child: ListTile(
+                        title: Text(user.address),
+                      ),
+                    ),
+                    Card(
+                      child: ListTile(
+                        title: Text(user.birthDate),
+                      ),
+                    ),
+                    Card(
+                      child: ListTile(
+                        title: Text(user.gender),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              Card(
-                child: ListTile(
-                  title: Text(widget.user.address),
-                ),
-              ),
-              Card(
-                child: ListTile(
-                  title: Text(widget.user.birthDate),
-                ),
-              ),
-              Card(
-                child: ListTile(
-                  title: Text(widget.user.gender),
-                ),
-              ),
-            ],
-          ),
-        ),
+            );
+          } else {
+            // You can show a loading indicator while waiting for the data
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
       ),
     );
   }

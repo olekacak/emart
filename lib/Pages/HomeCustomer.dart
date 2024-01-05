@@ -1,15 +1,12 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-
-import '../Model/ProductModel.dart';
-import '../Model/UserLoginModel.dart';
+import '../Model/Cart and Product/ProductModel.dart';
 import 'Cart and Product/Cart.dart';
-import 'DashboardCustomer.dart';
-import 'Filter.dart';
+import 'User/DashboardCustomer.dart';
+import 'Cart and Product/Filter.dart';
 import 'Inbox.dart';
 import 'Cart and Product/ProductDetails.dart';
-import 'Search.dart';
+import 'Cart and Product/Search.dart';
 
 class MyTab extends StatelessWidget {
   final String iconPath;
@@ -46,10 +43,6 @@ class CustomTab {
 }
 
 class HomeCustomerPage extends StatefulWidget {
-  final UserLoginModel user;
-
-  HomeCustomerPage({required this.user, Key? key}) : super(key: key);
-
   @override
   _HomeCustomerPageState createState() => _HomeCustomerPageState();
 }
@@ -74,10 +67,10 @@ class _HomeCustomerPageState extends State<HomeCustomerPage> {
     _currentIndex = 0;
 
     _pages = [
-      HomeCustomerPage(user: widget.user),
+      HomeCustomerPage(),
       const SearchPage(),
       const InboxPage(),
-      DashboardCustomerPage(user: widget.user),
+      DashboardCustomerPage(),
     ];
 
     _loadProducts(); // Call the method to load products
@@ -132,7 +125,7 @@ class _HomeCustomerPageState extends State<HomeCustomerPage> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => CartPage(user: widget.user)),
+                      MaterialPageRoute(builder: (context) => CartPage()),
                     );
                   },
                 ),
@@ -142,7 +135,7 @@ class _HomeCustomerPageState extends State<HomeCustomerPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => DashboardCustomerPage(user: widget.user),
+                        builder: (context) => DashboardCustomerPage(),
                       ),
                     );
                   },
@@ -174,7 +167,7 @@ class _HomeCustomerPageState extends State<HomeCustomerPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => FilterPage(user: widget.user),
+                      builder: (context) => FilterPage(),
                     ),
                   );
                 },

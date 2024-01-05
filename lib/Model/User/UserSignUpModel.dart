@@ -1,4 +1,4 @@
-  import '../Controller/UserSignUpController.dart';
+  import '../../Controller/User/UserSignUpController.dart';
 
   class UserSignUpModel {
     String? userId;

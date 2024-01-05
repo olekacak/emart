@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../Controller/Stripe/StripeController.dart';
 import '../../Model/Cart and Product/CartModel.dart';
 import '../../Model/Stripe/StripeModel.dart';
 import '../../Model/Transaction/TransactionModel.dart';
-import '../../Model/UserLoginModel.dart';
 
 class CartPage extends StatefulWidget {
-  final UserLoginModel user;
-
-  CartPage({required this.user, Key? key}) : super(key: key);
-
   @override
   _CartPageState createState() => _CartPageState();
 }
@@ -21,8 +17,8 @@ class _CartPageState extends State<CartPage> {
   final StripeModel stripeModel = StripeModel();
   final StripeController stripeController = StripeController();
   Map<String, dynamic>? paymentIntent;
+  int userId = -1;
 
-  @override
   void initState() {
     super.initState();
     _loadCartItems();
@@ -41,12 +37,21 @@ class _CartPageState extends State<CartPage> {
 
   void _loadCartItems() async {
     try {
-      final List<CartModel> items = await CartModel.loadAll();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      userId = prefs.getInt('userId') ?? -1;
 
-      setState(() {
-        cartItems = items;
-        checkoutButtonText = 'Checkout RM${totalPrice.toStringAsFixed(2)}';
-      });
+      if (userId != -1) {
+        final List<CartModel> items = await CartModel.loadAll();
+
+        setState(() {
+          cartItems = items;
+          checkoutButtonText = 'Checkout RM${totalPrice.toStringAsFixed(2)}';
+        });
+      } else {
+        // Handle the case where userId is not available
+        // You might want to show an error message or redirect the user to login.
+        print("User ID not available");
+      }
     } catch (error) {
       print("Error: $error");
     }
@@ -63,11 +68,11 @@ class _CartPageState extends State<CartPage> {
 
       // Create a new TransactionModel object
       TransactionModel transaction = TransactionModel(
-        transactionId: 0,
+        transactionId: 1,
         transactionDate: formattedDate,
         status: "Completed",
         deliveryStatus: "Pending",
-        cartId: 0, // You may need to set this value appropriately based on your data
+        cartId: 1, // You may need to set this value appropriately based on your data
       );
 
       // Save the transaction data

@@ -1,19 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-
-import '../Model/UserLoginModel.dart';
-import 'Cart and Product/Cart.dart';
-import 'DashboardSeller.dart';
-import 'Filter.dart';
+import 'User/DashboardSeller.dart';
 import 'Inbox.dart';
-import 'Search.dart';
+import 'Cart and Product/Search.dart';
 
 
 class HomeSellerPage extends StatefulWidget {
-  final UserLoginModel user;
-
-  HomeSellerPage({required this.user, Key? key}) : super(key: key);
-
   @override
   _HomeSellerPageState createState() => _HomeSellerPageState();
 }
@@ -29,10 +21,10 @@ class _HomeSellerPageState extends State<HomeSellerPage> {
     _currentIndex = 0;
 
     _pages = [
-      HomeSellerPage(user: widget.user),
+      HomeSellerPage(),
       const SearchPage(),
       const InboxPage(),
-      DashboardSellerPage(user: widget.user),
+      DashboardSellerPage(),
     ];
   }
 
@@ -69,17 +61,16 @@ class _HomeSellerPageState extends State<HomeSellerPage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => CartPage(user: widget.user)),
+                MaterialPageRoute(builder: (context) => InboxPage()),
               );
             },
           ),
           IconButton(
             icon: const Icon(Icons.account_circle, color: Colors.white),
             onPressed: () {
-              Navigator.push(
+              Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                    builder: (context) => DashboardSellerPage(user: widget.user)),
+                MaterialPageRoute(builder: (context) => DashboardSellerPage()),
               );
             },
           ),
@@ -104,7 +95,7 @@ class _HomeSellerPageState extends State<HomeSellerPage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => FilterPage(user: widget.user)));
+                            builder: (context) => InboxPage()));
                   },
                 ),
               ],
