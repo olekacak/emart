@@ -22,6 +22,8 @@ class _AddProductPageState extends State<AddProductPage> {
   String base64String = '';
   int userId = -1;
 
+  String selectedCategory = 'snacks';
+
   void initState() {
     super.initState();
     _loadUserId();
@@ -82,85 +84,99 @@ class _AddProductPageState extends State<AddProductPage> {
       appBar: AppBar(
         title: Text('Add Product'),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Image and Pick Image button wrapped in a Stack
-              Stack(
-                children: [
-                  buildImageSection(),
-                  buildPickImageButton(),
-                ],
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: productNameController,
+                      decoration: InputDecoration(labelText: 'Product Name'),
+                    ),
+                    TextField(
+                      controller: descriptionController,
+                      decoration: InputDecoration(labelText: 'Description'),
+                    ),
+                    TextField(
+                      controller: priceController,
+                      decoration: InputDecoration(labelText: 'Price'),
+                      keyboardType: TextInputType.number,
+                    ),
+                    SizedBox(height: 16.0),
+                    Text(
+                      'Category',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        //fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    DropdownButton<String>(
+                      value: selectedCategory,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedCategory = value!;
+                        });
+                      },
+                      items: [
+                        DropdownMenuItem(
+                          value: 'snacks',
+                          child: Text('Snacks'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'instant food',
+                          child: Text('Instant Food'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'sweets',
+                          child: Text('Sweets'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'drinks',
+                          child: Text('Drinks'),
+                        ),
+                      ],
+                    ),
+                    TextField(
+                      controller: stockQuantityController,
+                      decoration: InputDecoration(labelText: 'Stock Quantity'),
+                    ),
+                    SizedBox(height: 16.0),
+                    ElevatedButton(
+                      onPressed: pickImage,
+                      child: Text('Pick Image'),
+                    ),
+                    // Display the picked image
+                    selectedImage != null
+                        ? Image.memory(
+                      selectedImage!,
+                      height: 100,
+                    )
+                        : Container(),
+                    SizedBox(height: 16.0),
+                  ],
+                ),
               ),
-              // Text fields
-              buildTextFields(),
-            ],
+            ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: ElevatedButton(
+                onPressed: () {
+                  saveProduct();
+                },
+                child: Text('Save Product'),
+              ),
+            ),
+          ),
+        ],
       ),
-    );
-  }
-
-  // Separate method to build the image display section
-  Widget buildImageSection() {
-    return Image.memory(
-      selectedImage ?? Uint8List(0),
-      height: 150,
-      width: double.infinity,
-      fit: BoxFit.contain,
-    );
-  }
-
-  // Separate method to build the "Pick Image" button
-  Widget buildPickImageButton() {
-    return Positioned(
-      bottom: 10, // Adjust the position as needed
-      right: 10, // Adjust the position as needed
-      child: ElevatedButton(
-        onPressed: pickImage,
-        child: Text('Pick Image'),
-      ),
-    );
-  }
-
-  // Separate method to build the text fields
-  Widget buildTextFields() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextField(
-          controller: productNameController,
-          decoration: InputDecoration(labelText: 'Product Name'),
-        ),
-        TextField(
-          controller: descriptionController,
-          decoration: InputDecoration(labelText: 'Description'),
-        ),
-        TextField(
-          controller: priceController,
-          decoration: InputDecoration(labelText: 'Price'),
-          keyboardType: TextInputType.number,
-        ),
-        TextField(
-          controller: categoryController,
-          decoration: InputDecoration(labelText: 'Category'),
-        ),
-        TextField(
-          controller: stockQuantityController,
-          decoration: InputDecoration(labelText: 'Stock Quantity'),
-        ),
-        SizedBox(height: 16.0),
-        ElevatedButton(
-          onPressed: () {
-            // Call the saveProduct method to save the product
-            saveProduct();
-          },
-          child: Text('Save Product'),
-        ),
-      ],
     );
   }
 
@@ -176,7 +192,7 @@ class _AddProductPageState extends State<AddProductPage> {
     newProduct.productName = productNameController.text;
     newProduct.description = descriptionController.text;
     newProduct.price = double.parse(priceController.text);
-    newProduct.category = categoryController.text;
+    newProduct.category = selectedCategory; // Use the selectedCategory
     newProduct.stockQuantity = stockQuantityController.text;
     newProduct.image = base64String;
     newProduct.userId = userId;
@@ -186,7 +202,7 @@ class _AddProductPageState extends State<AddProductPage> {
     print('Product saved: $saved');
     if (saved) {
       // Product saved successfully, navigate back to the previous screen
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     } else {
       // Handle error or show an error message
       _showMessage('Failed to save the product.');

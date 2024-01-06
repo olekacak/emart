@@ -41,6 +41,28 @@ class CartModel {
     };
   }
 
+  static Future<bool> addToCart(int productId, int quantity, double price, String productName) async {
+    CartController cartController = CartController(path: "/api/eMart2/cart.php"); // Update the path appropriately
+    cartController.setBody({
+      'productId': productId,
+      'quantity': quantity,
+      'price': price,
+      'productName': productName,
+      // Include any other necessary fields
+    });
+
+    try {
+      await cartController.post();
+      if (cartController.status() == 200) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print("Error adding to cart: $e");
+      return false;
+    }
+  }
+
   static Future<List<CartModel>> loadAll() async {
     List<CartModel> result = [];
     CartController cartProductController = CartController(path: "/api/eMart2/cart.php?cartId=1&userId=1");

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
+import '../../Model/Cart and Product/CartModel.dart';
 import '../../Model/Cart and Product/ProductModel.dart';
 import '../../Model/Cart and Product/ReviewModel.dart';
 import '../../Model/User/UserLoginModel.dart';
@@ -102,7 +103,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   void loadAllProducts() async {
     try {
-      allProducts = await ProductModel.loadAll(category: ''); // Fetch all products
+      allProducts = await ProductModel.loadAll(); // Fetch all products
       setState(() {}); // Refresh the UI with the loaded products
     } catch (e) {
       print('Error loading products: $e');
@@ -447,16 +448,23 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     );
   }
 
-
   void _addToCart(BuildContext context, int selectedQuantity) {
-    // Implement the logic to add the product to the cart with the selected quantity
-    // For example: Cart.addToCart(widget.product, selectedQuantity);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Added to Cart: $selectedQuantity items'),
-      ),
-    );
+    if (widget.product.productId != null) {
+      CartModel.addToCart(widget.product.productId!, selectedQuantity, widget.product.price, widget.product.productName).then((result) {
+        if (result) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Added to Cart: $selectedQuantity items')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to add to cart')),
+          );
+        }
+      });
+    } else {
+      // Handle the case where productId is null
+      // For example, show an error message
+    }
   }
 
   void _updateQuantity(int quantity) {

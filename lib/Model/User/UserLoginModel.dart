@@ -146,6 +146,43 @@ class UserLoginModel {
     return result;
   }
 
+  static Future<UserLoginModel?> getUserByEmail(String email) async {
+    try {
+      List<UserLoginModel> allUsers = await loadAll();
+      // Using firstWhere with orElse to handle not found case
+      return allUsers.firstWhere(
+            (user) => user.email == email,
+        //orElse: () => null, // Return null if no user found
+      );
+    } catch (e) {
+      print("Error in getUserByEmail: $e");
+      return null; // Return null in case of error
+    }
+  }
+
+  Future<bool> updateUser() async {
+    if (userId == null) {
+      print('Error: userId is null');
+      return false;
+    }
+
+    UserLoginController userLoginController = UserLoginController(
+        path: "/api/workshop2/user_login.php");
+
+    var userDataJson = toJson(); // This includes the updated password
+
+    userLoginController.setBody(userDataJson);
+    await userLoginController.put();
+
+    if (userLoginController.status() == 200) {
+      // Update local user data if necessary
+      return true;
+    } else {
+      print('Update failed. Error: ${userLoginController.result()}');
+      return false;
+    }
+  }
+
   Future<bool> deleteUser() async {
     if (userId == null) {
       // Cannot delete an expense without an ID

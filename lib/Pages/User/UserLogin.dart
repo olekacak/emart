@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:emartsystem/Model/User/UserLoginModel.dart';
 import 'package:emartsystem/Pages/User/UserSignUp.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'Admin.dart';
 import '../HomeCustomer.dart';
 import '../HomeSeller.dart';
+import 'ForgotPassword.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -24,6 +26,7 @@ class UserLoginPage extends StatefulWidget {
 class _UserLoginPageState extends State<UserLoginPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool isPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +35,16 @@ class _UserLoginPageState extends State<UserLoginPage> {
         title: Center(
           child: Text(
             "Welcome Back",
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white, // Set text color to white
+            ),
           ),
         ),
         centerTitle: true,
+        automaticallyImplyLeading: false, // Set to false to remove the back button
+        backgroundColor: Colors.purple, // Set the background color to purple
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -70,15 +79,70 @@ class _UserLoginPageState extends State<UserLoginPage> {
                   decoration: InputDecoration(
                     labelText: 'Username',
                     hintText: 'Enter your username',
+                    prefixIcon: Icon(Icons.person,
+                      color: Colors.purple,
+                    ),
+                    border: OutlineInputBorder(), // Normal border
+                    focusedBorder: OutlineInputBorder( // Border when TextField is focused
+                      borderSide: BorderSide(color: Colors.purple, width: 2.0),
+                    ),
+                    enabledBorder: OutlineInputBorder( // Border when TextField is enabled but not focused
+                      borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                    ),
+                    errorBorder: OutlineInputBorder( // Border when TextField has an error
+                      borderSide: BorderSide(color: Colors.red, width: 1.0),
+                    ),
+                    labelStyle: TextStyle(color: Colors.purple),
                   ),
                 ),
                 SizedBox(height: 16),
                 TextField(
                   controller: passwordController,
-                  obscureText: true,
+                  obscureText: !isPasswordVisible, // Toggle password visibility
                   decoration: InputDecoration(
                     labelText: 'Password',
                     hintText: 'Enter your password',
+                    prefixIcon: Icon(Icons.lock,
+                      color: Colors.purple,
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                        color: Colors.purple,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          isPasswordVisible = !isPasswordVisible;
+                        });
+                      },
+                    ),
+                    border: OutlineInputBorder(), // Normal border
+                    focusedBorder: OutlineInputBorder( // Border when TextField is focused
+                      borderSide: BorderSide(color: Colors.purple, width: 2.0),
+                    ),
+                    enabledBorder: OutlineInputBorder( // Border when TextField is enabled but not focused
+                      borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                    ),
+                    errorBorder: OutlineInputBorder( // Border when TextField has an error
+                      borderSide: BorderSide(color: Colors.red, width: 1.0),
+                    ),
+                    labelStyle: TextStyle(color: Colors.purple),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ForgotPasswordPage()),
+                      );
+                    },
+                    child: Text(
+                      'Forgot Password',
+                      style: TextStyle(color: Colors.purple), // Set text color to purple
+                    ),
                   ),
                 ),
                 SizedBox(height: 16),
@@ -142,7 +206,7 @@ class _UserLoginPageState extends State<UserLoginPage> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => HomeSellerPage(),
+                              builder: (context) => HomeSellerPage(user: user),
                             ),
                           );
                         } else {
@@ -168,24 +232,37 @@ class _UserLoginPageState extends State<UserLoginPage> {
                   child: Text('Log In'),
                 ),
                 SizedBox(height: 16),
-                TextButton(
-                  onPressed: () {
-                    // Handle "Forgot Password" logic here
-                  },
-                  child: Text('Forgot Password?'),
+                Center(
+                  child: RichText(
+                    text: TextSpan(
+                      text: 'Don\'t have an account? ',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                      ),
+                      children: <TextSpan>[
+                        TextSpan(
+                          text: 'Create Account',
+                          style: TextStyle(
+                            color: Colors.purple,
+                            fontSize: 16,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              // Navigate to the SignUpPage when 'Create Account' is tapped
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => UserSignUpPage(),
+                                ),
+                              );
+                            },
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                SizedBox(height: 16),
-                TextButton(
-                  onPressed: () {
-                    // Handle "Create Account" logic here
-                    // After clicking, navigate to SignUpPage
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => UserSignUpPage()),
-                    );
-                  },
-                  child: Text('Create Account'),
-                ),
+
                 SizedBox(height: 16),
               ],
             ),

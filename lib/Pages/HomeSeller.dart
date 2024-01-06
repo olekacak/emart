@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import '../Model/Cart and Product/ProductModel.dart';
+import '../Model/User/UserLoginModel.dart';
 import 'Cart and Product/Cart.dart';
 import 'Cart and Product/Filter.dart';
 import 'Cart and Product/ProductDetails.dart';
@@ -47,6 +48,10 @@ class CustomTab {
 }
 
 class HomeSellerPage extends StatefulWidget {
+  final UserLoginModel user;
+
+  HomeSellerPage({required this.user, Key? key}) : super(key: key);
+
   @override
   _HomeSellerPageState createState() => _HomeSellerPageState();
 }
@@ -74,7 +79,7 @@ class _HomeSellerPageState extends State<HomeSellerPage> with SingleTickerProvid
 
   _loadProducts() async {
     try {
-      products = await ProductModel.loadAll(category: '');
+      products = await ProductModel.loadAll();
 
       // Shuffle the products list randomly
       products.shuffle();
@@ -96,10 +101,10 @@ class _HomeSellerPageState extends State<HomeSellerPage> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     List<Widget> _pages = [
-      HomeSellerPage(),
+      HomeSellerPage(user: widget.user),
       const SearchPage(),
       const InboxPage(),
-      DashboardSellerPage(),
+      DashboardSellerPage(user: widget.user),
     ];
 
     return Scaffold(

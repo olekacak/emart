@@ -42,7 +42,7 @@ class _ViewShopPageState extends State<ViewShopPage> with SingleTickerProviderSt
 
   void loadUserProducts() async {
     try {
-      userProducts = await ProductModel.loadAll(category: '');
+      userProducts = await ProductModel.loadAll();
       userProducts = userProducts.where((product) => product.userId == widget.userId).toList();
     } catch (e) {
       print('Error loading products: $e');

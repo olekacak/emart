@@ -13,6 +13,7 @@
     String status;
     String sellerAccount;
     String roleId;
+    String image;
 
     UserSignUpModel({
       required this.username,
@@ -25,7 +26,9 @@
       required this.gender,
       this.sellerAccount = 'false',
       this.status = 'active',
-      required this.roleId});
+      required this.roleId,
+      required this.image,
+    });
 
     Map<String, dynamic> toJson() {
       return {
@@ -40,6 +43,7 @@
         'status': status,
         'sellerAccount': sellerAccount,
         'roleId': roleId,
+        'image':image,
       };
     }
 
