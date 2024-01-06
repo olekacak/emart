@@ -9,7 +9,8 @@ class DashboardController {
   final Map<String, String> _headers = {};
   dynamic _resultData;
 
-  DashboardController({required this.path, this.server = "http://192.168.0.121"});
+  DashboardController({required this.path, this.server =
+  "http://172.20.10.3"});
 
   setBody(Map<String, dynamic> data) {
     _body.clear();

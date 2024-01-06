@@ -83,7 +83,7 @@ class UserLoginModel {
 
   // Save user method
   Future<bool> saveUser() async {
-    UserLoginController userLoginController = UserLoginController(path: "/api/workshop2/user_login.php");
+    UserLoginController userLoginController = UserLoginController(path: "/api/eMart2/user_login.php");
     userLoginController.setBody(toJson());
     await userLoginController.postUserLogin();
 
@@ -123,63 +123,28 @@ class UserLoginModel {
     return false;
   }
 
-
-  // // Update user method
-  // Future<bool> updateUser() async {
-  //   if (userId == null) {
-  //     print('Update failed: userId is null.');
-  //     return false;
-  //   }
-  //
-  //   print('Updating user with userId: $userId');
-  //
-  //   UserLoginController userLoginController = UserLoginController(path: "/api/workshop2/user_login.php");
-  //   userLoginController.setBody(toJson());
-  //
-  //   print('Sending update request to the server...');
-  //   print('Request Payload: ${jsonEncode(toJson())}');
-  //
-  //   await userLoginController.put();
-  //
-  //   print('Update request completed.');
-  //
-  //   if (userLoginController.status() == 200) {
-  //     print('Update successful');
-  //     // Map<String, dynamic> result = userLoginController.result();
-  //     //
-  //     // if (result.containsKey('message') && result['message'] == 'User information updated successfully') {
-  //     //   userId = result['userId'] as int? ?? -1;
-  //     //   name = result['name'] as String? ?? '';
-  //     //   email = result['email'] as String? ?? '';
-  //     //   phoneNo = result['phoneNo'] as String? ?? '';
-  //     //   address = result['address'] as String? ?? '';
-  //     //   birthDate = result['birthDate'] as String? ?? '';
-  //     //   gender = result['gender'] as String? ?? '';
-  //     //   sellerAccount = result['sellerAccount'] as String? ?? '';
-  //     //   image = result['image'] as String? ?? '';
-  //     //
-  //     //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //     //   await prefs.setInt('userId', userId);
-  //     //   await prefs.setString('name', name);
-  //     //   await prefs.setString('email', email);
-  //     //   await prefs.setString('phoneNo', phoneNo);
-  //     //   await prefs.setString('address', address);
-  //     //   await prefs.setString('birthDate', birthDate);
-  //     //   await prefs.setString('gender', gender);
-  //     //   await prefs.setString('sellerAccount', sellerAccount!);
-  //     //   await prefs.setString('image', image!);
-  //     //
-  //     //   print('User information updated successfully.');
-  //
-  //       return true;
-  //    // }
-  //   }
-  //
-  //   // Print the error message in case of failure
-  //   print('Update failed. Error: ${userLoginController.result()["error"]}');
-  //   return false;
-  // }
-
+  static Future<List<UserLoginModel>> loadAll() async {
+    List<UserLoginModel> result = [];
+    UserLoginController userLoginController = UserLoginController(
+        path: "/api/workshop2/user_login.php");
+    await userLoginController.get();
+    if (userLoginController.status() == 200 && userLoginController.result() != null) {
+      var responseBody = userLoginController.result();
+      // Check if responseBody is a string or a list
+      List<dynamic> list;
+      if (responseBody is String) {
+        list = json.decode(responseBody);
+      } else if (responseBody is List) {
+        list = responseBody;
+      } else {
+        throw Exception('Unknown data format');
+      }
+      for (var item in list) {
+        result.add(UserLoginModel.fromJson(item));
+      }
+    }
+    return result;
+  }
 
   Future<bool> deleteUser() async {
     if (userId == null) {
@@ -187,7 +152,7 @@ class UserLoginModel {
       return false;
     }
 
-    UserLoginController userLoginController = UserLoginController(path: "/api/workshop2/user_login.php");
+    UserLoginController userLoginController = UserLoginController(path: "/api/eMart2/user_login.php");
     userLoginController.setBody(toJson());
 
     await userLoginController.delete();

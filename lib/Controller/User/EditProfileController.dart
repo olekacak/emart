@@ -9,7 +9,8 @@ class EditProfileController {
   final Map<String, String> _headers = {};
   dynamic _resultData;
 
-  EditProfileController({required this.path, this.server = "http://192.168.0.121"});
+  EditProfileController({required this.path, this.server =
+  "http://172.20.10.3"});
 
   setBody(Map<String, dynamic> data) {
     _body.clear();

@@ -48,7 +48,7 @@ class _EditProductPageState extends State<EditProductPage> {
   pickImage() async {
     final picker = ImagePicker();
     try {
-      final pickedFile = await picker.getImage(source: ImageSource.gallery);
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
       if (pickedFile != null) {
         final imageBytes = await pickedFile.readAsBytes();

@@ -1,9 +1,9 @@
-import 'dart:convert'; //json encode/decode
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import '../../Model/User/UserLoginModel.dart';
 
-
-class UserLoginController{
+class DiscountController {
   String path;
   String server;
   http.Response? _res;
@@ -11,14 +11,15 @@ class UserLoginController{
   final Map<String,String> _headers = {};
   dynamic _resultData;
 
-  UserLoginController({required this.path, this.server =
-  "http://172.20.10.3"}); // lab 10.131.77.206   //phone 172.20.10.9 // rumah 192.168.32.1 // library 10.132.6.160
+  DiscountController({required this.path, this.server =
+  "http://172.20.10.3"}); // phone 172.20.10.9 // rumah 192.168.32.1 // library 10.132.6.160
   setBody(Map<String, dynamic> data){
     _body.clear();
     _body.addAll(data);
     _headers["Content-Type"] = "application/json; charset=UTF-8";
   }
-  Future<void> postUserLogin() async {
+
+  Future<void> post() async {
     _res = await http.post(
       Uri.parse(server + path),
       headers: _headers,
@@ -44,14 +45,6 @@ class UserLoginController{
     _parseResult();
   }
 
-  Future<void> delete() async {
-    _res = await http.delete(
-      Uri.parse(server + path),
-      headers: _headers,
-      body: jsonEncode(_body),
-    );
-    _parseResult();
-  }
 
   void _parseResult(){
     // parse result into json structure if possible
@@ -70,4 +63,5 @@ class UserLoginController{
   int status() {
     return _res?.statusCode ?? 0;
   }
+
 }

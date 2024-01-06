@@ -34,7 +34,7 @@ class CartProductModel {
 
   static Future<List<CartProductModel>> loadAll() async {
     List<CartProductModel> result = [];
-    CartProductController cartProductController = CartProductController(path: "/api/workshop2/cart_product.php");
+    CartProductController cartProductController = CartProductController(path: "/api/eMart2/cart_product.php");
     await cartProductController.get();
     if (cartProductController.status() == 200 && cartProductController.result() != null) {
       for (var item in cartProductController.result()) {
@@ -45,7 +45,7 @@ class CartProductModel {
   }
 
   Future<bool> saveCartProduct() async {
-    CartProductController cartProductController = CartProductController(path: "/api/workshop2/cart_product.php");
+    CartProductController cartProductController = CartProductController(path: "/api/eMart2/cart_product.php");
     cartProductController.setBody(toJson());
     await cartProductController.post();
 
@@ -61,7 +61,7 @@ class CartProductModel {
       return false;
     }
 
-    CartProductController cartProductController = CartProductController(path: "/api/workshop2/cart_product.php");
+    CartProductController cartProductController = CartProductController(path: "/api/eMart2/cart_product.php");
     cartProductController.setBody(toJson());
     await cartProductController.put();
     if (cartProductController.status() == 200) {
