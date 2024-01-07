@@ -46,9 +46,9 @@ class ProductModel {
     };
   }
 
-  static Future<List<ProductModel>> loadAll() async {
+  static Future<List<ProductModel>> loadAll({required String category}) async {
     List<ProductModel> result = [];
-    ProductController productController = ProductController(path: "/api/eMart2/product.php");
+    ProductController productController = ProductController(path: "/api/workshop2/product.php");
     await productController.get();
     if (productController.status() == 200 && productController.result() != null) {
       for (var item in productController.result()) {
@@ -59,7 +59,7 @@ class ProductModel {
   }
 
   Future<void> loadProductById() async {
-    ProductController productController = ProductController(path: "/api/eMart2/product.php");
+    ProductController productController = ProductController(path: "/api/workshop2/product.php");
     productController.setBody({'productId': productId});
     await productController.get();
 
@@ -77,7 +77,7 @@ class ProductModel {
   }
 
   Future<bool> saveProduct() async {
-    ProductController productController = ProductController(path: "/api/eMart2/product.php");
+    ProductController productController = ProductController(path: "/api/workshop2/product.php");
     productController.setBody(toJson());
     await productController.post();
 
@@ -94,7 +94,7 @@ class ProductModel {
       return false;
     }
 
-    ProductController productController = ProductController(path: "/api/eMart2/product.php");
+    ProductController productController = ProductController(path: "/api/workshop2/product.php");
     productController.setBody(toJson());
     await productController.put();
 
@@ -121,7 +121,7 @@ class ProductModel {
       return false;
     }
 
-    ProductController productController = ProductController(path: "/api/eMart2/product.php");
+    ProductController productController = ProductController(path: "/api/workshop2/product.php");
     // Set the necessary body or parameters for deletion. Often, this is just the ID.
     productController.setBody({'productId': productId});
 
@@ -134,6 +134,6 @@ class ProductModel {
       print('Delete failed. Error: ${productController.result()}');
       return false;
     }
-  }
+    }
 
 }

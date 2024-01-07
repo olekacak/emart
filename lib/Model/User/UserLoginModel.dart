@@ -140,7 +140,9 @@ class UserLoginModel {
         throw Exception('Unknown data format');
       }
       for (var item in list) {
-        result.add(UserLoginModel.fromJson(item));
+        var user = UserLoginModel.fromJson(item);
+        print("Fetched user: ${user.name}, Email: ${user.email}, Image: ${user.image}");
+        result.add(user);
       }
     }
     return result;

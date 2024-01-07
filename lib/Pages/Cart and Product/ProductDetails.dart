@@ -103,7 +103,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   void loadAllProducts() async {
     try {
-      allProducts = await ProductModel.loadAll(); // Fetch all products
+      allProducts = await ProductModel.loadAll(category: ''); // Fetch all products
       setState(() {}); // Refresh the UI with the loaded products
     } catch (e) {
       print('Error loading products: $e');

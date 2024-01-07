@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Model/Cart and Product/DiscountModel.dart';
 import '../../Model/User/UserLoginModel.dart';
@@ -6,19 +7,33 @@ import '../../Model/User/UserLoginModel.dart';
 typedef OnDiscountAddedCallback = void Function();
 
 class DiscountPage extends StatefulWidget {
-  final UserLoginModel user;
   final OnDiscountAddedCallback onDiscountAdded;
 
-  const DiscountPage({required this.user, required this.onDiscountAdded});
+  const DiscountPage({required this.onDiscountAdded});
 
   @override
   _DiscountPageState createState() => _DiscountPageState();
 }
 
 class _DiscountPageState extends State<DiscountPage> {
+
+  int userId = -1;
+
   String selectedName = 'Free Shipping';
   String selectedValue = '-'; // Set the default value to '-'
   String selectedMin = 'RM5'; // Set the default value to 'RM5'
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  void _loadUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getInt('userId') ?? -1;
+    setState(() {});
+  }
 
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -137,7 +152,7 @@ class _DiscountPageState extends State<DiscountPage> {
     newDiscount.name = selectedName;
     newDiscount.value = selectedValue;
     newDiscount.minPurchaseAmount = selectedMin;
-    newDiscount.userId = widget.user.userId;
+    newDiscount.userId = userId;
 
     bool saved = await newDiscount.saveDiscount();
     print('Discount saved: $saved');

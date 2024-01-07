@@ -10,10 +10,6 @@ import 'Profile.dart';
 import 'UserLogin.dart';
 
 class DashboardSellerPage extends StatefulWidget {
-  final UserLoginModel user;
-
-  DashboardSellerPage({required this.user, Key? key}) : super(key: key);
-
   @override
   _DashboardSellerPageState createState() => _DashboardSellerPageState();
 }
@@ -155,12 +151,11 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => MyShopPage(user: widget.user)
-                                ),
+                                MaterialPageRoute(builder: (context) => MyShopPage()),
                               );
                             },
                             leading: Icon(Icons.swap_horiz),
-                            title: Text('Switch Hosting')
+                            title: Text('Switch Hosting'),
                           ),
                         ],
                       ),

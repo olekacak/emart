@@ -206,7 +206,7 @@ class _UserLoginPageState extends State<UserLoginPage> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => HomeSellerPage(user: user),
+                              builder: (context) => HomeSellerPage(),
                             ),
                           );
                         } else {

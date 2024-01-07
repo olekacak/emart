@@ -11,10 +11,6 @@ import '../../Model/User/UserLoginModel.dart';
 import 'Discount.dart';
 
 class MyShopPage extends StatefulWidget {
-  final UserLoginModel user;
-
-  MyShopPage({required this.user, Key? key}) : super(key: key);
-
   @override
   _MyShopPageState createState() => _MyShopPageState();
 }
@@ -28,7 +24,6 @@ class _MyShopPageState extends State<MyShopPage>
 
   Uint8List? selectedImage;
   String base64String = '';
-
   int userId = -1;
   String name = '';
   String email = '';
@@ -41,15 +36,10 @@ class _MyShopPageState extends State<MyShopPage>
     products = [];
     discounts = [];
     reviews = [];
-    _loadData(); // Combine the data loading into a single method
+    _loadProducts();
+    _loadDiscounts();
     _loadReviews();
-    _tabController.addListener(_handleTabChange);
-  }
-
-  _loadData() async {
-    await _loadProducts();
-    await _loadDiscounts();
-    await _loadReviews();
+    _tabController.addListener(_handleTabChange);// Initial data load when the page is created
   }
 
   _handleTabChange() {
@@ -58,28 +48,17 @@ class _MyShopPageState extends State<MyShopPage>
     });
   }
 
-  // Method to add a new product and update the product list
-  _addProduct() async {
-    // Navigate to the AddProductPage and wait for result
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AddProductPage(),
-      ),
-    );
-
-    // Check if a new product was added
-    if (result == true) {
-      // Reload the product list
-      await _loadProducts();
-      // Optionally, you can show a message indicating success
-      _showMessage('Product added successfully');
-    }
-  }
-
-
   _loadProducts() async {
-    List<ProductModel> loadedProducts = await ProductModel.loadAll();
+    List<ProductModel> loadedProducts = await ProductModel.loadAll(category: '');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getInt('userId') ?? -1;
+
+    if (userId != -1) {
+      name = prefs.getString('name') ?? '';
+      email = prefs.getString('email') ?? '';
+      image = prefs.getString('image') ?? '';
+      print('SharedPreferences = ${name}');
+    }
     setState(() {
       products = loadedProducts;
     });
@@ -118,63 +97,63 @@ class _MyShopPageState extends State<MyShopPage>
 
   @override
   void dispose() {
-    _tabController.removeListener(_handleTabChange);
     _tabController.dispose();
     super.dispose();
   }
 
   void handleDiscountAdded() {
+    // Reload the discounts or perform any other necessary updates
+    // when a new discount is added
     _loadDiscounts();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('My Shop'),
-      ),
-      body: Column(
-        children: <Widget>[
-          Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            elevation: 5.0,
-            margin: EdgeInsets.symmetric(vertical: 8.0),
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.grey[200],
-                    backgroundImage: image != null
-                        ? MemoryImage(base64Decode(image!))
-                        : null,
-                  ),
-                  SizedBox(width: 16.0),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Seller: ${widget.user.username}',
-                          style: TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+        appBar: AppBar(
+          title: Text('My Shop'),
+        ),
+        body: Column(
+          children: <Widget>[
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              elevation: 5.0,
+              margin: EdgeInsets.symmetric(vertical: 8.0),
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundColor: Colors.grey[200],
+                      backgroundImage: image != null
+                          ? MemoryImage(base64Decode(image!))
+                          : null,
                     ),
-                  ),
-                ],
+                    SizedBox(width: 16.0),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Seller: ${name}',
+                            style: TextStyle(
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          SizedBox(height: 16.0),
-          Container(
-            child: TabBar(
+            SizedBox(height: 16.0),
+            TabBar(
               controller: _tabController,
               tabs: [
                 Tab(text: 'Listing'),
@@ -182,148 +161,134 @@ class _MyShopPageState extends State<MyShopPage>
                 Tab(text: 'Feedback'),
               ],
             ),
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, // Number of columns in the grid
-                    crossAxisSpacing: 8.0, // Spacing between columns
-                    mainAxisSpacing: 8.0, // Spacing between rows
-                  ),
-                  itemCount: products
-                      .where((product) => product.userId == widget.user.userId)
-                      .length,
-                  itemBuilder: (context, index) {
-                    ProductModel product = products
-                        .where((product) => product.userId == widget.user.userId)
-                        .toList()[index];
-
-                    // Ensure the Base64 string is a multiple of 4 in length
-                    String base64Image = product.image!;
-                    if (base64Image.length % 4 != 0) {
-                      base64Image = base64Image.padRight(
-                        base64Image.length + 4 - base64Image.length % 4,
-                        '=',
-                      );
-                    }
-                    // Decode the Base64 string to bytes
-                    Uint8List imageBytes = base64.decode(base64Image);
-
-                    // Replace the return Card(...) with the following:
-                    return GestureDetector(
-                      onTap: () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ProductDetailSellerPage(product: product),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  if (_tabController.index == 0)
+                    GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2, // Number of columns in the grid
+                        crossAxisSpacing: 8.0, // Spacing between columns
+                        mainAxisSpacing: 8.0, // Spacing between rows
+                      ),
+                      itemCount: products
+                          .where((product) => product.userId == userId)
+                          .length,
+                      itemBuilder: (context, index) {
+                        ProductModel product = products
+                            .where((product) => product.userId == userId)
+                            .toList()[index];
+                        // Ensure the Base64 string is a multiple of 4 in length
+                        String base64Image = product.image!;
+                        if (base64Image.length % 4 != 0) {
+                          base64Image = base64Image.padRight(
+                            base64Image.length + 4 - base64Image.length % 4,
+                            '=',
+                          );
+                        }
+                        // Decode the Base64 string to bytes
+                        Uint8List imageBytes = base64.decode(base64Image);
+                        return Card(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: <Widget>[
+                              ClipRect(
+                                child: Image.memory(
+                                  imageBytes,
+                                  fit: BoxFit.contain, // Product image
+                                  height: 150.0, // Set a fixed height for the image
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text(product.productName),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Text('\RM ${product.price}'), // Product price
+                              ),
+                            ],
                           ),
                         );
-                        // Reload the data when the user navigates back to this page
-                        _loadProducts();
                       },
-                      child: Card(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: <Widget>[
-                            Expanded(
-                              child: (imageBytes != null) ? Image.memory(imageBytes, fit: BoxFit.cover) : Container(),
+                    ),
+
+                  if (_tabController.index == 1)
+                    ListView.builder(
+                      itemCount: discounts
+                          .where((discount) => discount.userId == userId)
+                          .length,
+                      itemBuilder: (context, index) {
+                        DiscountModel discount = discounts
+                            .where((discount) => discount.userId == userId)
+                            .toList()[index];
+                        return Card(
+                          child: ListTile(
+                            title: Text(
+                                'Discount Name: ${discount.name ?? 'N/A'}'),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Discount Value: ${discount.value}'),
+                                Text(
+                                    'Minimum Purchase: ${discount.minPurchaseAmount}'),
+                              ],
                             ),
-                            Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                product.productName,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Text('\RM ${product.price}'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                if (_tabController.index == 1)
-                  ListView.builder(
-                    itemCount: discounts
-                        .where((discount) => discount.userId == widget.user.userId)
-                        .length,
-                    itemBuilder: (context, index) {
-                      DiscountModel discount = discounts
-                          .where((discount) => discount.userId == widget.user.userId)
-                          .toList()[index];
-                      return Card(
-                        child: ListTile(
-                          title: Text(
-                              'Discount Name: ${discount.name ?? 'N/A'}'),
+                          ),
+                        );
+                      },
+                    )
+                  else if (_tabController.index == 2)
+                    ListView.builder(
+                      itemCount: reviews
+                          .where((review) =>
+                      review.userId == userId &&
+                          products.any((product) =>
+                          product.productId == review.productId &&
+                              product.userId == userId))
+                          .length,
+                      itemBuilder: (context, index) {
+                        ReviewModel review = reviews
+                            .where((review) =>
+                        review.userId == userId &&
+                            products.any((product) =>
+                            product.productId == review.productId &&
+                                product.userId == userId))
+                            .toList()[index];
+
+                        // Find the corresponding ProductModel for the given review
+                        ProductModel? associatedProduct = products.firstWhere(
+                              (product) => product.productId == review.productId,
+                          orElse: () => ProductModel(
+                            productId: 0,
+                            productName: 'N/A',
+                            description: 'N/A',
+                            price: 0.0,
+                            category: 'N/A',
+                            stockQuantity: 'N/A',
+                            image: 'N/A',
+                          ),
+                        );
+
+                        return ListTile(
+                          title: Text('Rating: ${review.rating}'),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Discount Value: ${discount.value}'),
-                              Text(
-                                  'Minimum Purchase: ${discount.minPurchaseAmount}'),
+                              Text('Comment: ${review.comment}'),
+                              Text('Product ID: ${review.productId}'),
+                              Text('Product Name: ${associatedProduct.productName}'),
                             ],
                           ),
-                        ),
-                      );
-                    },
-                  )
-                else if (_tabController.index == 2)
-                  ListView.builder(
-                    itemCount: reviews
-                        .where((review) =>
-                    review.userId == widget.user.userId &&
-                        products.any((product) =>
-                        product.productId == review.productId &&
-                            product.userId == widget.user.userId))
-                        .length,
-                    itemBuilder: (context, index) {
-                      ReviewModel review = reviews
-                          .where((review) =>
-                      review.userId == widget.user.userId &&
-                          products.any((product) =>
-                          product.productId == review.productId &&
-                              product.userId == widget.user.userId))
-                          .toList()[index];
-
-                      // Find the corresponding ProductModel for the given review
-                      ProductModel? associatedProduct = products.firstWhere(
-                            (product) => product.productId == review.productId,
-                        orElse: () => ProductModel(
-                          productId: 0,
-                          productName: 'N/A',
-                          description: 'N/A',
-                          price: 0.0,
-                          category: 'N/A',
-                          stockQuantity: 'N/A',
-                          image: 'N/A',
-                        ),
-                      );
-
-                      return ListTile(
-                        title: Text('Rating: ${review.rating}'),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Comment: ${review.comment}'),
-                            Text('Product ID: ${review.productId}'),
-                            Text('Product Name: ${associatedProduct.productName}'),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-              ],
+                        );
+                      },
+                    ),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       floatingActionButton: _tabController.index == 0 ||
           _tabController.index == 1
           ? Container(
@@ -348,7 +313,6 @@ class _MyShopPageState extends State<MyShopPage>
                     context,
                     MaterialPageRoute(
                       builder: (context) => DiscountPage(
-                        user: widget.user,
                         onDiscountAdded: handleDiscountAdded,
                       ),
                     ),
@@ -382,4 +346,3 @@ class _MyShopPageState extends State<MyShopPage>
     }
   }
 }
-

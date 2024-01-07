@@ -78,7 +78,7 @@ class _HomeCustomerPageState extends State<HomeCustomerPage> with SingleTickerPr
 
   _loadProducts() async {
     try {
-      products = await ProductModel.loadAll();
+      products = await ProductModel.loadAll(category: '');
 
       // Shuffle the products list randomly
       products.shuffle();

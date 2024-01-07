@@ -48,9 +48,6 @@ class CustomTab {
 }
 
 class HomeSellerPage extends StatefulWidget {
-  final UserLoginModel user;
-
-  HomeSellerPage({required this.user, Key? key}) : super(key: key);
 
   @override
   _HomeSellerPageState createState() => _HomeSellerPageState();
@@ -79,7 +76,7 @@ class _HomeSellerPageState extends State<HomeSellerPage> with SingleTickerProvid
 
   _loadProducts() async {
     try {
-      products = await ProductModel.loadAll();
+      products = await ProductModel.loadAll(category: '');
 
       // Shuffle the products list randomly
       products.shuffle();
@@ -101,10 +98,10 @@ class _HomeSellerPageState extends State<HomeSellerPage> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     List<Widget> _pages = [
-      HomeSellerPage(user: widget.user),
+      HomeSellerPage(),
       const SearchPage(),
       const InboxPage(),
-      DashboardSellerPage(user: widget.user),
+      DashboardSellerPage(),
     ];
 
     return Scaffold(
