@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Controller/Cart and Product/ReviewController.dart';
 
@@ -36,6 +37,12 @@ class ReviewModel {
       'comment': comment,
       'reviewDate': reviewDate,
     };
+  }
+
+  // Call this function when a review is selected
+  Future<void> saveReviewId(int reviewId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('selectedReviewId', reviewId);
   }
 
   static Future<List<ReviewModel>> loadAll() async {
@@ -78,5 +85,28 @@ class ReviewModel {
     }
     return false;
   }
+
+  Future<bool> deleteReview() async {
+    if (reviewId == null) {
+      // Cannot delete a product without an ID
+      return false;
+    }
+
+    ReviewController reviewController = ReviewController(path:
+    "/api/eMart2/review.php");
+    // Set the necessary body or parameters for deletion. Often, this is just the ID.
+    reviewController.setBody({'reviewId': reviewId});
+
+    await reviewController.delete();
+
+    if (reviewController.status() == 200) {
+      return true;
+    } else {
+      // Print the error message in case of failure
+      print('Delete failed. Error: ${reviewController.result()}');
+      return false;
+    }
+  }
+
 
 }

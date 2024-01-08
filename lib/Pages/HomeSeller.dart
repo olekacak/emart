@@ -5,7 +5,7 @@ import '../Model/Cart and Product/ProductModel.dart';
 import '../Model/User/UserLoginModel.dart';
 import 'Cart and Product/Cart.dart';
 import 'Cart and Product/Filter.dart';
-import 'Cart and Product/ProductDetails.dart';
+import 'Cart and Product/ProductDetail.dart';
 import 'User/DashboardCustomer.dart';
 import 'User/DashboardSeller.dart';
 import 'Inbox.dart';
@@ -233,7 +233,7 @@ class _HomeSellerPageState extends State<HomeSellerPage> with SingleTickerProvid
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ProductDetailsPage(product: product),
+                builder: (context) => ProductDetailPage(product: product),
               ),
             );
           },

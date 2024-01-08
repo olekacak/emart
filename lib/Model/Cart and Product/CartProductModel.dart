@@ -4,7 +4,7 @@ class CartProductModel {
   int? cartProductId;
   int? cartId;
   int? productId;
-  String quantity;
+  int quantity;
   double price;
 
   CartProductModel({
@@ -19,7 +19,7 @@ class CartProductModel {
       : cartProductId = json['cartId'] as int? ?? 0,
         cartId = json['cartId'] as int? ?? 0,
         productId = json['productId'] as int? ?? 0,
-        quantity = json['quantity'] as String? ?? '',
+        quantity = json['quantity'] as int? ?? 0,
         price = (json['price'] as num?)?.toDouble() ?? 0.0;
 
   Map<String, dynamic> toJson() {

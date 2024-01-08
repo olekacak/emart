@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:emartsystem/Pages/User/UserLogin.dart';
-import '../../Model/User/UserLoginModel.dart';  // Replace with your actual model import path
+import '../../Model/User/UserLoginModel.dart';
+import 'User.dart';  // Replace with your actual model import path
 
 class AdminPage extends StatefulWidget {
   @override
@@ -78,10 +79,26 @@ class _AdminPageState extends State<AdminPage> {
             leading: Icon(Icons.person),
             title: Text('User'),
             onTap: () {
-              // Navigation logic
-            },
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) => UserPage(users: []),
+              //   ),
+              // );
+              },
           ),
-          // Additional ListTiles as required
+          ListTile(
+            leading: Icon(Icons.logout),
+            title: Text('Log Out'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UserLoginPage(),
+                ),
+              );
+              },
+          ),
         ],
       ),
     );

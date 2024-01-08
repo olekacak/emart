@@ -4,8 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Model/Cart and Product/CartProductModel.dart';
 import '../../Model/Cart and Product/ProductModel.dart';
-import '../../Model/Cart and Product/CartModel.dart'; // Import CartModel if needed
-import '../../Model/User/UserLoginModel.dart';
 import 'Cart.dart';
 
 class ProductDetailPage extends StatefulWidget {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import '../../Model/Cart and Product/ProductModel.dart';
 import '../../Model/User/UserLoginModel.dart';
-import 'ProductDetails.dart';
+import 'ProductDetail.dart';
 
 class ViewShopPage extends StatefulWidget {
   final int userId;
@@ -119,7 +119,7 @@ class _ViewShopPageState extends State<ViewShopPage> with SingleTickerProviderSt
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ProductDetailsPage(product: product),
+                builder: (context) => ProductDetailPage(product: product),
               ),
             );
           },

@@ -9,6 +9,7 @@ import '../../Model/Cart and Product/ProductModel.dart';
 import '../../Model/Cart and Product/ReviewModel.dart';
 import '../../Model/User/UserLoginModel.dart';
 import 'Discount.dart';
+import 'Report.dart';
 
 class MyShopPage extends StatefulWidget {
   @override
@@ -81,6 +82,43 @@ class _MyShopPageState extends State<MyShopPage>
     } catch (e) {
       print('Error loading discounts: $e');
       // Handle the error as needed
+    }
+  }
+
+  void _confirmAndDeleteReview(ReviewModel review) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Confirm Deletion"),
+          content: Text("Are you sure you want to delete this review?"),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: Text("Delete"),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                _deleteReview(review); // Proceed with deletion
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteReview(ReviewModel review) async {
+    bool success = await review.deleteReview();
+    if (success) {
+      _showMessage("Review Deleted Successfully");
+      _loadReviews(); // Reload reviews to update the UI
+    } else {
+      _showMessage("Failed to Delete Review");
     }
   }
 
@@ -281,7 +319,52 @@ class _MyShopPageState extends State<MyShopPage>
                               Text('Product Name: ${associatedProduct.productName}'),
                             ],
                           ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.delete),
+                                onPressed: () => _confirmAndDeleteReview(review),
+                              ),
+
+                              PopupMenuButton<int>(
+                                onSelected: (int item) async {
+                                  if (item == 0) {
+                                    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+                                    if (review.reviewId != null) {
+                                      await prefs.setInt('selectedReviewId', review.reviewId!);
+
+                                      // Navigate to ReportPage
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => ReportPage()),
+                                      );
+                                    } else {
+                                      // Handle the case where reviewId is null
+                                      // For example, show an error message
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Review ID is not available.'))
+                                      );
+                                    }
+                                  }
+                                  // Add more cases here for other menu items if needed
+                                },
+
+                                itemBuilder: (context) {
+                                  return [
+                                    PopupMenuItem<int>(
+                                      value: 0,
+                                      child: Text('Report'),
+                                    ),
+                                    // You can add more items here if needed
+                                  ];
+                                },
+                              ),
+                            ],
+                          ),
                         );
+
                       },
                     ),
                 ],
