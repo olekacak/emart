@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:emartsystem/Pages/User/UserLogin.dart';
 import '../../Model/User/UserLoginModel.dart';
-import 'User.dart';  // Replace with your actual model import path
+import 'InboxReport.dart';
+import 'ReviewReport.dart';
+import 'User.dart';
+import 'UserSeller.dart';  // Replace with your actual model import path
 
 class AdminPage extends StatefulWidget {
   @override
@@ -45,7 +48,7 @@ class _AdminPageState extends State<AdminPage> {
         title: Text('Admin Page'),
       ),
       drawer: _buildDrawer(),
-      body: _buildUserList(),
+      //body: _buildUserList(),
     );
   }
 
@@ -69,22 +72,27 @@ class _AdminPageState extends State<AdminPage> {
             },
           ),
           ListTile(
-            leading: Icon(Icons.filter_list),
-            title: Text('Filter'),
+            leading: Icon(Icons.inbox),
+            title: Text('Inbox'),
             onTap: () {
-              // Navigation logic
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => InboxReportPage(),
+                ),
+              );
             },
           ),
           ListTile(
             leading: Icon(Icons.person),
             title: Text('User'),
             onTap: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => UserPage(users: []),
-              //   ),
-              // );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UserSellerPage(),
+                ),
+              );
               },
           ),
           ListTile(
@@ -104,46 +112,7 @@ class _AdminPageState extends State<AdminPage> {
     );
   }
 
-  Widget _buildUserList() {
-    return ListView.builder(
-      itemCount: users.length,
-      itemBuilder: (context, index) {
-        final user = users[index];
-        print('User: ${user.username}, Email: ${user.email}, Image: ${user.image}');
 
-        return ListTile(
-          leading: CircleAvatar(
-            radius: 30,
-            backgroundColor: Colors.grey[200],
-            backgroundImage: user.image != null
-                ? MemoryImage(base64Decode(user.image!))
-                : null,
-          ),
-          title: Row(
-            children: [
-              SizedBox(width: 16.0),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Seller: ${user.username}',
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    // Add more details here if needed
-                  ],
-                ),
-              ),
-            ],
-          ),
-          onTap: () => _showUserDetails(user),
-        );
-      },
-    );
-  }
 
   void _showUserDetails(UserLoginModel user) {
     // Implement this method to navigate to a detailed user view

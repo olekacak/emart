@@ -1,13 +1,11 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:emartsystem/Pages/Cart%20and%20Product/AddProductPage.dart';
-import 'package:emartsystem/Pages/Cart%20and%20Product/ProductDetailSeller.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Model/Cart and Product/DiscountModel.dart';
 import '../../Model/Cart and Product/ProductModel.dart';
 import '../../Model/Cart and Product/ReviewModel.dart';
-import '../../Model/User/UserLoginModel.dart';
 import 'Discount.dart';
 import 'Report.dart';
 

@@ -45,6 +45,7 @@ class ReviewModel {
     await prefs.setInt('selectedReviewId', reviewId);
   }
 
+
   static Future<List<ReviewModel>> loadAll() async {
     List<ReviewModel> result = [];
     ReviewController reviewController = ReviewController(
