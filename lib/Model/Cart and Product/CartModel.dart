@@ -1,59 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../Controller/Cart and Product/CartController.dart';
 
 class CartModel {
   int? cartId;
   int? userId;
-  int? cartProductId; // Add new fields
-  int? quantity;
-  double? price;
-  int? productId;
-  String productName;
+  String status;
 
   CartModel({
     this.cartId,
     this.userId,
-    this.cartProductId, // Initialize new fields in the constructor
-    this.quantity,
-    this.price,
-    this.productId,
-    required this.productName,
+    required this.status,
   });
 
   CartModel.fromJson(Map<String, dynamic> json)
       : cartId = json['cartId'] as int?,
         userId = json['userId'] as int?,
-        cartProductId = json['cartProductId'] as int?,
-        quantity = json['quantity'] as int?,
-        price = json['price'] is int ? (json['price'] as int).toDouble() : json['price'] as double?,
-        productId = json['productId'] as int?,
-        productName = json['productName'];
+        status = json['status'];
 
 
   Map<String, dynamic> toJson() {
     return {
       'cartId': cartId,
       'userId': userId,
-      'cartProductId': cartProductId, // Add new fields to the JSON representation
-      'quantity': quantity,
-      'price': price,
-      'productId': productId,
     };
   }
 
-  static Future<bool> addToCart(int productId, int quantity, double price, String productName) async {
-    CartController cartController = CartController(path: "/api/eMart2/cart.php"); // Update the path appropriately
+  void setId(int newCartId) {
+    cartId = newCartId;
+  }
+  Future<void> getId(int? id, String idType) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(idType, id ?? -1);
+  }
+
+  Future<bool> addCart() async {
+    CartController cartController = CartController(path: "/api/workshop2/cart.php");
     cartController.setBody({
-      'productId': productId,
-      'quantity': quantity,
-      'price': price,
-      'productName': productName,
-      // Include any other necessary fields
+      'userId': userId,
+      'cartId': cartId, // Use the current value of cartId
+      'status': status,
     });
 
     try {
       await cartController.post();
       if (cartController.status() == 200) {
+        Map<String, dynamic> result = await cartController.result();
         return true;
       }
       return false;
@@ -63,13 +55,23 @@ class CartModel {
     }
   }
 
+
   static Future<List<CartModel>> loadAll() async {
     List<CartModel> result = [];
-    CartController cartProductController = CartController(path: "/api/eMart2/cart.php?cartId=1&userId=1");
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int userId = prefs.getInt('userId') ?? -1;
+    CartController cartProductController = CartController(path: "/api/workshop2/cart.php?userId=$userId");
     await cartProductController.get();
-    if (cartProductController.status() == 200 && cartProductController.result() != null) {
-      for (var item in cartProductController.result()) {
-        result.add(CartModel.fromJson(item));
+
+    if (cartProductController.status() == 200) {
+      // Extract 'data' field from the response
+      var responseData = cartProductController.result()?['data'];
+
+      // Check if 'data' is a non-null list
+      if (responseData != null && responseData is List) {
+        for (var item in responseData) {
+          result.add(CartModel.fromJson(item));
+        }
       }
     }
     return result;

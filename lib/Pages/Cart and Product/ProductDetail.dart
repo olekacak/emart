@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import '../../Model/Cart and Product/CartModel.dart';
 import '../../Model/Cart and Product/CartProductModel.dart';
 import '../../Model/Cart and Product/ProductModel.dart';
 import 'Cart.dart';
@@ -19,7 +19,70 @@ class ProductDetailPage extends StatefulWidget {
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
   int selectedQuantity = 1;
-  bool success = false; // Add a success variable to track adding to cart
+  bool success = false;
+  int userId = -1;
+  int cartId = -1;
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserId();
+    initializeCart();
+  }
+  Future<void> initializeCart() async {
+    int? retrievedCartId = await checkCart();
+    if (retrievedCartId != null) {
+      setState(() {
+        cartId = retrievedCartId;
+      });
+    } else {
+      print('Failed to retrieve cartId');
+    }
+  }
+
+  Future<int?> checkCart() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getInt('userId') ?? -1;
+    if (userId != -1) {
+      // Check if the cart exists for the user
+      List<CartModel> carts = await CartModel.loadAll();
+      if (carts.isEmpty) {
+        // Cart doesn't exist for the user, create a new one
+        bool cartCreated = await CartModel(userId: userId, status: 'pending').addCart();
+        if (cartCreated) {
+          print('New cart created successfully');
+          carts = await CartModel.loadAll();
+        } else {
+          print('Failed to create a new cart');
+        }
+      } else {
+        // Check if the existing cart's status is "completed"
+        if (carts.first.status == 'completed') {
+          // If the status is "completed", create a new cart
+          bool cartCreated = await CartModel(userId: userId, status: 'pending').addCart();
+          if (cartCreated) {
+            print('New cart created successfully');
+            carts = await CartModel.loadAll(); // Reload carts after creation
+          } else {
+            print('Failed to create a new cart');
+          }
+        } else {
+          print('Cart already exists for the user');
+        }
+      }
+
+      // Retrieve the cartId of the created or existing cart
+      int? cartId = carts.isNotEmpty ? carts.first.cartId! : -1;
+      print('Retrieved cartId: $cartId');
+      await prefs.setInt('cartId', cartId ?? -1);
+      return cartId;
+    }
+  }
+
+  loadUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+     userId = prefs.getInt('userId') ?? -1;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -123,18 +186,19 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   SizedBox(height: 12.0),
                   ElevatedButton(
                     onPressed: () async {
-                      // Load the user's ID
-                      int userId = await _loadUserId();
                       if (userId != -1) {
+
                         // User ID is available, proceed to add the product to the cart
                         CartProductModel cartProduct = CartProductModel(
+                          cartId: cartId,
+                          productName: '',
                           productId: widget.product.productId,
                           quantity: selectedQuantity,
                           price: widget.product.price,
                         );
 
-                        // Call a function to add to the cart, set 'success' accordingly
-                        success = await _addToCart(cartProduct);
+                        // Call the saveCartProduct method on the cartProduct instance
+                        success = await cartProduct.saveCartProduct();
 
                         if (success) {
                           Navigator.push(
@@ -147,7 +211,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                'Failed to add product to cart. Please check your internet connection or try again later.',
+                                'Failed to add product to cart.',
                               ),
                             ),
                           );
@@ -174,18 +238,5 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         ),
       ),
     );
-  }
-
-  Future<int> _loadUserId() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int userId = prefs.getInt('userId') ?? -1;
-    return userId;
-  }
-
-  Future<bool> _addToCart(CartProductModel cartProduct) async {
-    // Implement your logic to add the product to the cart here
-    // Return true if successful, false otherwise
-    // You can use the CartModel class to manage the cart
-    return true; // Replace with actual implementation
   }
 }

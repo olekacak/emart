@@ -1,6 +1,5 @@
 import 'dart:convert'; //json encode/decode
 import 'package:http/http.dart' as http;
-import 'package:flutter/material.dart';
 
 class CartProductController {
   String path;
@@ -11,7 +10,7 @@ class CartProductController {
   dynamic _resultData;
 
   CartProductController({required this.path, this.server =
-  "http://172.20.10.3"}); // phone 172.20.10.9 // rumah 192.168.32.1 // library 10.132.6.160
+  "http://192.168.0.107"}); // phone 172.20.10.9 // rumah 192.168.32.1 // library 10.132.6.160
   setBody(Map<String, dynamic> data){
     _body.clear();
     _body.addAll(data);

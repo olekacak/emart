@@ -10,7 +10,7 @@ class CartController {
   dynamic _resultData;
 
   CartController({required this.path, this.server =
-  "http://172.20.10.3"});
+  "http://192.168.0.107"});
 
   setBody(Map<String, dynamic> data) {
     _body.clear();

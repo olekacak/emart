@@ -83,7 +83,7 @@ class UserProfileModel {
 
   // Save user method
   Future<bool> loadByUserId() async {
-    UserProfileController userProfileController = UserProfileController(path: "/api/eMart2/user_profile.php");
+    UserProfileController userProfileController = UserProfileController(path: "/api/workshop2/user_profile.php");
     userProfileController.setBody(toJson());
     await userProfileController.post();
 

@@ -36,7 +36,7 @@ class DiscountModel {
 
   static Future<List<DiscountModel>> loadAll() async {
     List<DiscountModel> result = [];
-    DiscountController discountController = DiscountController(path: "/api/eMart2/discount.php");
+    DiscountController discountController = DiscountController(path: "/api/workshop2/discount.php");
     await discountController.get();
     if (discountController.status() == 200 && discountController.result() != null) {
       for (var item in discountController.result()) {
@@ -47,7 +47,7 @@ class DiscountModel {
   }
 
   Future<bool> saveDiscount() async {
-    DiscountController discountController = DiscountController(path: "/api/eMart2/discount.php");
+    DiscountController discountController = DiscountController(path: "/api/workshop2/discount.php");
     discountController.setBody(toJson());
     await discountController.post();
 
@@ -62,7 +62,7 @@ class DiscountModel {
       return false;
     }
 
-    DiscountController discountController = DiscountController(path: "/api/eMart2/discount.php");
+    DiscountController discountController = DiscountController(path: "/api/workshop2/discount.php");
     discountController.setBody(toJson());
     await discountController.put();
     if (discountController.status() == 200) {

@@ -50,7 +50,7 @@
     Future<int> saveUserSignUp() async {
       // Create an instance of UserSignUpController
       UserSignUpController userSignUpController = UserSignUpController(
-        path: "/api/eMart2/user_signup.php",
+        path: "/api/workshop2/user_signup.php",
       );
 
       // Set the body of the request with the JSON representation of the user model

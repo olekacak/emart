@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Controller/Stripe/StripeController.dart';
 import '../../Model/Cart and Product/CartModel.dart';
+import '../../Model/Cart and Product/CartProductModel.dart';
 import '../../Model/Stripe/StripeModel.dart';
 import '../../Model/Transaction/TransactionModel.dart';
 
@@ -11,13 +12,15 @@ class CartPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<CartPage> {
-  List<CartModel> cartItems = [];
+  List<CartProductModel> cartItems = [];
   String checkoutButtonText = 'Checkout';
-  double totalPrice = 0; // Store the total price here
+  double totalPrice = 0;
   final StripeModel stripeModel = StripeModel();
   final StripeController stripeController = StripeController();
   Map<String, dynamic>? paymentIntent;
   int userId = -1;
+  int cartId = -1;
+
 
   @override
   void initState() {
@@ -36,21 +39,24 @@ class _CartPageState extends State<CartPage> {
     }
   }
 
+  // Inside _CartPageState class
   void _loadCartItems() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       userId = prefs.getInt('userId') ?? -1;
 
       if (userId != -1) {
-        final List<CartModel> items = await CartModel.loadAll();
+        // Load CartModel to get the cartId
+        List<CartModel> carts = await CartModel.loadAll();
+          // Load CartProductModel based on userId and cartId
+          final List<CartProductModel> items = await CartProductModel.loadAll(userId, cartId);
 
-        setState(() {
-          cartItems = items;
-          checkoutButtonText = 'Checkout RM${totalPrice.toStringAsFixed(2)}';
-        });
+          setState(() {
+            cartItems = items;
+            checkoutButtonText = 'Checkout RM${totalPrice.toStringAsFixed(2)}';
+          });
       } else {
         // Handle the case where userId is not available
-        // You might want to show an error message or redirect the user to login.
         print("User ID not available");
       }
     } catch (error) {
@@ -58,36 +64,43 @@ class _CartPageState extends State<CartPage> {
     }
   }
 
-  void _handleCheckout() async {
+  void _handleCheckout(BuildContext context) async {
     try {
-
       await makePayment();
 
-      // Get the current date as a string
       final DateTime now = DateTime.now();
       final String formattedDate = "${now.year}-${now.month}-${now.day}";
 
-      // Create a new TransactionModel object
       TransactionModel transaction = TransactionModel(
-        transactionId: 1,
+        transactionId: 0,
         transactionDate: formattedDate,
         status: "Completed",
         deliveryStatus: "Pending",
-        cartId: 1, // You may need to set this value appropriately based on your data
+        cartId: 1,
       );
 
-      // Save the transaction data
       bool success = await transaction.saveTransaction();
 
       if (success) {
-        // Transaction saved successfully, you can show a success message or navigate to a confirmation page.
+        showMessage(context, "Payment success");
       } else {
-        // Transaction failed to save, you can show an error message.
+        showMessage(context, "Failed to make payment");
       }
     } catch (error) {
       print("Error: $error");
     }
   }
+
+
+  void showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 3),
+      ),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +132,7 @@ class _CartPageState extends State<CartPage> {
               child: ListView.builder(
                 itemCount: cartItems.length,
                 itemBuilder: (context, index) {
-                  CartModel cartItem = cartItems[index];
+                  CartProductModel cartItem = cartItems[index];
                   int quantity = cartItem.quantity ?? 0;
 
                   void decrementQuantity() {
@@ -207,7 +220,7 @@ class _CartPageState extends State<CartPage> {
             padding: EdgeInsets.all(10),
             color: Colors.white,
             child: ElevatedButton(
-              onPressed: _handleCheckout, // Call the checkout function
+              onPressed: () => _handleCheckout(context),
               child: Text(checkoutButtonText),
             ),
           ),

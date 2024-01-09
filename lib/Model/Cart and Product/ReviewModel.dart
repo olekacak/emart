@@ -49,7 +49,7 @@ class ReviewModel {
   static Future<List<ReviewModel>> loadAll() async {
     List<ReviewModel> result = [];
     ReviewController reviewController = ReviewController(
-        path: "/api/eMart2/review.php");
+        path: "/api/workshop2/review.php");
     await reviewController.get();
     if (reviewController.status() == 200 && reviewController.result() != null) {
       for (var item in reviewController.result()) {
@@ -61,7 +61,7 @@ class ReviewModel {
 
   Future<bool> saveReview() async {
     ReviewController reviewController = ReviewController(
-        path: "/api/eMart2/review.php");
+        path: "/api/workshop2/review.php");
     reviewController.setBody(toJson());
     await reviewController.post();
 
@@ -77,7 +77,7 @@ class ReviewModel {
     }
 
     ReviewController reviewController = ReviewController(
-        path: "/api/eMart2/review.php");
+        path: "/api/workshop2/review.php");
     reviewController.setBody(toJson());
     await reviewController.put();
     if (reviewController.status() == 200) {
