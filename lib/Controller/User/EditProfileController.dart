@@ -10,7 +10,7 @@ class EditProfileController {
   dynamic _resultData;
 
   EditProfileController({required this.path, this.server =
-  "http://192.168.0.107"});
+  ""});
 
   setBody(Map<String, dynamic> data) {
     _body.clear();

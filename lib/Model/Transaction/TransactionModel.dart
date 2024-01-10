@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../../Controller/Transaction/TransactionController.dart';
+import '../../main.dart';
 
 class TransactionModel {
   int? transactionId;
@@ -9,6 +10,7 @@ class TransactionModel {
   String status;
   String deliveryStatus;
   int cartId;
+  static String? server;
 
   TransactionModel({
     this.transactionId,
@@ -36,7 +38,7 @@ class TransactionModel {
   }
 
   Future<bool> saveTransaction() async {
-    TransactionController transactionController = TransactionController(path: "/api/workshop2/transaction.php");
+    TransactionController transactionController = TransactionController(path: "${MyApp().server}/api/workshop2/transaction.php", server: server!);
     transactionController.setBody(toJson());
     await transactionController.post();
 
@@ -51,7 +53,7 @@ class TransactionModel {
       return false;
     }
 
-    TransactionController transactionController = TransactionController(path: "/api/workshop2/transaction.php");
+    TransactionController transactionController = TransactionController(path: "${MyApp().server}/api/workshop2/transaction.php", server: server!);
     transactionController.setBody(toJson());
     await transactionController.put();
 
@@ -66,7 +68,7 @@ class TransactionModel {
       return false;
     }
 
-    TransactionController transactionController = TransactionController(path: "/api/workshop2/transactions.php");
+    TransactionController transactionController = TransactionController(path: "${MyApp().server}/api/workshop2/transactions.php", server: server!);
     transactionController.setBody({'transactionId': transactionId});
 
     await transactionController.delete();
@@ -81,7 +83,7 @@ class TransactionModel {
 
   static Future<List<TransactionModel>> loadAll() async {
     List<TransactionModel> result = [];
-    TransactionController transactionController = TransactionController(path: "/api/workshop2/transaction.php");
+    TransactionController transactionController = TransactionController(path: "${MyApp().server}/api/workshop2/transaction.php", server: server!);
     await transactionController.get();
     if (transactionController.status() == 200 && transactionController.result() != null) {
       for (var item in transactionController.result()) {

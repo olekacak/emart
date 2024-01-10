@@ -10,7 +10,7 @@ class TransactionController {
   dynamic _resultData;
 
   TransactionController({required this.path, this.server =
-  "http://192.168.0.107"});
+  ""});
 
   setBody(Map<String, dynamic> data) {
     _body.clear();

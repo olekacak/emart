@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Controller/Cart and Product/CartController.dart';
+import '../../main.dart';
 
 class CartModel {
   int? cartId;
   int? userId;
   String status;
+
 
   CartModel({
     this.cartId,
@@ -35,7 +37,7 @@ class CartModel {
   }
 
   Future<bool> addCart() async {
-    CartController cartController = CartController(path: "/api/workshop2/cart.php");
+    CartController cartController = CartController(path: "${MyApp().server}/api/workshop2/cart.php");
     cartController.setBody({
       'userId': userId,
       'cartId': cartId, // Use the current value of cartId
@@ -60,7 +62,7 @@ class CartModel {
     List<CartModel> result = [];
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int userId = prefs.getInt('userId') ?? -1;
-    CartController cartProductController = CartController(path: "/api/workshop2/cart.php?userId=$userId");
+    CartController cartProductController = CartController(path: "${MyApp().server}/api/workshop2/cart.php?userId=$userId");
     await cartProductController.get();
 
     if (cartProductController.status() == 200) {

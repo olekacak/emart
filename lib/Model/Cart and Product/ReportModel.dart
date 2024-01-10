@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Controller/Cart and Product/ReportController.dart';
+import '../../main.dart';
 
 class ReportModel {
   int? reportId;
@@ -41,7 +42,7 @@ class ReportModel {
   static Future<List<ReportModel>> loadAll() async {
     List<ReportModel> result = [];
     ReportController reportController = ReportController(
-        path: "/api/eMart2/report.php");
+        path: "${MyApp().server}/api/eMart2/report.php");
     await reportController.get();
     if (reportController.status() == 200 && reportController.result() != null) {
       for (var item in reportController.result()) {
@@ -53,7 +54,7 @@ class ReportModel {
 
   Future<bool> saveReport() async {
     ReportController reportController = ReportController(
-        path: "/api/eMart2/report.php");
+        path: "${MyApp().server}/api/eMart2/report.php");
     reportController.setBody(toJson());
     await reportController.post();
 
@@ -70,7 +71,7 @@ class ReportModel {
     }
 
     ReportController reportController = ReportController(path:
-    "/api/eMart2/report.php");
+    "${MyApp().server}/api/eMart2/report.php");
     // Set the necessary body or parameters for deletion. Often, this is just the ID.
     reportController.setBody({'reportId': reportId});
 

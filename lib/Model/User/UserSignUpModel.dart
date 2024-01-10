@@ -1,4 +1,5 @@
   import '../../Controller/User/UserSignUpController.dart';
+import '../../main.dart';
 
   class UserSignUpModel {
     String? userId;
@@ -50,7 +51,7 @@
     Future<int> saveUserSignUp() async {
       // Create an instance of UserSignUpController
       UserSignUpController userSignUpController = UserSignUpController(
-        path: "/api/workshop2/user_signup.php",
+        path: "${MyApp().server}/api/workshop2/user_signup.php",
       );
 
       // Set the body of the request with the JSON representation of the user model

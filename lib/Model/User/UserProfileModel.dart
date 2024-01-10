@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Controller/User/UserProfileController.dart';
+import '../../main.dart';
 
 class UserProfileModel {
   int userId;
@@ -83,7 +84,7 @@ class UserProfileModel {
 
   // Save user method
   Future<bool> loadByUserId() async {
-    UserProfileController userProfileController = UserProfileController(path: "/api/workshop2/user_profile.php");
+    UserProfileController userProfileController = UserProfileController(path: "${MyApp().server}/api/workshop2/user_profile.php");
     userProfileController.setBody(toJson());
     await userProfileController.post();
 
@@ -117,7 +118,7 @@ class UserProfileModel {
     print('Updating user profile with userId: $userId');
 
     UserProfileController userProfileController =
-    UserProfileController(path: "/api/eMart2/user_profile.php");
+    UserProfileController(path: "${MyApp().server}/api/eMart2/user_profile.php");
     userProfileController.setBody(toJson());
 
     print('Sending update request to the server...');

@@ -12,7 +12,9 @@ void main() async{
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+   MyApp({super.key});
+
+  String server = "http://192.168.0.107";
 
   // This widget is the root of the application.
   @override

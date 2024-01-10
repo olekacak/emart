@@ -28,6 +28,30 @@ class _CartPageState extends State<CartPage> {
     _loadCartItems();
   }
 
+  void updateTotalPrice() {
+    totalPrice = 0;
+    for (var item in cartItems) {
+      totalPrice += (item.price ?? 0) * item.quantity;
+    }
+    setState(() {
+      checkoutButtonText = 'Checkout RM${totalPrice.toStringAsFixed(2)}';
+    });
+  }
+
+
+  Future<void> updateCartItem(CartProductModel cartItem) async {
+    try {
+      bool success = await cartItem.updateCartProduct();
+      if (success) {
+        print("Cart item updated successfully in the database");
+      } else {
+        print("Failed to update cart item in the database");
+      }
+    } catch (error) {
+      print("Error updating cart item: $error");
+    }
+  }
+
   Future<void> makePayment() async {
     try {
       int totalPriceStripe = (totalPrice * 100).toInt();
@@ -104,14 +128,6 @@ class _CartPageState extends State<CartPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Calculate the total price
-    for (var item in cartItems) {
-      totalPrice += (item.price ?? 0);
-    }
-
-    // Update the checkout button text with the total price
-    checkoutButtonText = 'Checkout RM${totalPrice.toStringAsFixed(2)}';
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -135,17 +151,21 @@ class _CartPageState extends State<CartPage> {
                   CartProductModel cartItem = cartItems[index];
                   int quantity = cartItem.quantity ?? 0;
 
-                  void decrementQuantity() {
-                    if (quantity > 1) {
+                  void decrementQuantity(int index) {
+                    if (cartItems[index].quantity > 1) {
                       setState(() {
-                        quantity--;
+                        cartItems[index].quantity--;
+                        updateTotalPrice();
+                        updateCartItem(cartItems[index]);
                       });
                     }
                   }
 
-                  void incrementQuantity() {
+                  void incrementQuantity(int index) {
                     setState(() {
-                      quantity++;
+                      cartItems[index].quantity++;
+                      updateTotalPrice();
+                      updateCartItem(cartItems[index]);
                     });
                   }
 
@@ -191,18 +211,14 @@ class _CartPageState extends State<CartPage> {
                                 children: [
                                   IconButton(
                                     icon: Icon(Icons.remove),
-                                    onPressed: decrementQuantity,
+                                    onPressed: () => decrementQuantity(index),
                                   ),
-                                  Text(
-                                    '$quantity',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
+
+                                  Text('$quantity'),
+
                                   IconButton(
                                     icon: Icon(Icons.add),
-                                    onPressed: incrementQuantity,
+                                    onPressed: () => incrementQuantity(index),
                                   ),
                                 ],
                               ),

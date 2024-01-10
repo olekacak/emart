@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../Controller/Cart and Product/DiscountController.dart';
+import '../../main.dart';
 
 class DiscountModel {
   int? discountId;
@@ -8,6 +9,7 @@ class DiscountModel {
   String name;
   String value;
   String minPurchaseAmount;
+  static String? server;
 
   DiscountModel({
     this.discountId,
@@ -36,7 +38,7 @@ class DiscountModel {
 
   static Future<List<DiscountModel>> loadAll() async {
     List<DiscountModel> result = [];
-    DiscountController discountController = DiscountController(path: "/api/workshop2/discount.php");
+    DiscountController discountController = DiscountController(path: "${MyApp().server}/api/workshop2/discount.php", server: server!);
     await discountController.get();
     if (discountController.status() == 200 && discountController.result() != null) {
       for (var item in discountController.result()) {
@@ -47,7 +49,7 @@ class DiscountModel {
   }
 
   Future<bool> saveDiscount() async {
-    DiscountController discountController = DiscountController(path: "/api/workshop2/discount.php");
+    DiscountController discountController = DiscountController(path: "${MyApp().server}/api/workshop2/discount.php", server: server!);
     discountController.setBody(toJson());
     await discountController.post();
 
@@ -62,7 +64,7 @@ class DiscountModel {
       return false;
     }
 
-    DiscountController discountController = DiscountController(path: "/api/workshop2/discount.php");
+    DiscountController discountController = DiscountController(path: "${MyApp().server}/api/workshop2/discount.php", server: server!);
     discountController.setBody(toJson());
     await discountController.put();
     if (discountController.status() == 200) {

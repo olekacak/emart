@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:emartsystem/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Controller/User/UserLoginController.dart';
@@ -83,7 +84,7 @@ class UserLoginModel {
 
   // Save user method
   Future<bool> saveUser() async {
-    UserLoginController userLoginController = UserLoginController(path: "/api/workshop2/user_login.php");
+    UserLoginController userLoginController = UserLoginController(path: "${MyApp().server}/api/workshop2/user_login.php");
     userLoginController.setBody(toJson());
     await userLoginController.postUserLogin();
 
@@ -126,7 +127,7 @@ class UserLoginModel {
   static Future<List<UserLoginModel>> loadAll() async {
     List<UserLoginModel> result = [];
     UserLoginController userLoginController = UserLoginController(
-        path: "/api/workshop2/user_login.php");
+        path: "${MyApp().server}/api/workshop2/user_login.php");
     await userLoginController.get();
     if (userLoginController.status() == 200 && userLoginController.result() != null) {
       var responseBody = userLoginController.result();
@@ -169,7 +170,7 @@ class UserLoginModel {
     }
 
     UserLoginController userLoginController = UserLoginController(
-        path: "/api/workshop2/user_login.php");
+        path: "${MyApp().server}/api/workshop2/user_login.php");
 
     var userDataJson = toJson(); // This includes the updated password
 
@@ -191,7 +192,7 @@ class UserLoginModel {
       return false;
     }
 
-    UserLoginController userLoginController = UserLoginController(path: "/api/eMart2/user_login.php");
+    UserLoginController userLoginController = UserLoginController(path: "${MyApp().server}/api/eMart2/user_login.php");
     userLoginController.setBody(toJson());
 
     await userLoginController.delete();

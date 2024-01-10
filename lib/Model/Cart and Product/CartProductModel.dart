@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Controller/Cart and Product/CartProductController.dart';
+import '../../main.dart';
 
 class CartProductModel {
   int? cartProductId;
@@ -10,6 +11,7 @@ class CartProductModel {
   int quantity;
   double price;
   String productName;
+  
 
   CartProductModel({
     this.cartProductId,
@@ -37,8 +39,10 @@ class CartProductModel {
       'productId': productId,
       'quantity': quantity,
       'price': price,
+      'productName': productName,
     };
   }
+
 
   static Future<List<CartProductModel>> loadAll(int userId, int cartId) async {
     List<CartProductModel> result = [];
@@ -48,7 +52,7 @@ class CartProductModel {
     print("userId cart ${userId}");
     print("cartId cart ${cartId}");
     CartProductController cartProductController = CartProductController(
-      path: "/api/workshop2/cart_product.php?userId=$userId&cartId=$cartId",
+      path: "${MyApp().server}/api/workshop2/cart_product.php?userId=$userId&cartId=$cartId",
     );
 
     await cartProductController.get();
@@ -64,7 +68,7 @@ class CartProductModel {
 
 
   Future<bool> saveCartProduct() async {
-    CartProductController cartProductController = CartProductController(path: "/api/workshop2/cart_product.php");
+    CartProductController cartProductController = CartProductController(path: "${MyApp().server}/api/workshop2/cart_product.php");
     final requestBody = toJson(); // Get the JSON request body
     print('Request Body: $requestBody'); // Print the request body for debugging
     cartProductController.setBody(requestBody);
@@ -83,7 +87,7 @@ class CartProductModel {
       return false;
     }
 
-    CartProductController cartProductController = CartProductController(path: "/api/workshop2/cart_product.php");
+    CartProductController cartProductController = CartProductController(path: "${MyApp().server}/api/workshop2/cart_product.php");
     cartProductController.setBody(toJson());
     await cartProductController.put();
     if (cartProductController.status() == 200) {
