@@ -5,6 +5,8 @@ import 'package:emartsystem/Pages/User/Setting.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Model/User/UserProfileModel.dart';
+import '../Cart and Product/About.dart';
+import '../Cart and Product/Help.dart';
 import 'Profile.dart';
 import 'UserLogin.dart';
 
@@ -200,11 +202,27 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                             ListTile(
                               leading: Icon(Icons.info),
                               title: Text('About'),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => AboutPage(),
+                                  ),
+                                );
+                              },
                             ),
                             SizedBox(height: 10),
                             ListTile(
                               leading: Icon(Icons.help),
                               title: Text('Help'),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => HelpPage(),
+                                  ),
+                                );
+                              },
                             ),
                             SizedBox(height: 10),
                             ListTile(

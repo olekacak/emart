@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Model/User/UserProfileModel.dart';
+import '../Cart and Product/About.dart';
+import '../Cart and Product/Help.dart';
 import 'DashboardSeller.dart';
 import 'Profile.dart';
 import 'Setting.dart';
@@ -248,11 +250,27 @@ class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
                                     ListTile(
                                       leading: Icon(Icons.info),
                                       title: Text('About'),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => AboutPage(),
+                                          ),
+                                        );
+                                      },
                                     ),
                                     SizedBox(height: 10),
                                     ListTile(
                                       leading: Icon(Icons.help),
                                       title: Text('Help'),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => HelpPage(),
+                                          ),
+                                        );
+                                      },
                                     ),
                                     SizedBox(height: 10),
                                     ListTile(
