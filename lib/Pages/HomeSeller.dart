@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:emartsystem/Pages/Cart%20and%20Product/Product.dart';
 import 'package:flutter/material.dart';
 import '../Model/Cart and Product/ProductModel.dart';
 import '../Model/User/UserLoginModel.dart';
@@ -233,7 +234,7 @@ class _HomeSellerPageState extends State<HomeSellerPage> with SingleTickerProvid
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ProductDetailPage(product: product),
+                builder: (context) => ProductPage(product: product),
               ),
             );
           },
