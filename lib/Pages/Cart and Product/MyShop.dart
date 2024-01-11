@@ -19,7 +19,8 @@ class MyShopPage extends StatefulWidget {
 class _MyShopPageState extends State<MyShopPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  late List<ProductModel> products;
+  late Future<UserProfileModel> userFuture;
+  late Future<List<ProductModel>> productsFuture;
   late List<DiscountModel> discounts;
   List<ReviewModel> reviews = [];
 
@@ -32,11 +33,11 @@ class _MyShopPageState extends State<MyShopPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    products = [];
+    userFuture = _loadUser();
+    productsFuture = _loadProducts();
     discounts = [];
     reviews = [];
     _loadProducts();
-    _loadDiscounts();
     _loadReviews();
     _tabController.addListener(_handleTabChange);
   }
@@ -45,8 +46,7 @@ class _MyShopPageState extends State<MyShopPage>
     setState(() {});
   }
 
-  _loadProducts() async {
-    List<ProductModel> loadedProducts = await ProductModel.loadAll(category: '');
+  Future<UserProfileModel> _loadUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userId = prefs.getInt('userId') ?? -1;
 
@@ -68,11 +68,17 @@ class _MyShopPageState extends State<MyShopPage>
         '',
       );
 
+      // Fetch user data from the server
       await user.loadByUserId();
     }
-    setState(() {
-      products = loadedProducts;
-    });
+
+    return user;
+  }
+
+  Future<List<ProductModel>> _loadProducts() async {
+    List<ProductModel> loadedProducts = await ProductModel.loadAll(category: '');
+
+    return loadedProducts;
   }
 
   _loadReviews() async {
@@ -169,8 +175,12 @@ class _MyShopPageState extends State<MyShopPage>
             margin: EdgeInsets.symmetric(vertical: 8.0),
             child: Padding(
               padding: EdgeInsets.all(16.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: FutureBuilder<UserProfileModel>(
+                future: userFuture,
+                builder: (context,snapshot){
+                  if(snapshot.connectionState == ConnectionState.done) {
+    UserProfileModel user = snapshot.data!;
+    return Row(crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CircleAvatar(
                     radius: 30,
@@ -202,7 +212,12 @@ class _MyShopPageState extends State<MyShopPage>
                     ),
                   ),
                 ],
-              ),
+              );
+                  }else {
+    return CircularProgressIndicator();
+    }
+            },
+          ),
             ),
           ),
           SizedBox(height: 16.0),
@@ -215,7 +230,12 @@ class _MyShopPageState extends State<MyShopPage>
             ],
           ),
           Expanded(
-            child: TabBarView(
+            child: FutureBuilder<List<ProductModel>>(
+    future: productsFuture,
+    builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.done) {
+    List<ProductModel> products = snapshot.data!;
+    return TabBarView(
               controller: _tabController,
               children: [
                 GridView.builder(
@@ -373,6 +393,13 @@ class _MyShopPageState extends State<MyShopPage>
                   },
                 ),
               ],
+            );
+    }else {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    },
             ),
           ),
         ],
