@@ -38,13 +38,11 @@ class _MyShopPageState extends State<MyShopPage>
     _loadProducts();
     _loadDiscounts();
     _loadReviews();
-    _tabController.addListener(_handleTabChange);// Initial data load when the page is created
+    _tabController.addListener(_handleTabChange);
   }
 
   _handleTabChange() {
-    setState(() {
-      // Trigger a rebuild when the tab changes
-    });
+    setState(() {});
   }
 
   _loadProducts() async {
@@ -70,7 +68,6 @@ class _MyShopPageState extends State<MyShopPage>
         '',
       );
 
-      // Fetch user data from the server
       await user.loadByUserId();
     }
     setState(() {
@@ -87,14 +84,15 @@ class _MyShopPageState extends State<MyShopPage>
 
   _loadDiscounts() async {
     try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      userId = prefs.getInt('userId') ?? -1;
+
       List<DiscountModel> loadedDiscounts = await DiscountModel.loadAll();
-      print(loadedDiscounts);
       setState(() {
         discounts = loadedDiscounts;
       });
     } catch (e) {
       print('Error loading discounts: $e');
-      // Handle the error as needed
     }
   }
 
@@ -109,14 +107,14 @@ class _MyShopPageState extends State<MyShopPage>
             TextButton(
               child: Text("Cancel"),
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
             ),
             TextButton(
               child: Text("Delete"),
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                _deleteReview(review); // Proceed with deletion
+                Navigator.of(context).pop();
+                _deleteReview(review);
               },
             ),
           ],
@@ -129,7 +127,7 @@ class _MyShopPageState extends State<MyShopPage>
     bool success = await review.deleteReview();
     if (success) {
       _showMessage("Review Deleted Successfully");
-      _loadReviews(); // Reload reviews to update the UI
+      _loadReviews();
     } else {
       _showMessage("Failed to Delete Review");
     }
@@ -137,7 +135,6 @@ class _MyShopPageState extends State<MyShopPage>
 
   void _showMessage(String msg) {
     if (mounted) {
-      // Make sure this context is still mounted/exist
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(msg),
@@ -153,8 +150,6 @@ class _MyShopPageState extends State<MyShopPage>
   }
 
   void handleDiscountAdded() {
-    // Reload the discounts or perform any other necessary updates
-    // when a new discount is added
     _loadDiscounts();
   }
 
@@ -253,8 +248,6 @@ class _MyShopPageState extends State<MyShopPage>
                               builder: (context) => ProductDetailSellerPage(product: product),
                             ),
                           );
-
-                          // Reload the data when the user navigates back to this page
                           _loadProducts();
                         },
                         child: Column(
@@ -276,6 +269,10 @@ class _MyShopPageState extends State<MyShopPage>
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: 8.0),
                               child: Text('\RM ${product.price}'),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Text('Quantity: ${product.stockQuantity}'),
                             ),
                           ],
                         ),
@@ -325,20 +322,6 @@ class _MyShopPageState extends State<MyShopPage>
                         product.productId == review.productId &&
                             product.userId == userId))
                         .toList()[index];
-
-                    ProductModel? associatedProduct = products.firstWhere(
-                          (product) => product.productId == review.productId,
-                      orElse: () => ProductModel(
-                        productId: 0,
-                        productName: 'N/A',
-                        description: 'N/A',
-                        price: 0.0,
-                        category: 'N/A',
-                        stockQuantity: 'N/A',
-                        image: 'N/A',
-                      ),
-                    );
-
                     return ListTile(
                       title: Text('Rating: ${review.rating}'),
                       subtitle: Column(
@@ -346,9 +329,6 @@ class _MyShopPageState extends State<MyShopPage>
                         children: [
                           Text('Comment: ${review.comment}'),
                           Text('Product ID: ${review.productId}'),
-                          Text(
-                            'Product Name: ${associatedProduct.productName}',
-                          ),
                         ],
                       ),
                       trailing: Row(
@@ -361,22 +341,22 @@ class _MyShopPageState extends State<MyShopPage>
                           PopupMenuButton<int>(
                             onSelected: (int item) async {
                               if (item == 0) {
-                                final SharedPreferences prefs =
-                                await SharedPreferences.getInstance();
+                                final SharedPreferences prefs = await SharedPreferences.getInstance();
 
                                 if (review.reviewId != null) {
-                                  await prefs.setInt(
-                                      'selectedReviewId', review.reviewId!);
+                                  await prefs.setInt('selectedReviewId', review.reviewId!);
+                                  await prefs.setInt('selectedAdminId', 1);
+
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => ReportPage()),
+                                    MaterialPageRoute(builder: (context) => ReportPage(userId: review.userId ?? 0, adminId: 1,)),
                                   );
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Review ID is not available.')));
+                                      SnackBar(content: Text('Review ID is not available.'))
+                                  );
                                 }
                               }
-                              // Add more cases here for other menu items if needed
                             },
                             itemBuilder: (context) {
                               return [
@@ -384,7 +364,6 @@ class _MyShopPageState extends State<MyShopPage>
                                   value: 0,
                                   child: Text('Report'),
                                 ),
-                                // You can add more items here if needed
                               ];
                             },
                           ),
@@ -444,14 +423,13 @@ class _MyShopPageState extends State<MyShopPage>
     );
   }
 
-
   String _getButtonText(int tabIndex) {
     if (tabIndex == 0) {
       return 'Add Your Product';
     } else if (tabIndex == 1) {
       return 'Add Your Discount';
     } else {
-      return 'Add Your Feedback'; // Modify this text as needed
+      return 'Add Your Feedback';
     }
   }
 }

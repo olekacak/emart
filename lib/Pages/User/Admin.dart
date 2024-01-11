@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:emartsystem/Pages/User/UserLogin.dart';
 import '../../Model/User/UserLoginModel.dart';
 import 'InboxReport.dart';
+import 'ProductChart.dart';
 import 'ReviewReport.dart';
 import 'User.dart';
 import 'UserSeller.dart';  // Replace with your actual model import path
@@ -65,13 +66,6 @@ class _AdminPageState extends State<AdminPage> {
             ),
           ),
           ListTile(
-            leading: Icon(Icons.production_quantity_limits),
-            title: Text('Products'),
-            onTap: () {
-              // Navigation logic
-            },
-          ),
-          ListTile(
             leading: Icon(Icons.inbox),
             title: Text('Inbox'),
             onTap: () {
@@ -79,6 +73,18 @@ class _AdminPageState extends State<AdminPage> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => InboxReportPage(),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.production_quantity_limits),
+            title: Text('Product'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProductChartPage(),
                 ),
               );
             },

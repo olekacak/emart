@@ -1,9 +1,15 @@
+import 'package:emartsystem/Controller/User/OneSignalController.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Model/Cart and Product/ReportModel.dart';
 
 class ReportPage extends StatefulWidget {
+
+  final int adminId;
+  final int userId;
+  const ReportPage({required this.adminId, required this.userId});
+
   @override
   _ReportPageState createState() => _ReportPageState();
 }
@@ -18,6 +24,9 @@ class _ReportPageState extends State<ReportPage> {
   void initState() {
     super.initState();
     _retrieveSelectedReviewId();
+
+    print("This admin: ${widget.adminId}");
+    print("This seller: ${widget.userId}");
   }
 
   Future<void> _retrieveSelectedReviewId() async {
@@ -96,6 +105,13 @@ class _ReportPageState extends State<ReportPage> {
                         );
                       },
                     );
+
+                    OneSignalController notify = OneSignalController();
+                    List<String> targetUsers = [];
+                    targetUsers.add(widget.userId.toString());
+                    targetUsers.add(widget.adminId.toString());
+
+                    notify.SendNotification("New Report Received", "Piqa Ad lawa", targetUsers);
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to submit report')));
                   }
@@ -105,8 +121,6 @@ class _ReportPageState extends State<ReportPage> {
               },
               child: Text('Submit Report'),
             ),
-
-
           ],
         ),
       ),

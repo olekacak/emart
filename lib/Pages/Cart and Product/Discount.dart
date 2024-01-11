@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Model/Cart and Product/DiscountModel.dart';
-import '../../Model/User/UserLoginModel.dart';
 
 typedef OnDiscountAddedCallback = void Function();
 
@@ -19,14 +18,14 @@ class _DiscountPageState extends State<DiscountPage> {
 
   int userId = -1;
 
-  String selectedName = 'Free Shipping';
-  String selectedValue = '-'; // Set the default value to '-'
+  String selectedName = 'With Discount'; // Set the default value to 'With Discount'
+  String selectedValue = '5% discount'; // Set the default value to '5% discount'
   String selectedMin = 'RM5'; // Set the default value to 'RM5'
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    _loadUserId();
   }
 
   void _loadUserId() async {
@@ -48,8 +47,8 @@ class _DiscountPageState extends State<DiscountPage> {
     userId: 0,
   );
 
-  // Add options for the discount names
-  List<String> discountNameOptions = ['Free Shipping', 'With Discount'];
+  // Update the discountNameOptions list to only include 'With Discount'
+  List<String> discountNameOptions = ['With Discount'];
 
   @override
   Widget build(BuildContext context) {
@@ -75,37 +74,35 @@ class _DiscountPageState extends State<DiscountPage> {
                 onChanged: (newValue) {
                   setState(() {
                     selectedName = newValue!;
-                    // If the selected name is 'Free Shipping', set selectedValue to '-'
-                    selectedValue = newValue == 'Free Shipping' ? '-' : '5% discount';
+                    // Update the default selected value when changing the name
+                    selectedValue = '5% discount';
                   });
                 },
                 hint: Text('Select Discount Name'),
               ),
               SizedBox(height: 16.0),
-              // Show/hide the discount value based on the selected discount name
-              if (selectedName != 'Free Shipping')
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Discount Value'),
-                    DropdownButton<String>(
-                      value: selectedValue,
-                      items: ['5% discount', '10% discount', '15% discount', '20% discount']
-                          .map((value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (newValue) {
-                        setState(() {
-                          selectedValue = newValue!;
-                        });
-                      },
-                      hint: Text('Select Value'),
-                    ),
-                  ],
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Discount Value'),
+                  DropdownButton<String>(
+                    value: selectedValue,
+                    items: ['5% discount', '10% discount']
+                        .map((value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                      setState(() {
+                        selectedValue = newValue!;
+                      });
+                    },
+                    hint: Text('Select Value'),
+                  ),
+                ],
+              ),
               Text('Minimum Purchase'),
               Row(
                 children: [
@@ -131,13 +128,11 @@ class _DiscountPageState extends State<DiscountPage> {
           ),
         ),
       ),
-      // Align the button at the bottom center
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
           onPressed: () {
-            // Call the saveDiscount method to save the discount
             saveDiscount();
           },
           child: Text('Save Discount'),
@@ -146,9 +141,14 @@ class _DiscountPageState extends State<DiscountPage> {
     );
   }
 
-  // Save Discount method
   void saveDiscount() async {
-    // Set values in the DiscountModel
+
+    print('Saving Discount:');
+    print('Name: $selectedName');
+    print('Value: $selectedValue');
+    print('Min Purchase: $selectedMin');
+    print('User ID: $userId');
+
     newDiscount.name = selectedName;
     newDiscount.value = selectedValue;
     newDiscount.minPurchaseAmount = selectedMin;
@@ -157,12 +157,9 @@ class _DiscountPageState extends State<DiscountPage> {
     bool saved = await newDiscount.saveDiscount();
     print('Discount saved: $saved');
     if (saved) {
-      // Discount saved successfully, notify the callback function
       widget.onDiscountAdded();
-      // Navigate back to the previous screen
       Navigator.pop(context);
     } else {
-      // Handle error or show an error message
       _showMessage('Failed to save the discount.');
     }
   }

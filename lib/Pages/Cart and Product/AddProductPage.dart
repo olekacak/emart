@@ -132,12 +132,12 @@ class _AddProductPageState extends State<AddProductPage> {
                           child: Text('Instant Food'),
                         ),
                         DropdownMenuItem(
-                          value: 'sweets',
-                          child: Text('Sweets'),
+                          value: 'breakfast',
+                          child: Text('Breakfast'),
                         ),
                         DropdownMenuItem(
-                          value: 'drinks',
-                          child: Text('Drinks'),
+                          value: 'dessert',
+                          child: Text('Dessert'),
                         ),
                       ],
                     ),

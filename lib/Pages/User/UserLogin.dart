@@ -1,4 +1,5 @@
 import 'package:flutter/gestures.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:emartsystem/Model/User/UserLoginModel.dart';
 import 'package:emartsystem/Pages/User/UserSignUp.dart';
@@ -189,6 +190,8 @@ class _UserLoginPageState extends State<UserLoginPage> {
 
                       int? adminId = prefs.getInt('adminId');
                       int? userId = prefs.getInt('userId');
+
+                      OneSignal.login(userId.toString());
 
                       print("userId login pref ${userId}");
 

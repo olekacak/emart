@@ -63,8 +63,8 @@ class _HomeSellerPageState extends State<HomeSellerPage> with SingleTickerProvid
     CustomTab(iconPath: 'assets/all_product.png', name: 'All Products'),
     CustomTab(iconPath: 'assets/snacks.png', name: 'Snacks'),
     CustomTab(iconPath: 'assets/instant_food.png', name: 'Instant Food'),
-    CustomTab(iconPath: 'assets/sweets.png', name: 'Sweets'),
-    CustomTab(iconPath: 'assets/drinks.png', name: 'Drinks'),
+    CustomTab(iconPath: 'assets/sweets.png', name: 'Breakfast'),
+    CustomTab(iconPath: 'assets/drinks.png', name: 'Dessert'),
   ];
 
   @override
@@ -86,8 +86,8 @@ class _HomeSellerPageState extends State<HomeSellerPage> with SingleTickerProvid
           'All Products': products,
           'Snacks': products.where((p) => p.category.toLowerCase() == 'snacks').toList(),
           'Instant Food': products.where((p) => p.category.toLowerCase() == 'instant food').toList(),
-          'Sweets': products.where((p) => p.category.toLowerCase() == 'sweets').toList(),
-          'Drinks': products.where((p) => p.category.toLowerCase() == 'drinks').toList(),
+          'Breakfast': products.where((p) => p.category.toLowerCase() == 'breakfast').toList(),
+          'Dessert': products.where((p) => p.category.toLowerCase() == 'dessert').toList(),
         };
       });
     } catch (e) {
