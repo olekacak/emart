@@ -118,7 +118,7 @@ class UserProfileModel {
     print('Updating user profile with userId: $userId');
 
     UserProfileController userProfileController =
-    UserProfileController(path: "${MyApp().server}/api/eMart2/user_profile.php");
+    UserProfileController(path: "${MyApp().server}/api/workshop2/user_profile.php");
     userProfileController.setBody(toJson());
 
     print('Sending update request to the server...');
@@ -132,7 +132,9 @@ class UserProfileModel {
       print('Update successful');
       return true;
     }
-    print('Update failed. Error: ${userProfileController.result()["error"]}');
+
+    print('Update failed. Server response: ${userProfileController.result()}');
     return false;
   }
+
 }

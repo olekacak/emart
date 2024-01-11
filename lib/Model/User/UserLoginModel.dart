@@ -114,7 +114,7 @@ class UserLoginModel {
       // address = result['address'] as String? ?? '';
       // birthDate = result['birthDate'] as String? ?? '';
       // gender = result['gender'] as String? ?? '';
-      // sellerAccount = result['sellerAccount'] as String? ?? '';
+       sellerAccount = result['sellerAccount'] as String? ?? '';
       // image = result['image'] as String? ?? '';
 
 

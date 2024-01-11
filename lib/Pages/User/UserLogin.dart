@@ -200,8 +200,10 @@ class _UserLoginPageState extends State<UserLoginPage> {
                             builder: (context) => AdminPage(),
                           ),
                         );
-                      } else if (userId != null && userId > 0) {
-                        if (user.sellerAccount != null) {
+                      } else if (userId! > 0) {
+                        print("Seller Account Value: ${user.sellerAccount}");
+
+                        if (user.sellerAccount == "true") {
                           // Navigate to HomeSellerPage
                           Navigator.pushReplacement(
                             context,

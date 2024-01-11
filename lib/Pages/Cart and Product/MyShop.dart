@@ -6,7 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../Model/Cart and Product/DiscountModel.dart';
 import '../../Model/Cart and Product/ProductModel.dart';
 import '../../Model/Cart and Product/ReviewModel.dart';
+import '../../Model/User/UserProfileModel.dart';
 import 'Discount.dart';
+import 'ProductDetailSeller.dart';
 import 'Report.dart';
 
 class MyShopPage extends StatefulWidget {
@@ -24,9 +26,7 @@ class _MyShopPageState extends State<MyShopPage>
   Uint8List? selectedImage;
   String base64String = '';
   int userId = -1;
-  String name = '';
-  String email = '';
-  String image = '';
+  late UserProfileModel user;
 
   @override
   void initState() {
@@ -53,10 +53,25 @@ class _MyShopPageState extends State<MyShopPage>
     userId = prefs.getInt('userId') ?? -1;
 
     if (userId != -1) {
-      name = prefs.getString('name') ?? '';
-      email = prefs.getString('email') ?? '';
-      image = prefs.getString('image') ?? '';
-      print('SharedPreferences = ${name}');
+      user = UserProfileModel(
+        -1,
+        userId,
+        -1,
+        null,
+        null,
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        null,
+        '',
+      );
+
+      // Fetch user data from the server
+      await user.loadByUserId();
     }
     setState(() {
       products = loadedProducts;
@@ -146,230 +161,243 @@ class _MyShopPageState extends State<MyShopPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('My Shop'),
-        ),
-        body: Column(
-          children: <Widget>[
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0),
-              ),
-              elevation: 5.0,
-              margin: EdgeInsets.symmetric(vertical: 8.0),
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Colors.grey[200],
-                      backgroundImage: image != null
-                          ? MemoryImage(base64Decode(image!))
-                          : null,
-                    ),
-                    SizedBox(width: 16.0),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Seller: ${name}',
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+      appBar: AppBar(
+        title: Text('My Shop'),
+      ),
+      body: Column(
+        children: <Widget>[
+          Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
             ),
-            SizedBox(height: 16.0),
-            TabBar(
-              controller: _tabController,
-              tabs: [
-                Tab(text: 'Listing'),
-                Tab(text: 'Discount'),
-                Tab(text: 'Feedback'),
-              ],
-            ),
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
+            elevation: 5.0,
+            margin: EdgeInsets.symmetric(vertical: 8.0),
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (_tabController.index == 0)
-                    GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2, // Number of columns in the grid
-                        crossAxisSpacing: 8.0, // Spacing between columns
-                        mainAxisSpacing: 8.0, // Spacing between rows
-                      ),
-                      itemCount: products
-                          .where((product) => product.userId == userId)
-                          .length,
-                      itemBuilder: (context, index) {
-                        ProductModel product = products
-                            .where((product) => product.userId == userId)
-                            .toList()[index];
-                        // Ensure the Base64 string is a multiple of 4 in length
-                        String base64Image = product.image!;
-                        if (base64Image.length % 4 != 0) {
-                          base64Image = base64Image.padRight(
-                            base64Image.length + 4 - base64Image.length % 4,
-                            '=',
-                          );
-                        }
-                        // Decode the Base64 string to bytes
-                        Uint8List imageBytes = base64.decode(base64Image);
-                        return Card(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: <Widget>[
-                              ClipRect(
-                                child: Image.memory(
-                                  imageBytes,
-                                  fit: BoxFit.contain, // Product image
-                                  height: 150.0, // Set a fixed height for the image
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text(product.productName),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                                child: Text('\RM ${product.price}'), // Product price
-                              ),
-                            ],
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: Colors.grey[200],
+                    backgroundImage: user.image != null
+                        ? MemoryImage(base64Decode(user.image!))
+                        : null,
+                  ),
+                  SizedBox(width: 16.0),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          ' ${user.name}',
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
                           ),
-                        );
-                      },
+                        ),
+                        Text(
+                          ' ${user.email}',
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
-
-                  if (_tabController.index == 1)
-                    ListView.builder(
-                      itemCount: discounts
-                          .where((discount) => discount.userId == userId)
-                          .length,
-                      itemBuilder: (context, index) {
-                        DiscountModel discount = discounts
-                            .where((discount) => discount.userId == userId)
-                            .toList()[index];
-                        return Card(
-                          child: ListTile(
-                            title: Text(
-                                'Discount Name: ${discount.name ?? 'N/A'}'),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Discount Value: ${discount.value}'),
-                                Text(
-                                    'Minimum Purchase: ${discount.minPurchaseAmount}'),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    )
-                  else if (_tabController.index == 2)
-                    ListView.builder(
-                      itemCount: reviews
-                          .where((review) =>
-                      review.userId == userId &&
-                          products.any((product) =>
-                          product.productId == review.productId &&
-                              product.userId == userId))
-                          .length,
-                      itemBuilder: (context, index) {
-                        ReviewModel review = reviews
-                            .where((review) =>
-                        review.userId == userId &&
-                            products.any((product) =>
-                            product.productId == review.productId &&
-                                product.userId == userId))
-                            .toList()[index];
-
-                        // Find the corresponding ProductModel for the given review
-                        ProductModel? associatedProduct = products.firstWhere(
-                              (product) => product.productId == review.productId,
-                          orElse: () => ProductModel(
-                            productId: 0,
-                            productName: 'N/A',
-                            description: 'N/A',
-                            price: 0.0,
-                            category: 'N/A',
-                            stockQuantity: 'N/A',
-                            image: 'N/A',
-                          ),
-                        );
-
-                        return ListTile(
-                          title: Text('Rating: ${review.rating}'),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Comment: ${review.comment}'),
-                              Text('Product ID: ${review.productId}'),
-                              Text('Product Name: ${associatedProduct.productName}'),
-                            ],
-                          ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: Icon(Icons.delete),
-                                onPressed: () => _confirmAndDeleteReview(review),
-                              ),
-
-                              PopupMenuButton<int>(
-                                onSelected: (int item) async {
-                                  if (item == 0) {
-                                    final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-                                    if (review.reviewId != null) {
-                                      await prefs.setInt('selectedReviewId', review.reviewId!);
-
-                                      // Navigate to ReportPage
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => ReportPage()),
-                                      );
-                                    } else {
-                                      // Handle the case where reviewId is null
-                                      // For example, show an error message
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(content: Text('Review ID is not available.'))
-                                      );
-                                    }
-                                  }
-                                  // Add more cases here for other menu items if needed
-                                },
-
-                                itemBuilder: (context) {
-                                  return [
-                                    PopupMenuItem<int>(
-                                      value: 0,
-                                      child: Text('Report'),
-                                    ),
-                                    // You can add more items here if needed
-                                  ];
-                                },
-                              ),
-                            ],
-                          ),
-                        );
-
-                      },
-                    ),
+                  ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+          SizedBox(height: 16.0),
+          TabBar(
+            controller: _tabController,
+            tabs: [
+              Tab(text: 'Listing'),
+              Tab(text: 'Discount'),
+              Tab(text: 'Feedback'),
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 8.0,
+                    mainAxisSpacing: 8.0,
+                  ),
+                  itemCount: products
+                      .where((product) => product.userId == userId)
+                      .length,
+                  itemBuilder: (context, index) {
+                    ProductModel product = products
+                        .where((product) => product.userId == userId)
+                        .toList()[index];
+                    String base64Image = product.image!;
+                    if (base64Image.length % 4 != 0) {
+                      base64Image = base64Image.padRight(
+                        base64Image.length + 4 - base64Image.length % 4,
+                        '=',
+                      );
+                    }
+                    Uint8List imageBytes = base64.decode(base64Image);
+                    return Card(
+                      child: InkWell(
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProductDetailSellerPage(product: product),
+                            ),
+                          );
+
+                          // Reload the data when the user navigates back to this page
+                          _loadProducts();
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            Expanded(
+                              child: ClipRect(
+                                child: Image.memory(
+                                  imageBytes,
+                                  fit: BoxFit.contain,
+                                  height: 150.0,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(product.productName),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Text('\RM ${product.price}'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                ListView.builder(
+                  itemCount: discounts
+                      .where((discount) => discount.userId == userId)
+                      .length,
+                  itemBuilder: (context, index) {
+                    DiscountModel discount = discounts
+                        .where((discount) => discount.userId == userId)
+                        .toList()[index];
+                    return Card(
+                      child: ListTile(
+                        title: Text(
+                          'Discount Name: ${discount.name ?? 'N/A'}',
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Discount Value: ${discount.value}'),
+                            Text(
+                              'Minimum Purchase: ${discount.minPurchaseAmount}',
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                ListView.builder(
+                  itemCount: reviews
+                      .where((review) =>
+                  review.userId == userId &&
+                      products.any((product) =>
+                      product.productId == review.productId &&
+                          product.userId == userId))
+                      .length,
+                  itemBuilder: (context, index) {
+                    ReviewModel review = reviews
+                        .where((review) =>
+                    review.userId == userId &&
+                        products.any((product) =>
+                        product.productId == review.productId &&
+                            product.userId == userId))
+                        .toList()[index];
+
+                    ProductModel? associatedProduct = products.firstWhere(
+                          (product) => product.productId == review.productId,
+                      orElse: () => ProductModel(
+                        productId: 0,
+                        productName: 'N/A',
+                        description: 'N/A',
+                        price: 0.0,
+                        category: 'N/A',
+                        stockQuantity: 'N/A',
+                        image: 'N/A',
+                      ),
+                    );
+
+                    return ListTile(
+                      title: Text('Rating: ${review.rating}'),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Comment: ${review.comment}'),
+                          Text('Product ID: ${review.productId}'),
+                          Text(
+                            'Product Name: ${associatedProduct.productName}',
+                          ),
+                        ],
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () => _confirmAndDeleteReview(review),
+                          ),
+                          PopupMenuButton<int>(
+                            onSelected: (int item) async {
+                              if (item == 0) {
+                                final SharedPreferences prefs =
+                                await SharedPreferences.getInstance();
+
+                                if (review.reviewId != null) {
+                                  await prefs.setInt(
+                                      'selectedReviewId', review.reviewId!);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => ReportPage()),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Review ID is not available.')));
+                                }
+                              }
+                              // Add more cases here for other menu items if needed
+                            },
+                            itemBuilder: (context) {
+                              return [
+                                PopupMenuItem<int>(
+                                  value: 0,
+                                  child: Text('Report'),
+                                ),
+                                // You can add more items here if needed
+                              ];
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
       floatingActionButton: _tabController.index == 0 ||
           _tabController.index == 1
           ? Container(
@@ -413,9 +441,9 @@ class _MyShopPageState extends State<MyShopPage>
         ),
       )
           : null,
-
     );
   }
+
 
   String _getButtonText(int tabIndex) {
     if (tabIndex == 0) {
