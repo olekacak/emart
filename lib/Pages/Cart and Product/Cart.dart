@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Controller/Stripe/StripeController.dart';
-import '../../Model/Cart and Product/CartModel.dart';
 import '../../Model/Cart and Product/CartProductModel.dart';
+import '../../Model/Cart and Product/ProductModel.dart';
 import '../../Model/Stripe/StripeModel.dart';
-import '../../Model/Transaction/TransactionModel.dart';
+import '../Transaction/Payment.dart';
 
 class CartPage extends StatefulWidget {
   @override
@@ -13,14 +13,13 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   List<CartProductModel> cartItems = [];
-  String checkoutButtonText = 'Checkout';
-  double totalPrice = 0;
+  List<ProductModel> product = [];
   final StripeModel stripeModel = StripeModel();
   final StripeController stripeController = StripeController();
   Map<String, dynamic>? paymentIntent;
   int userId = -1;
   int cartId = -1;
-
+  double price = 0.0;
 
   @override
   void initState() {
@@ -28,22 +27,21 @@ class _CartPageState extends State<CartPage> {
     _loadCartItems();
   }
 
-  void updateTotalPrice() {
-    totalPrice = 0;
-    for (var item in cartItems) {
-      totalPrice += (item.price ?? 0) * item.quantity;
+  double calculateTotalAmount() {
+    double totalAmount = 0.0;
+    for (var cartItem in cartItems) {
+      totalAmount += (cartItem.price ?? 0) * cartItem.quantity;
     }
-    setState(() {
-      checkoutButtonText = 'Checkout RM${totalPrice.toStringAsFixed(2)}';
-    });
+    return totalAmount;
   }
-
 
   Future<void> updateCartItem(CartProductModel cartItem) async {
     try {
       bool success = await cartItem.updateCartProduct();
       if (success) {
         print("Cart item updated successfully in the database");
+        setState(() {
+        });
       } else {
         print("Failed to update cart item in the database");
       }
@@ -52,33 +50,20 @@ class _CartPageState extends State<CartPage> {
     }
   }
 
-  Future<void> makePayment() async {
-    try {
-      int totalPriceStripe = (totalPrice * 100).toInt();
-      paymentIntent = await stripeModel.createPaymentIntent(totalPriceStripe.toString(), 'MYR');
-      await stripeController.initializePaymentSheet(paymentIntent!);
-      await stripeController.displayPaymentSheet();
-    } catch (err) {
-      print(err);
-    }
-  }
-
-  // Inside _CartPageState class
   void _loadCartItems() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       userId = prefs.getInt('userId') ?? -1;
+      cartId = prefs.getInt('cartId') ?? -1;
 
       if (userId != -1) {
-        // Load CartModel to get the cartId
-        List<CartModel> carts = await CartModel.loadAll();
-          // Load CartProductModel based on userId and cartId
-          final List<CartProductModel> items = await CartProductModel.loadAll(userId, cartId);
-
-          setState(() {
-            cartItems = items;
-            checkoutButtonText = 'Checkout RM${totalPrice.toStringAsFixed(2)}';
-          });
+        // Load CartProductModel based on userId and cartId
+        final List<CartProductModel> items = await CartProductModel.loadAll(userId, cartId);
+        print("cartId cartproduct model is ${cartId}");
+        setState(() {
+          // Update the cartItems list with the fetched items
+        });
+          cartItems = items;
       } else {
         // Handle the case where userId is not available
         print("User ID not available");
@@ -88,33 +73,24 @@ class _CartPageState extends State<CartPage> {
     }
   }
 
-  void _handleCheckout(BuildContext context) async {
+  void deleteCartItem(int index) async {
     try {
-      await makePayment();
-
-      final DateTime now = DateTime.now();
-      final String formattedDate = "${now.year}-${now.month}-${now.day}";
-
-      TransactionModel transaction = TransactionModel(
-        transactionId: 0,
-        transactionDate: formattedDate,
-        status: "Completed",
-        deliveryStatus: "Pending",
-        cartId: 1,
-      );
-
-      bool success = await transaction.saveTransaction();
+      int? cartProductId = cartItems[index].cartProductId;
+      print("cartproductid is ${cartProductId}");
+      bool success = await cartItems[index].deleteCartProduct();
 
       if (success) {
-        showMessage(context, "Payment success");
+        // Remove the deleted item from the local list
+        setState(() {
+          cartItems.removeAt(index);
+        });
       } else {
-        showMessage(context, "Failed to make payment");
+        showMessage(context, "Failed to delete cart item");
       }
     } catch (error) {
-      print("Error: $error");
+      print("Delete failed. Error: $error");
     }
   }
-
 
   void showMessage(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -128,6 +104,7 @@ class _CartPageState extends State<CartPage> {
 
   @override
   Widget build(BuildContext context) {
+    bool hasItemsInCart = cartItems.isNotEmpty;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -152,10 +129,37 @@ class _CartPageState extends State<CartPage> {
                   int quantity = cartItem.quantity ?? 0;
 
                   void decrementQuantity(int index) {
-                    if (cartItems[index].quantity > 1) {
+                    if (cartItems[index].quantity == 1) {
+                      // If the quantity is already 1, show a confirmation dialog to remove the item
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Remove Item from Cart?'),
+                            content: Text('Are you sure you want to remove this item from your cart?'),
+                            actions: <Widget>[
+                              TextButton(
+                                child: Text('Cancel'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              TextButton(
+                                child: Text('Remove'),
+                                onPressed: () {
+                                  // Remove the item from the cart
+                                  deleteCartItem(index);
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    } else {
                       setState(() {
                         cartItems[index].quantity--;
-                        updateTotalPrice();
+                        cartItems[index].totalPrice = cartItems[index].price * cartItems[index].quantity;
                         updateCartItem(cartItems[index]);
                       });
                     }
@@ -164,13 +168,9 @@ class _CartPageState extends State<CartPage> {
                   void incrementQuantity(int index) {
                     setState(() {
                       cartItems[index].quantity++;
-                      updateTotalPrice();
+                      cartItems[index].totalPrice = cartItems[index].price * cartItems[index].quantity; // Update totalPrice
                       updateCartItem(cartItems[index]);
                     });
-                  }
-
-                  void deleteCartItem() {
-                    // Implement the logic to delete the cart item here
                   }
 
                   bool isChecked = false;
@@ -200,7 +200,7 @@ class _CartPageState extends State<CartPage> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  '\RM${(cartItem.price ?? 0).toStringAsFixed(2)}',
+                                  '\RM${(cartItem.totalPrice ?? 0).toStringAsFixed(2)}',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
@@ -220,6 +220,10 @@ class _CartPageState extends State<CartPage> {
                                     icon: Icon(Icons.add),
                                     onPressed: () => incrementQuantity(index),
                                   ),
+                                  IconButton(
+                                    icon: Icon(Icons.delete),
+                                    onPressed: () => deleteCartItem(index),
+                                  ),
                                 ],
                               ),
                             ],
@@ -235,9 +239,26 @@ class _CartPageState extends State<CartPage> {
           Container(
             padding: EdgeInsets.all(10),
             color: Colors.white,
-            child: ElevatedButton(
-              onPressed: () => _handleCheckout(context),
-              child: Text(checkoutButtonText),
+            child: Container(
+              padding: EdgeInsets.all(10),
+              color: Colors.white,
+              child: ElevatedButton(
+                onPressed: hasItemsInCart
+                    ? () {
+                  double totalAmount = calculateTotalAmount();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PaymentPage(
+                        totalAmount: totalAmount,
+                        cartId: cartId,
+                      ),
+                    ),
+                  );
+                }
+                    : null, // Disable button if no items in the cart
+                child: Text("Checkout"),
+              ),
             ),
           ),
         ],

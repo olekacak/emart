@@ -222,7 +222,7 @@ class _HomeSellerPageState extends State<HomeSellerPage> with SingleTickerProvid
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 1.5, // Adjust the aspect ratio for more space
+        childAspectRatio: 0.7, // Adjust the aspect ratio for more space
         crossAxisSpacing: 20,
         mainAxisSpacing: 20,
       ),

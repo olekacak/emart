@@ -1,9 +1,13 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../Controller/Cart and Product/CartController.dart';
 import '../../Model/Cart and Product/CartModel.dart';
 import '../../Model/Cart and Product/CartProductModel.dart';
 import '../../Model/Cart and Product/ProductModel.dart';
+import '../../Model/User/WishlistModel.dart';
+import '../../main.dart';
 import 'Cart.dart';
 
 class ProductDetailPage extends StatefulWidget {
@@ -22,13 +26,42 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   bool success = false;
   int userId = -1;
   int cartId = -1;
+  bool isFavorite = false;
 
   @override
   void initState() {
     super.initState();
     loadUserId();
     initializeCart();
+    toggleFavorite();
+    checkIfInWishlist();
   }
+
+  Future<void> checkIfInWishlist() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getInt('userId') ?? -1;
+    if (userId != -1) {
+      try {
+        List<WishlistModel> wishlistItems = await WishlistModel.loadAll(userId);
+        setState(() {
+          // Check if the current product ID is in the list of wishlist items
+          isFavorite = wishlistItems.any((item) => item.productId == widget.product.productId);
+        });
+        print("Wishlist product IDs: ${wishlistItems.map((item) => item.productId).toList()}");
+        print("Current product ID: ${widget.product.productId}");
+
+      } catch (e) {
+        // Handle the exception, e.g., wishlist items not found or other errors
+        print("Error checking wishlist: $e");
+        setState(() {
+          isFavorite = false;
+        });
+      }
+    }
+  }
+
+
+
   Future<void> initializeCart() async {
     int? retrievedCartId = await checkCart();
     if (retrievedCartId != null) {
@@ -48,7 +81,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       List<CartModel> carts = await CartModel.loadAll();
       if (carts.isEmpty) {
         // Cart doesn't exist for the user, create a new one
-        bool cartCreated = await CartModel(userId: userId, status: 'pending').addCart();
+        bool cartCreated =
+            await CartModel(userId: userId, status: 'pending').addCart();
         if (cartCreated) {
           print('New cart created successfully');
           carts = await CartModel.loadAll();
@@ -59,7 +93,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         // Check if the existing cart's status is "completed"
         if (carts.first.status == 'completed') {
           // If the status is "completed", create a new cart
-          bool cartCreated = await CartModel(userId: userId, status: 'pending').addCart();
+          bool cartCreated =
+              await CartModel(userId: userId, status: 'pending').addCart();
           if (cartCreated) {
             print('New cart created successfully');
             carts = await CartModel.loadAll(); // Reload carts after creation
@@ -81,7 +116,39 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   loadUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-     userId = prefs.getInt('userId') ?? -1;
+    userId = prefs.getInt('userId') ?? -1;
+  }
+
+  Future<void> toggleFavorite() async {
+    if (userId != -1) {
+      WishlistModel wishlistItem = WishlistModel(
+        userId: userId,
+        productId: widget.product.productId,
+        product: widget.product,
+      );
+
+      if (!isFavorite) {
+        // Add to wishlist
+        bool addedToWishlist = await wishlistItem.addToWishlist();
+        if (addedToWishlist) {
+          setState(() {
+            isFavorite = true;
+          });
+        }
+      } else {
+        // Remove from wishlist
+        bool removedFromWishlist = await wishlistItem.removeFromWishlist();
+        if (removedFromWishlist) {
+          setState(() {
+            isFavorite = false;
+          });
+        }
+      }
+    } else {
+      // Handle the case where userId is not available
+      // You might want to show an error message or redirect the user to login.
+      print("User ID not available");
+    }
   }
 
   @override
@@ -116,6 +183,18 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: isFavorite ? Colors.red : null,
+                        ),
+                        onPressed: toggleFavorite,
+                      ),
+                    ],
+                  ),
                   Text(
                     widget.product.productName,
                     style: TextStyle(
@@ -187,19 +266,18 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   ElevatedButton(
                     onPressed: () async {
                       if (userId != -1) {
-
                         // User ID is available, proceed to add the product to the cart
                         CartProductModel cartProduct = CartProductModel(
                           cartId: cartId,
                           productName: '',
                           productId: widget.product.productId,
                           quantity: selectedQuantity,
+                          totalPrice: widget.product.price * selectedQuantity,
                           price: widget.product.price,
                         );
 
                         // Call the saveCartProduct method on the cartProduct instance
                         success = await cartProduct.saveCartProduct();
-
                         if (success) {
                           Navigator.push(
                             context,

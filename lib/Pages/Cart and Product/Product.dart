@@ -360,7 +360,7 @@ class _ProductPageState extends State<ProductPage> {
       physics: NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 1.5,
+        childAspectRatio: 0.7,
         crossAxisSpacing: 20,
         mainAxisSpacing: 20,
       ),

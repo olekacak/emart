@@ -78,4 +78,29 @@ class CartModel {
     }
     return result;
   }
+
+  Future<bool> updateCart() async {
+    CartController cartController = CartController(path: "${MyApp().server}/api/workshop2/cart.php");
+    cartController.setBody({
+      'userId': userId,
+      'cartId': cartId, // Use the current value of cartId
+      'status': status,
+    });
+
+    try {
+      await cartController.put(); // Use the 'put' method for updating
+      if (cartController.status() == 200) {
+        Map<String, dynamic>? result = await cartController.result();
+        if (result != null) {
+          // Handle the updated data if needed
+        }
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print("Error updating cart: $e");
+      return false;
+    }
+  }
+
 }

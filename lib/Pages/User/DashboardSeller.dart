@@ -2,11 +2,13 @@ import 'dart:convert';
 
 import 'package:emartsystem/Pages/Cart%20and%20Product/MyShop.dart';
 import 'package:emartsystem/Pages/User/Setting.dart';
+import 'package:emartsystem/Pages/User/Wishlist.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Model/User/UserProfileModel.dart';
 import '../Cart and Product/About.dart';
 import '../Cart and Product/Help.dart';
+import 'Order.dart';
 import 'Profile.dart';
 import 'UserLogin.dart';
 
@@ -157,6 +159,12 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                       ),
                       SizedBox(height: 10),
                       ListTile(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => WishlistPage()),
+                          );
+                        },
                         leading: Icon(Icons.favorite),
                         title: Text('Wishlist'),
                       ),
@@ -170,6 +178,17 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                         },
                         leading: Icon(Icons.swap_horiz),
                         title: Text('Switch Hosting'),
+                      ),
+                      SizedBox(height: 10),
+                      ListTile(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => OrderPage()),
+                          );
+                        },
+                        leading: Icon(Icons.receipt_long_rounded),
+                        title: Text('Order'),
                       ),
                     ],
                   ),

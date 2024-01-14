@@ -1,7 +1,9 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Controller/Cart and Product/CartProductController.dart';
+import '../../Controller/Cart and Product/ProductController.dart';
 import '../../main.dart';
+import 'ProductModel.dart';
 
 class CartProductModel {
   int? cartProductId;
@@ -9,17 +11,19 @@ class CartProductModel {
   int? userId;
   int? productId;
   int quantity;
-  double price;
+  double totalPrice;
   String productName;
-  
+  double price;
+
 
   CartProductModel({
     this.cartProductId,
     this.cartId,
     this.productId,
     required this.quantity,
-    required this.price,
+    required this.totalPrice,
     required this.productName,
+    required this.price,
   });
 
   CartProductModel.fromJson(Map<String, dynamic> json)
@@ -28,8 +32,9 @@ class CartProductModel {
         userId = json['userId'] as int? ?? 0,
         productId = json['productId'] as int? ?? 0,
         quantity = json['quantity'] as int? ?? 0,
-        price = (json['price'] as num?)?.toDouble() ?? 0.0,
-        productName = json['productName'];
+        totalPrice = (json['totalPrice'] as num?)?.toDouble() ?? 0.0,
+        productName = json['productName'],
+        price = (json['price'] as num?)?.toDouble() ?? 0.0;
 
 
   Map<String, dynamic> toJson() {
@@ -38,9 +43,18 @@ class CartProductModel {
       'cartId': cartId,
       'productId': productId,
       'quantity': quantity,
-      'price': price,
+      'totalPrice': totalPrice,
       'productName': productName,
+      'price': price,
     };
+  }
+
+  void setProductId(int newProductId) {
+    productId = newProductId;
+  }
+  Future<void> getProductId(int? ProductId, String ProductIdType) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(ProductIdType, ProductId ?? -1);
   }
 
 
@@ -62,7 +76,6 @@ class CartProductModel {
         result.add(CartProductModel.fromJson(item));
       }
     }
-
     return result;
   }
 
@@ -80,7 +93,6 @@ class CartProductModel {
     return false;
   }
 
-
   // Update product method
   Future<bool> updateCartProduct() async {
     if (productId == null) {
@@ -88,12 +100,65 @@ class CartProductModel {
     }
 
     CartProductController cartProductController = CartProductController(path: "${MyApp().server}/api/workshop2/cart_product.php");
-    cartProductController.setBody(toJson());
+
+    // Explicitly include both quantity and price in the request payload
+    Map<String, dynamic> requestBody = {
+      'cartProductId': cartProductId,
+      'cartId': cartId,
+      'productId': productId,
+      'quantity': quantity,
+      'totalPrice': totalPrice,
+      'productName': productName,
+      'price': price,
+    };
+
+    cartProductController.setBody(requestBody);
     await cartProductController.put();
+
     if (cartProductController.status() == 200) {
       Map<String, dynamic> result = cartProductController.result();
       return true;
     }
     return false;
   }
+
+  Future<bool> deleteCartProduct() async {
+    if (cartProductId == null) {
+      // Cannot delete an expense without an ID
+      return false;
+    }
+    print("cartProductId in model is ${cartProductId}");
+    CartProductController cartProductController = CartProductController(path: "${MyApp().server}/api/workshop2/cart_product.php");
+    cartProductController.setBody(toJson());
+
+    await cartProductController.delete();
+
+    if (cartProductController.status() == 200) {
+      return true;
+    } else {
+      // Print the error message in case of failure
+      print('Delete failed. Error: ${cartProductController.result()}');
+      return false;
+    }
+  }
+
+  // Future<bool> deleteCartProduct() async {
+  //   if (cartProductId == null) {
+  //     // Cannot delete an expense without an ID
+  //     return false;
+  //   }
+  //   print("cartProductId in model is ${cartProductId}");
+  //   CartProductController cartProductController = CartProductController(path: "${MyApp().server}/api/workshop2/cart_product.php");
+  //   cartProductController.setBody(toJson());
+  //
+  //   await cartProductController.delete();
+  //
+  //   if (cartProductController.status() == 200) {
+  //     return true;
+  //   } else {
+  //     // Print the error message in case of failure
+  //     print('Delete failed. Error: ${cartProductController.result()}');
+  //     return false;
+  //   }
+  // }
 }
