@@ -43,6 +43,7 @@ class _AddProductPageState extends State<AddProductPage> {
     stockQuantity: '',
     image: '',
     userId: 0,
+    isInWishlist: false,
   );
 
   pickImage() async {

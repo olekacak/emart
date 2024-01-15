@@ -10,18 +10,22 @@ class WishlistModel {
   int? productId;
   ProductModel product;
 
+  bool isInWishlist;
+
   WishlistModel({
     this.wishlistId,
     this.userId,
     this.productId,
     required this.product,
+    required this.isInWishlist,
   });
 
   WishlistModel.fromJson(Map<String, dynamic> json)
       : wishlistId = json['wishlistId'] as int?,
         userId = json['userId'] as int?,
         productId = json['productId'] as int?,
-        product = ProductModel.fromJson(json);
+        product = ProductModel.fromJson(json),
+        isInWishlist = json['isInWishlist'] ?? false;
 
 
   Map<String, dynamic> toJson() {

@@ -12,6 +12,7 @@ class ProductModel {
   String category;
   String stockQuantity;
   String image;
+  bool isInWishlist;
 
   ProductModel({
     this.productId,
@@ -22,6 +23,7 @@ class ProductModel {
     required this.category,
     required this.stockQuantity,
     required this.image,
+    required this.isInWishlist,
   });
 
   ProductModel.fromJson(Map<String, dynamic> json)
@@ -32,7 +34,8 @@ class ProductModel {
         price = (json['price'] as num?)?.toDouble() ?? 0.0,
         category = json['category'] as String? ?? '',
         stockQuantity = json['stockQuantity'] as String? ?? '',
-        image = json['image'] != null ? json['image'] as String : '';
+        image = json['image'] != null ? json['image'] as String : '',
+        isInWishlist = json['isInWishlist'] ?? false;
 
   Map<String, dynamic> toJson() {
     return {
@@ -135,6 +138,6 @@ class ProductModel {
       print('Delete failed. Error: ${productController.result()}');
       return false;
     }
-    }
+  }
 
 }

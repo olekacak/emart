@@ -140,6 +140,7 @@ class _EditProductPageState extends State<EditProductPage> {
       stockQuantity: stockQuantityController.text,
       image: base64String,
       userId: userId,
+      isInWishlist: false,
     );
 
     bool updated = await product.updateProduct();

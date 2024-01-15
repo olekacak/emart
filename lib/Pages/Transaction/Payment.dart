@@ -1,9 +1,12 @@
+import 'package:emartsystem/Model/Cart%20and%20Product/CartModel.dart';
+import 'package:emartsystem/Pages/HomeSeller.dart';
 import 'package:flutter/material.dart';
 import '../../Controller/Stripe/StripeController.dart';
 import '../../Model/Cart and Product/CartProductModel.dart';
 import '../../Model/Stripe/StripeModel.dart';
 import '../../Model/Transaction/TransactionModel.dart';
 import '../HomeCustomer.dart';
+import '../User/Order.dart';
 
 class GroupedCartItem {
   int productId;
@@ -35,6 +38,7 @@ class PaymentPage extends StatefulWidget {
 
 class _PaymentPageState extends State<PaymentPage> {
   List<CartProductModel> cartItems = [];
+  List<CartModel> cart = [];
   String checkoutButtonText = 'Checkout';
   double totalPrice = 0;
   final StripeModel stripeModel = StripeModel();
@@ -46,6 +50,15 @@ class _PaymentPageState extends State<PaymentPage> {
   @override
   void initState() {
     super.initState();
+  }
+
+  Future<void> updateCartStatus() async {
+    List<CartModel> cart = await CartModel.loadAll();
+
+    for (CartModel cart in cart) {
+      cart.status = 'Pending';
+      await cart.updateCart();
+    }
   }
 
   @override
@@ -155,6 +168,7 @@ class _PaymentPageState extends State<PaymentPage> {
 
             if (success) {
               print("Payment Successfully");
+              updateCartStatus();
               placeOrder(); // Pass true to indicate success
             } else {
               print("Failed to save transaction data.");
@@ -198,6 +212,7 @@ class _PaymentPageState extends State<PaymentPage> {
 
         if (success) {
           print("Cash on Delivery Successful");
+          updateCartStatus();
           placeOrder(); // Pass true to indicate success
         } else {
           print("Failed to save transaction data.");
@@ -301,7 +316,7 @@ class _PaymentPageState extends State<PaymentPage> {
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => HomeCustomerPage(),
+                              builder: (context) => HomeSellerPage(),
                             ),
                                 (route) => false, // Remove all previous routes
                           );

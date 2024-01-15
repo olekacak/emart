@@ -1,9 +1,7 @@
 import 'dart:convert';
-
-import 'package:emartsystem/Pages/Cart%20and%20Product/Product.dart';
 import 'package:flutter/material.dart';
 import '../Model/Cart and Product/ProductModel.dart';
-import '../Model/User/UserLoginModel.dart';
+import '../Model/User/WishlistModel.dart';
 import 'Cart and Product/Cart.dart';
 import 'Cart and Product/Filter.dart';
 import 'Cart and Product/ProductDetail.dart';
@@ -96,11 +94,31 @@ class _HomeSellerPageState extends State<HomeSellerPage> with SingleTickerProvid
     }
   }
 
+  void _toggleFavorite(ProductModel product) async {
+    // Create a WishlistModel instance for the product
+    WishlistModel wishlistItem = WishlistModel(
+        userId: product.userId, productId: product.productId, product: product, isInWishlist: false);
+
+    // Toggle the favorite status
+    if (product.isInWishlist) {
+      // Remove from wishlist
+      await wishlistItem.removeFromWishlist();
+    } else {
+      // Add to wishlist
+      await wishlistItem.addToWishlist();
+    }
+
+    // Update the UI
+    setState(() {
+      product.isInWishlist = !product.isInWishlist;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> _pages = [
       HomeSellerPage(),
-      const SearchPage(),
+      SearchPage(),
       const InboxPage(),
       DashboardSellerPage(),
     ];
@@ -148,6 +166,14 @@ class _HomeSellerPageState extends State<HomeSellerPage> with SingleTickerProvid
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SearchPage(),
+                        ),
+                      );
+                    },
                     decoration: InputDecoration(
                       labelText: 'Search',
                       border: OutlineInputBorder(),
@@ -234,7 +260,7 @@ class _HomeSellerPageState extends State<HomeSellerPage> with SingleTickerProvid
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ProductPage(product: product),
+                builder: (context) => ProductDetailPage(product: product),
               ),
             );
           },
@@ -262,12 +288,28 @@ class _HomeSellerPageState extends State<HomeSellerPage> with SingleTickerProvid
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    product.productName,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          product.productName,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.favorite,
+                          color: product.isInWishlist ? Colors.red : Colors.grey,
+                        ),
+                        onPressed: () {
+                          _toggleFavorite(product);
+                        },
+                      ),
+                    ],
                   ),
                 ),
                 Padding(

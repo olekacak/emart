@@ -142,17 +142,12 @@ class _DiscountPageState extends State<DiscountPage> {
   }
 
   void saveDiscount() async {
-
-    print('Saving Discount:');
-    print('Name: $selectedName');
-    print('Value: $selectedValue');
-    print('Min Purchase: $selectedMin');
-    print('User ID: $userId');
-
-    newDiscount.name = selectedName;
-    newDiscount.value = selectedValue;
-    newDiscount.minPurchaseAmount = selectedMin;
-    newDiscount.userId = userId;
+    newDiscount = DiscountModel(
+      name: selectedName,
+      value: selectedValue,
+      minPurchaseAmount: selectedMin,
+      userId: userId,
+    );
 
     bool saved = await newDiscount.saveDiscount();
     print('Discount saved: $saved');
@@ -163,4 +158,5 @@ class _DiscountPageState extends State<DiscountPage> {
       _showMessage('Failed to save the discount.');
     }
   }
+
 }
