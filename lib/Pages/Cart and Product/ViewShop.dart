@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import '../../Model/Cart and Product/ProductModel.dart';
 import '../../Model/User/UserLoginModel.dart';
-import 'Product.dart';
 import 'ProductDetail.dart';
 
 class ViewShopPage extends StatefulWidget {
@@ -120,7 +119,7 @@ class _ViewShopPageState extends State<ViewShopPage> with SingleTickerProviderSt
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ProductPage(product: product),
+                builder: (context) => ProductDetailPage(product: product),
               ),
             );
           },

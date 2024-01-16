@@ -14,11 +14,9 @@ import 'ViewShop.dart';
 class ProductDetailPage extends StatefulWidget {
   final ProductModel product;
   final double? averageRating;
-
   const ProductDetailPage({
     Key? key,
-    required this.product,
-    this.averageRating,
+    required this.product, this.averageRating,
   }) : super(key: key);
 
   @override
@@ -30,7 +28,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   bool success = false;
   int userId = -1;
   int cartId = -1;
+  int wishlistId = -1;
+
   bool isFavorite = false;
+  int productId = -1;
   bool isLoading = true;
   bool isLoadingReviews = true;
   UserLoginModel? userDetails;
@@ -41,35 +42,71 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   @override
   void initState() {
     super.initState();
+    loadUserId();
+    initializeCart();
+    checkIfProductIsFavorite();
     loadAllUsers();
     loadReviews();
     loadAllProducts();
-    loadUserId();
-    initializeCart();
-    toggleFavorite();
-    checkIfInWishlist();
   }
 
-  Future<void> checkIfInWishlist() async {
+  Future<void> checkIfProductIsFavorite() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getInt('userId') ?? -1;
+
+    if (userId != -1) {
+      isFavorite = await WishlistModel.loadById(userId, widget.product.productId!);
+      print("cubaaaa ${isFavorite}");
+      setState(() {});
+    }
+  }
+
+
+  void toggleFavorite() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userId = prefs.getInt('userId') ?? -1;
     if (userId != -1) {
-      try {
-        List<WishlistModel> wishlistItems = await WishlistModel.loadAll(userId);
-        setState(() {
-          // Check if the current product ID is in the list of wishlist items
-          isFavorite = wishlistItems.any((item) => item.productId == widget.product.productId);
-        });
-        print("Wishlist product IDs: ${wishlistItems.map((item) => item.productId).toList()}");
-        print("Current product ID: ${widget.product.productId}");
+      if (!isFavorite) {
+        // If it's not in the wishlist, add it
+        WishlistModel wishlistItem = WishlistModel(
+          userId: userId,
+          productId: widget.product.productId,
+          product: widget.product,
+          isFavorite: true,
+        );
+        bool added = await wishlistItem.addToWishlist();
+        if (added) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Added to wishlist'),
+            ),
+          );
+        }
+      } else {
+        // If it's already in the wishlist, remove it
+        WishlistModel wishlistItem = WishlistModel(
+          wishlistId: wishlistId,
+          userId: userId,
+          productId: widget.product.productId,
+          product: widget.product,
+          isFavorite: false,
+        );
 
-      } catch (e) {
-        // Handle the exception, e.g., wishlist items not found or other errors
-        print("Error checking wishlist: $e");
-        setState(() {
-          isFavorite = false;
-        });
+        bool removed = await wishlistItem.removeFromWishlist(userId, widget.product.productId!);
+
+        if (removed) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Removed from wishlist'),
+            ),
+          );
+        }
       }
+
+      // Update the favorite status
+      setState(() {
+        isFavorite = !isFavorite;
+      });
     }
   }
 
@@ -134,39 +171,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   loadUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userId = prefs.getInt('userId') ?? -1;
-  }
-
-  Future<void> toggleFavorite() async {
-    if (userId != -1) {
-      WishlistModel wishlistItem = WishlistModel(
-        userId: userId,
-        productId: widget.product.productId,
-        product: widget.product,
-        isInWishlist: false,
-      );
-
-      if (!isFavorite) {
-        // Add to wishlist
-        bool addedToWishlist = await wishlistItem.addToWishlist();
-        if (addedToWishlist) {
-          setState(() {
-            isFavorite = true;
-          });
-        }
-      } else {
-        // Remove from wishlist
-        bool removedFromWishlist = await wishlistItem.removeFromWishlist();
-        if (removedFromWishlist) {
-          setState(() {
-            isFavorite = false;
-          });
-        }
-      }
-    } else {
-      // Handle the case where userId is not available
-      // You might want to show an error message or redirect the user to login.
-      print("User ID not available");
-    }
   }
 
   void loadAllUsers() async {
@@ -262,14 +266,31 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              widget.product.productName,
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(width: 8), // Add spacing between the product name and the icon
-                          ],
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  widget.product.productName,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  isFavorite ? Icons.favorite : Icons.favorite_border,
+                                  color: isFavorite ? Colors.red : null,
+                                ),
+                                onPressed: () {
+                                  toggleFavorite();
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

@@ -14,7 +14,8 @@ class MyTab extends StatelessWidget {
   final String iconPath;
   final String name;
 
-  const MyTab({Key? key, required this.iconPath, required this.name}) : super(key: key);
+  const MyTab({Key? key, required this.iconPath, required this.name})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -47,12 +48,12 @@ class CustomTab {
 }
 
 class HomeSellerPage extends StatefulWidget {
-
   @override
   _HomeSellerPageState createState() => _HomeSellerPageState();
 }
 
-class _HomeSellerPageState extends State<HomeSellerPage> with SingleTickerProviderStateMixin {
+class _HomeSellerPageState extends State<HomeSellerPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _currentIndex = 0;
   List<ProductModel> products = [];
@@ -70,10 +71,10 @@ class _HomeSellerPageState extends State<HomeSellerPage> with SingleTickerProvid
   void initState() {
     super.initState();
     _tabController = TabController(length: myTabs.length, vsync: this);
-    _loadProducts();
+    loadProducts();
   }
 
-  _loadProducts() async {
+  loadProducts() async {
     try {
       products = await ProductModel.loadAll(category: '');
 
@@ -83,35 +84,23 @@ class _HomeSellerPageState extends State<HomeSellerPage> with SingleTickerProvid
       setState(() {
         categorizedProducts = {
           'All Products': products,
-          'Snacks': products.where((p) => p.category.toLowerCase() == 'snacks').toList(),
-          'Instant Food': products.where((p) => p.category.toLowerCase() == 'instant food').toList(),
-          'Breakfast': products.where((p) => p.category.toLowerCase() == 'breakfast').toList(),
-          'Dessert': products.where((p) => p.category.toLowerCase() == 'dessert').toList(),
+          'Snacks': products
+              .where((p) => p.category.toLowerCase() == 'snacks')
+              .toList(),
+          'Instant Food': products
+              .where((p) => p.category.toLowerCase() == 'instant food')
+              .toList(),
+          'Breakfast': products
+              .where((p) => p.category.toLowerCase() == 'breakfast')
+              .toList(),
+          'Dessert': products
+              .where((p) => p.category.toLowerCase() == 'dessert')
+              .toList(),
         };
       });
     } catch (e) {
       print('Error loading products: $e');
     }
-  }
-
-  void _toggleFavorite(ProductModel product) async {
-    // Create a WishlistModel instance for the product
-    WishlistModel wishlistItem = WishlistModel(
-        userId: product.userId, productId: product.productId, product: product, isInWishlist: false);
-
-    // Toggle the favorite status
-    if (product.isInWishlist) {
-      // Remove from wishlist
-      await wishlistItem.removeFromWishlist();
-    } else {
-      // Add to wishlist
-      await wishlistItem.addToWishlist();
-    }
-
-    // Update the UI
-    setState(() {
-      product.isInWishlist = !product.isInWishlist;
-    });
   }
 
   @override
@@ -197,13 +186,18 @@ class _HomeSellerPageState extends State<HomeSellerPage> with SingleTickerProvid
           ),
           TabBar(
             controller: _tabController,
-            tabs: myTabs.map((tab) => MyTab(iconPath: tab.iconPath, name: tab.name)).toList(),
+            tabs: myTabs
+                .map((tab) => MyTab(iconPath: tab.iconPath, name: tab.name))
+                .toList(),
           ),
           Expanded(
             child: TabBarView(
               physics: NeverScrollableScrollPhysics(), // Make it non-swipeable
               controller: _tabController,
-              children: myTabs.map((tab) => _buildProductGridView(categorizedProducts[tab.name] ?? [])).toList(),
+              children: myTabs
+                  .map((tab) => _buildProductGridView(
+                      categorizedProducts[tab.name] ?? []))
+                  .toList(),
             ),
           ),
         ],
@@ -288,28 +282,12 @@ class _HomeSellerPageState extends State<HomeSellerPage> with SingleTickerProvid
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          product.productName,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.favorite,
-                          color: product.isInWishlist ? Colors.red : Colors.grey,
-                        ),
-                        onPressed: () {
-                          _toggleFavorite(product);
-                        },
-                      ),
-                    ],
+                  child: Text(
+                    product.productName,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 Padding(

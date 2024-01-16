@@ -15,30 +15,71 @@ class WishlistPage extends StatefulWidget {
 
 class _WishlistPageState extends State<WishlistPage> {
   List<WishlistModel> wishlistItems = [];
+  int productId = -1;
 
   @override
   void initState() {
     super.initState();
-    _loadWishlistItems();
+    loadWishlistItems();
   }
 
-  _loadWishlistItems() async {
+  bool isProductInWishlist(ProductModel product) {
+    return wishlistItems.any((item) => item.product.productId == product.productId);
+  }
+
+  void loadWishlistItems() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       int userId = prefs.getInt('userId') ?? -1;
       print("userId: $userId");
 
       if (userId != -1) {
-        // Fetch wishlist items for the specific user and product
         List<WishlistModel> loadedItems = await WishlistModel.loadAll(userId);
+        // print("loaaddddd ${loadedItems[0].wishlistId}");
 
         setState(() {
           wishlistItems = loadedItems;
-          print("wishlistitem name ${wishlistItems}");// Update the state with the fetched wishlist items
+
+          // Check if the product in the wishlist is already marked as a favorite
+          for (var item in wishlistItems) {
+            if (isProductInWishlist(item.product)) {
+              item.isFavorite = true;
+            }
+          }
         });
       }
     } catch (e) {
       print('Error loading wishlist items: $e');
+    }
+  }
+
+  Future<void> toggleFavorite(WishlistModel wishlistItem) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int userId = prefs.getInt('userId') ?? -1;
+    print("wiwiwiwiwi ${wishlistItem.product.userId}");
+    if (userId != -1) {
+      if (!isProductInWishlist(wishlistItem.product)) {
+        // Add to wishlist
+        bool addedToWishlist = await wishlistItem.addToWishlist();
+        if (addedToWishlist) {
+          setState(() {
+            wishlistItem.isFavorite = true; // Update the item to be marked as a favorite
+            wishlistItems.add(wishlistItem); // Add the item to the local list
+          });
+        }
+      } else {
+        // Remove from wishlist
+        bool removedFromWishlist = await wishlistItem.removeFromWishlist(userId, wishlistItem.productId!);
+        if (removedFromWishlist) {
+          setState(() {
+            wishlistItem.isFavorite = false; // Update the item to not be marked as a favorite
+            wishlistItems.remove(wishlistItem); // Remove the item from the local list
+          });
+        }
+      }
+    } else {
+      // Handle the case where userId is not available
+      print("User ID not available");
     }
   }
 
@@ -95,12 +136,29 @@ class _WishlistPageState extends State<WishlistPage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      wishlistItem.product.productName,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            wishlistItem.product.productName,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            wishlistItem.isFavorite ? Icons.favorite : Icons.favorite_border,
+                            color: wishlistItem.isFavorite ? Colors.red : null,
+                          ),
+                          onPressed: () {
+                            print("afef ${wishlistItem.product.productName}");
+                            toggleFavorite(wishlistItem);
+                          },
+                        ),
+                      ],
                     ),
                   ),
                   Padding(

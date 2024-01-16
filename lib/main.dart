@@ -15,7 +15,7 @@
   class MyApp extends StatefulWidget {
     MyApp({Key? key}) : super(key: key);
 
-    String server = "http://10.131.74.232";
+    String server = "http://192.168.0.107";
 
     @override
     _MyAppState createState() => _MyAppState();
