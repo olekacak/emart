@@ -6,7 +6,6 @@ import '../Cart and Product/About.dart';
 import '../Cart and Product/Help.dart';
 import 'DashboardSeller.dart';
 import 'Profile.dart';
-import 'Setting.dart';
 import 'UserLogin.dart';
 
 class DashboardCustomerPage extends StatefulWidget {
@@ -43,7 +42,7 @@ class RegisterSeller extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => DashboardSellerPage(),
+                  builder: (context) => UserLoginPage(),
                 ),
               );
             } else {
@@ -271,17 +270,6 @@ class _DashboardCustomerPageState extends State<DashboardCustomerPage> {
                                           ),
                                         );
                                       },
-                                    ),
-                                    SizedBox(height: 10),
-                                    ListTile(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(builder: (context) => SettingPage()),
-                                        );
-                                      },
-                                      leading: Icon(Icons.settings),
-                                      title: Text('Setting'),
                                     ),
                                     SizedBox(height: 16),
                                     ElevatedButton(

@@ -8,29 +8,34 @@ import '../../main.dart';
 class TransactionModel {
   int? transactionId;
   int userId;
-  String transactionDate;
+  String? transactionDate;
+  String? cartStatus;
   String status;
-  String deliveryStatus;
-  int cartId;
+  String? deliveryStatus;
+  int? cartId;
   int cartProductId;
+  double totalPrice;
   double price;
   int quantity;
   String image;
   int productId;
   String productName;
+  String? paymentOption;
+  String? voucher;
+  double? totalPayment;
+  bool hasReview;
 
-  String paymentOption;
-  String voucher;
-  double totalPayment;
 
   TransactionModel({
     this.transactionId,
     required this.userId,
     required this.transactionDate,
+    required this.cartStatus,
     required this.status,
     required this.deliveryStatus,
     required this.cartId,
     required this.cartProductId,
+    required this.totalPrice,
     required this.price,
     required this.quantity,
     required this.image,
@@ -39,31 +44,32 @@ class TransactionModel {
     required this.paymentOption,
     required this.voucher,
     required this.totalPayment,
+    required this.hasReview,
+
   });
 
   TransactionModel.fromJson(Map<String, dynamic> json)
-      : transactionId = json['transaction']['transactionId'] as int? ?? -1,
-        userId = json['transaction']['userId'] as int? ?? -1,
-        transactionDate = json['transaction']['transactionDate'] as String? ?? '',
-        status = json['transaction']['status'] as String? ?? '',
-        deliveryStatus = json['transaction']['deliveryStatus'] as String? ?? '',
-        cartId = json['transaction']['cartId'] as int? ?? -1,
-        paymentOption = json['transaction']['paymentOption'] as String? ?? '',
-        voucher = json['transaction']['voucher'] as String? ?? '',
-        totalPayment = (json['transaction']['totalPayment'] as num?)?.toDouble() ?? 0.0,
+      : transactionId = json['cart']['transactionId'] as int? ?? -1,
+        userId = json['cart']['userId'] as int? ?? -1,
+        status = json['cartProduct']['status'] as String? ?? '',
+        cartId = json['cart']['cartId'] as int? ?? -1,
         cartProductId = json['cartProduct']['cartProductId'] as int? ?? -1,
-        price = (json['cartProduct']['totalPrice'] as num?)?.toDouble() ?? 0.0,
+        totalPrice = (json['cartProduct']['totalPrice'] as num?)?.toDouble() ?? 0.0,
         quantity = json['cartProduct']['quantity'] as int? ?? 0,
         productId = json['product']['productId'] as int? ?? -1,
         productName = json['product']['productName'] as String? ?? '',
-        image = json['product']['image'] as String? ?? '';
-
+        price = (json['product']['price'] as num?)?.toDouble() ?? 0.0,
+        image = json['product']['image'] as String? ?? '',
+        hasReview = json['hasReview'] as bool? ?? false;
 
 
   Map<String, dynamic> toJson() {
     return {
       'transactionId': transactionId,
+      'cartProductId': cartProductId,
+      'productId': productId,
       'transactionDate': transactionDate,
+      'cartStatus': cartStatus,
       'status': status,
       'deliveryStatus': deliveryStatus,
       'userId': userId,
@@ -71,20 +77,22 @@ class TransactionModel {
       'paymentOption': paymentOption,
       'voucher': voucher,
       'totalPayment': totalPayment,
+      'totalPrice': totalPrice,
+      'price': price,
     };
   }
 
   Future<bool> saveTransaction() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    userId = prefs.getInt('userId') ?? -1;
+    // userId = prefs.getInt('userId') ?? -1;
 
     TransactionController transactionController = TransactionController(path: "${MyApp().server}/api/workshop2/transaction.php?userId=$userId");
-    print("Transaction Payload: ${toJson()}");
+    // print("Transaction Payload: ${toJson()}");
     transactionController.setBody(toJson());
     await transactionController.post();
 
     if (transactionController.status() == 200) {
-      print("raw response: ${transactionController.result()}");
+      // print("raw response: ${transactionController.result()}");
       return true;
     }
     return false;
@@ -97,7 +105,7 @@ class TransactionModel {
     }
 
     TransactionController transactionController = TransactionController(path: "${MyApp().server}/api/workshop2/transaction.php");
-    print("Transaction Payload: ${toJson()}");
+    // print("Transaction Payload: ${toJson()}");
     transactionController.setBody(toJson());
     await transactionController.put();
 
@@ -129,22 +137,46 @@ class TransactionModel {
     List<TransactionModel> result = [];
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userId = prefs.getInt('userId') ?? -1;
-    print("userId trans ${userId}");
+
     TransactionController transactionController = TransactionController(path: "${MyApp().server}/api/workshop2/transaction.php?userId=$userId");
     await transactionController.get();
 
-    if (transactionController.status() == 200 && transactionController.result() != null) {
-      // Correctly access the "transactions" key from the JSON response
-      List<dynamic> transactionsJson = transactionController.result()['transactions'];
+    if (transactionController.status() == 200) {
+      final dynamic response = transactionController.result();
 
-      for (var item in transactionsJson) {
-        var transactionModel = TransactionModel.fromJson(item);
-        result.add(transactionModel);
-        print("ProductName: ${transactionModel.productName}");
+      if (response != null && response.containsKey('carts')) {
+        final List<dynamic> transactionsJson = response['carts'];
+
+        for (final transactionJson in transactionsJson) {
+          // Extract cart-level information from the transaction
+          final transactionModel = TransactionModel.fromJson(transactionJson);
+          result.add(transactionModel);
+          // print("User ID: ${transactionModel.userId}");
+          // print("Cart ID: ${transactionModel.cartId}");
+          // print("transactionId: ${transactionModel.transactionId}");
+
+          if (transactionJson.containsKey('products')) {
+            final List<dynamic> productsJson = transactionJson['products'];
+
+            for (final productJson in productsJson) {
+              // Extract product-level information from the productJson
+              final productModel = TransactionModel.fromJson(productJson);
+              result.add(productModel);
+              // print("CartProduct ID: ${productModel.cartProductId}");
+              print("productJson: $productJson");
+              print("totalPrice : ${productModel.totalPrice}");
+              // print("Product ID: ${productModel.productId}");
+              // print("ProductName: ${productModel.productName}");
+              // print("Status: ${productModel.status}");
+              // print("Quantity: ${productModel.quantity}");
+
+            }
+          }
+        }
       }
-
     }
     return result;
   }
+
 
 }

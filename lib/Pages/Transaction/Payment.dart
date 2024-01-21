@@ -56,7 +56,7 @@ class _PaymentPageState extends State<PaymentPage> {
     List<CartModel> cart = await CartModel.loadAll();
 
     for (CartModel cart in cart) {
-      cart.status = 'Pending';
+      cart.cartStatus = 'Pending';
       await cart.updateCart();
     }
   }
@@ -149,6 +149,7 @@ class _PaymentPageState extends State<PaymentPage> {
             TransactionModel transaction = TransactionModel(
               transactionId: -1,
               transactionDate: formattedDate,
+              cartStatus: "Pending",
               status: "Pending",
               deliveryStatus: "Pending",
               cartId: widget.cartId,
@@ -156,12 +157,14 @@ class _PaymentPageState extends State<PaymentPage> {
               voucher: "Free Shipping",
               totalPayment: widget.totalAmount, // Set totalPayment to the actual total amount
               cartProductId: -1,
-              price: widget.totalAmount, // Set price to the actual total amount
+              totalPrice: widget.totalAmount, // Set price to the actual total amount
+              price: 0,
               quantity: 1, // You can adjust the quantity as needed
               image: '',
               userId: userId,
               productId: -1,
               productName: '',
+              hasReview: false,
             );
 
             bool success = await transaction.saveTransaction();
@@ -192,6 +195,7 @@ class _PaymentPageState extends State<PaymentPage> {
         TransactionModel transaction = TransactionModel(
           transactionId: -1,
           transactionDate: formattedDate,
+          cartStatus: "Pending",
           status: "Pending",
           deliveryStatus: "Pending",
           cartId: widget.cartId,
@@ -199,12 +203,14 @@ class _PaymentPageState extends State<PaymentPage> {
           voucher: "Free Shipping",
           totalPayment: widget.totalAmount, // Set totalPayment to the actual total amount
           cartProductId: -1,
-          price: widget.totalAmount, // Set price to the actual total amount
+          totalPrice: widget.totalAmount, // Set price to the actual total amount
+          price: 0,
           quantity: 1, // You can adjust the quantity as needed
           image: '',
           userId: userId,
           productId: -1,
           productName: '',
+          hasReview: false,
         );
 
         print("cartid cod = ${widget.cartId}");

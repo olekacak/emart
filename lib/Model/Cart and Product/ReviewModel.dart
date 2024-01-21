@@ -46,6 +46,27 @@ class ReviewModel {
     await prefs.setInt('selectedReviewId', reviewId);
   }
 
+  static Future<bool> loadById(int userId, int productId) async {
+    ReviewController reviewController = ReviewController(
+      path: "${MyApp().server}/api/workshop2/review.php?userId=$userId&productId=$productId",
+    );
+
+    await reviewController.get();
+
+    if (reviewController.status() == 200) {
+      List<dynamic>? reviews = reviewController.result();
+
+      // Check if there are any reviews for the given user and product IDs
+      if (reviews != null && reviews.isNotEmpty) {
+        return true;
+      }
+    }
+
+    // No reviews found or an error occurred
+    return false;
+  }
+
+
 
   static Future<List<ReviewModel>> loadAll() async {
     List<ReviewModel> result = [];
@@ -64,6 +85,7 @@ class ReviewModel {
     ReviewController reviewController = ReviewController(
         path: "${MyApp().server}/api/workshop2/review.php");
     reviewController.setBody(toJson());
+    print('JSON data to be sent: ${toJson()}');
     await reviewController.post();
 
     if (reviewController.status() == 200) {

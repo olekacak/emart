@@ -1,7 +1,5 @@
 import 'dart:convert';
-
 import 'package:emartsystem/Pages/Cart%20and%20Product/MyShop.dart';
-import 'package:emartsystem/Pages/User/Setting.dart';
 import 'package:emartsystem/Pages/User/Wishlist.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -242,17 +240,6 @@ class _DashboardSellerPageState extends State<DashboardSellerPage> {
                                   ),
                                 );
                               },
-                            ),
-                            SizedBox(height: 10),
-                            ListTile(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => SettingPage()),
-                                );
-                              },
-                              leading: Icon(Icons.settings),
-                              title: Text('Setting'),
                             ),
                             SizedBox(height: 16),
                             ElevatedButton(

@@ -6,19 +6,19 @@ import '../../main.dart';
 class CartModel {
   int? cartId;
   int? userId;
-  String status;
+  String cartStatus;
 
 
   CartModel({
     this.cartId,
     this.userId,
-    required this.status,
+    required this.cartStatus,
   });
 
   CartModel.fromJson(Map<String, dynamic> json)
       : cartId = json['cartId'] as int?,
         userId = json['userId'] as int?,
-        status = json['status'];
+        cartStatus = json['cartStatus'];
 
 
   Map<String, dynamic> toJson() {
@@ -41,7 +41,7 @@ class CartModel {
     cartController.setBody({
       'userId': userId,
       'cartId': cartId, // Use the current value of cartId
-      'status': status,
+      'cartStatus': cartStatus,
     });
 
     try {
@@ -84,9 +84,9 @@ class CartModel {
     cartController.setBody({
       'userId': userId,
       'cartId': cartId, // Use the current value of cartId
-      'status': status,
+      'cartStatus': cartStatus,
     });
-
+    print("cart Payload: ${toJson()}");
     try {
       await cartController.put(); // Use the 'put' method for updating
       if (cartController.status() == 200) {

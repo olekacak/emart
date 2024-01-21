@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Model/Cart and Product/ProductModel.dart';
 import '../Model/User/UserLoginModel.dart';
-import '../Model/User/WishlistModel.dart';
 import 'Cart and Product/Cart.dart';
 import 'Cart and Product/Filter.dart';
 import 'Cart and Product/ProductDetail.dart';
@@ -49,10 +48,6 @@ class CustomTab {
 }
 
 class HomeCustomerPage extends StatefulWidget {
-  //final UserLoginModel user;
-
-  //HomeCustomerPage({required this.user, Key? key}) : super(key: key);
-
   @override
   _HomeCustomerPageState createState() => _HomeCustomerPageState();
 }
@@ -60,6 +55,7 @@ class HomeCustomerPage extends StatefulWidget {
 class _HomeCustomerPageState extends State<HomeCustomerPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late UserLoginModel _user;
   int _currentIndex = 0;
   List<ProductModel> products = [];
   Map<String, List<ProductModel>> categorizedProducts = {};
@@ -77,6 +73,7 @@ class _HomeCustomerPageState extends State<HomeCustomerPage>
     super.initState();
     _tabController = TabController(length: myTabs.length, vsync: this);
     _loadProducts();
+    _loadUser();
   }
 
   _loadProducts() async {
@@ -106,6 +103,19 @@ class _HomeCustomerPageState extends State<HomeCustomerPage>
     } catch (e) {
       print('Error loading products: $e');
     }
+  }
+
+  Future<void> _loadUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Retrieve user information from SharedPreferences
+    String userJson = prefs.getString('user') ?? '{}';
+    Map<String, dynamic> userMap = json.decode(userJson);
+    UserLoginModel user = UserLoginModel.fromJson(userMap);
+
+    setState(() {
+      _user = user;
+    });
   }
 
   @override
@@ -182,7 +192,7 @@ class _HomeCustomerPageState extends State<HomeCustomerPage>
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => FilterPage(),
+                      builder: (context) => FilterPage(user: _user),
                     ),
                   );
                 },
@@ -201,7 +211,7 @@ class _HomeCustomerPageState extends State<HomeCustomerPage>
               controller: _tabController,
               children: myTabs
                   .map((tab) => _buildProductGridView(
-                      categorizedProducts[tab.name] ?? []))
+                  categorizedProducts[tab.name] ?? []))
                   .toList(),
             ),
           ),
@@ -231,8 +241,8 @@ class _HomeCustomerPageState extends State<HomeCustomerPage>
             label: "Search",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.inbox),
-            label: "Inbox",
+            icon: Icon(Icons.favorite_outlined),
+            label: "Wishlist",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),

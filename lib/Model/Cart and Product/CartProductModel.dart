@@ -14,6 +14,7 @@ class CartProductModel {
   double totalPrice;
   String productName;
   double price;
+  String status;
 
 
   CartProductModel({
@@ -24,6 +25,7 @@ class CartProductModel {
     required this.totalPrice,
     required this.productName,
     required this.price,
+    required this.status,
   });
 
   CartProductModel.fromJson(Map<String, dynamic> json)
@@ -34,7 +36,8 @@ class CartProductModel {
         quantity = json['quantity'] as int? ?? 0,
         totalPrice = (json['totalPrice'] as num?)?.toDouble() ?? 0.0,
         productName = json['productName'],
-        price = (json['price'] as num?)?.toDouble() ?? 0.0;
+        price = (json['price'] as num?)?.toDouble() ?? 0.0,
+        status = json['status'];
 
 
   Map<String, dynamic> toJson() {
@@ -46,6 +49,7 @@ class CartProductModel {
       'totalPrice': totalPrice,
       'productName': productName,
       'price': price,
+      'status': status,
     };
   }
 
@@ -110,6 +114,7 @@ class CartProductModel {
       'totalPrice': totalPrice,
       'productName': productName,
       'price': price,
+      'status': status,
     };
 
     cartProductController.setBody(requestBody);

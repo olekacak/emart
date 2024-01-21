@@ -1,13 +1,9 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:emartsystem/Pages/User/UserLogin.dart';
 import '../../Model/User/UserLoginModel.dart';
-import 'InboxReport.dart';
-import 'ProductChart.dart';
+import 'ProductSellerChart.dart';
 import 'ReviewReport.dart';
-import 'User.dart';
-import 'UserSeller.dart';  // Replace with your actual model import path
 
 class AdminPage extends StatefulWidget {
   @override
@@ -17,7 +13,7 @@ class AdminPage extends StatefulWidget {
 class _AdminPageState extends State<AdminPage> {
   String adminName = '';
   String adminEmail = '';
-  String adminImageUrl = '';
+  //String adminImageUrl = '';
   List<UserLoginModel> users = [];
 
   @override
@@ -30,9 +26,9 @@ class _AdminPageState extends State<AdminPage> {
   void _loadAdminDetails() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      adminName = prefs.getString('name') ?? 'Admin';
-      adminEmail = prefs.getString('email') ?? 'admin@example.com';
-      adminImageUrl = prefs.getString('image') ?? 'https://via.placeholder.com/150';
+      adminName = prefs.getString('name') ?? 'Ali';
+      adminEmail = prefs.getString('email') ?? 'ali@gmail.com';
+      //adminImageUrl = prefs.getString('image') ?? '';
     });
   }
 
@@ -49,7 +45,21 @@ class _AdminPageState extends State<AdminPage> {
         title: Text('Admin Page'),
       ),
       drawer: _buildDrawer(),
-      //body: _buildUserList(),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Welcome to Admin Page',
+              style: TextStyle(
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            // Add any additional widgets or content below
+          ],
+        ),
+      ),
     );
   }
 
@@ -62,7 +72,7 @@ class _AdminPageState extends State<AdminPage> {
             accountName: Text(adminName),
             accountEmail: Text(adminEmail),
             currentAccountPicture: CircleAvatar(
-              backgroundImage: NetworkImage(adminImageUrl),
+              //backgroundImage: NetworkImage(adminImageUrl),
             ),
           ),
           ListTile(
@@ -72,34 +82,22 @@ class _AdminPageState extends State<AdminPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => InboxReportPage(),
+                  builder: (context) => ReviewReportPage(),
                 ),
               );
             },
           ),
           ListTile(
             leading: Icon(Icons.production_quantity_limits),
-            title: Text('Product'),
+            title: Text('Chart'),
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ProductChartPage(),
+                  builder: (context) => ProductSellerChartPage(),
                 ),
               );
             },
-          ),
-          ListTile(
-            leading: Icon(Icons.person),
-            title: Text('User'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => UserSellerPage(),
-                ),
-              );
-              },
           ),
           ListTile(
             leading: Icon(Icons.logout),
@@ -111,17 +109,10 @@ class _AdminPageState extends State<AdminPage> {
                   builder: (context) => UserLoginPage(),
                 ),
               );
-              },
+            },
           ),
         ],
       ),
     );
-  }
-
-
-
-  void _showUserDetails(UserLoginModel user) {
-    // Implement this method to navigate to a detailed user view
-    // ...
   }
 }

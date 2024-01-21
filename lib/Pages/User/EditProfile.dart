@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class EditProfilePage extends StatefulWidget {
+
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
 }
@@ -22,20 +23,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late UserProfileModel user;
   int userId = -1;
 
+  late Future<void> _userFuture;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((_) async {
-      await loadUser();
-    });
+    _userFuture = loadUser();
   }
 
-  // Method to load user data from shared preferences
   Future<void> loadUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userId = prefs.getInt('userId') ?? -1;
 
-    // Initialize controllers with the current user data
     _nameController = TextEditingController();
     _emailController = TextEditingController();
     _phoneNoController = TextEditingController();
@@ -43,7 +42,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _birthDateController = TextEditingController();
     _genderController = TextEditingController();
 
-    // Initialize _user with an empty instance
     user = UserProfileModel(
       -1,
       userId,
@@ -64,9 +62,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     if (userId != -1) {
       await user.loadByUserId();
 
-      // Trigger a rebuild of the widget to reflect the loaded data
       setState(() {
-        // Update controllers when the widget is updated
         _nameController.text = user.name;
         _emailController.text = user.email;
         _phoneNoController.text = user.phoneNo;
@@ -92,10 +88,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
           user.image = base64String;
         });
 
-        // Update the user object with the latest values
         updateUserObject();
 
-        // Save changes to the database
         bool success = await user.updateProfile();
 
         if (success) {
@@ -106,21 +100,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       }
     } catch (e) {
       print('Error picking image: $e');
-      // Handle error (show a message to the user, etc.)
     }
-  }
-
-  @override
-  void didUpdateWidget(covariant EditProfilePage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    // Update controllers when the widget is updated
-    _nameController.text = user.name;
-    _emailController.text = user.email;
-    _phoneNoController.text = user.phoneNo;
-    _addressController.text = user.address;
-    _birthDateController.text = user.birthDate;
-    _genderController.text = user.gender;
   }
 
   @override
@@ -132,33 +112,40 @@ class _EditProfilePageState extends State<EditProfilePage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            // Reload user data when navigating back
-            loadUser();
-            Navigator.pop(context, user);
+            Navigator.pop(context);
           },
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(height: 20),
-            buildAvatarSection(),
-            buildTextFormField(controller: _nameController, label: 'Name'),
-            buildTextFormField(controller: _emailController, label: 'Email'),
-            buildTextFormField(controller: _phoneNoController, label: 'Phone Number'),
-            buildTextFormField(controller: _addressController, label: 'Address'),
-            buildTextFormField(controller: _birthDateController, label: 'Birth Date'),
-            buildTextFormField(controller: _genderController, label: 'Gender'),
-          ],
-        ),
+      body: FutureBuilder<void>(
+        future: _userFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error loading user data'));
+          } else {
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(height: 20),
+                  buildAvatarSection(),
+                  buildTextFormField(controller: _nameController, label: 'Name'),
+                  buildTextFormField(controller: _emailController, label: 'Email'),
+                  buildTextFormField(controller: _phoneNoController, label: 'Phone Number'),
+                  buildTextFormField(controller: _addressController, label: 'Address'),
+                  buildTextFormField(controller: _birthDateController, label: 'Birth Date'),
+                  buildTextFormField(controller: _genderController, label: 'Gender'),
+                ],
+              ),
+            );
+          }
+        },
       ),
       bottomNavigationBar: BottomAppBar(
         child: ElevatedButton(
           onPressed: () async {
-            // Update the user object with the latest values
             updateUserObject();
 
-            // Save changes to the database
             bool success = await user.updateProfile();
 
             if (success) {
@@ -182,9 +169,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       children: [
         CircleAvatar(
           radius: 60,
-          backgroundImage: user.image != null
-              ? MemoryImage(base64Decode(user.image!))
-              : null,
+          backgroundImage: user.image != null ? MemoryImage(base64Decode(user.image!)) : null,
         ),
         SizedBox(height: 10),
         ElevatedButton(
@@ -221,7 +206,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  // Method to update the user object with the latest values
   void updateUserObject() {
     user.name = _nameController.text ?? '';
     user.email = _emailController.text ?? '';
@@ -230,7 +214,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     user.birthDate = _birthDateController.text ?? '';
     user.gender = _genderController.text ?? '';
 
-    // Check if base64String is not null before assigning it to user.image
     if (base64String != null && base64String.isNotEmpty) {
       user.image = base64String;
     }

@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Model/Cart and Product/ProductModel.dart';
-import '../Model/User/WishlistModel.dart';
+import '../Model/User/UserLoginModel.dart';
 import 'Cart and Product/Cart.dart';
 import 'Cart and Product/Filter.dart';
 import 'Cart and Product/ProductDetail.dart';
@@ -55,6 +56,7 @@ class HomeSellerPage extends StatefulWidget {
 class _HomeSellerPageState extends State<HomeSellerPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late UserLoginModel _user;
   int _currentIndex = 0;
   List<ProductModel> products = [];
   Map<String, List<ProductModel>> categorizedProducts = {};
@@ -72,6 +74,7 @@ class _HomeSellerPageState extends State<HomeSellerPage>
     super.initState();
     _tabController = TabController(length: myTabs.length, vsync: this);
     loadProducts();
+    _loadUser();
   }
 
   loadProducts() async {
@@ -101,6 +104,19 @@ class _HomeSellerPageState extends State<HomeSellerPage>
     } catch (e) {
       print('Error loading products: $e');
     }
+  }
+
+  Future<void> _loadUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Retrieve user information from SharedPreferences
+    String userJson = prefs.getString('user') ?? '{}';
+    Map<String, dynamic> userMap = json.decode(userJson);
+    UserLoginModel user = UserLoginModel.fromJson(userMap);
+
+    setState(() {
+      _user = user;
+    });
   }
 
   @override
@@ -177,7 +193,7 @@ class _HomeSellerPageState extends State<HomeSellerPage>
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => FilterPage(),
+                      builder: (context) => FilterPage(user: _user),
                     ),
                   );
                 },
@@ -196,7 +212,7 @@ class _HomeSellerPageState extends State<HomeSellerPage>
               controller: _tabController,
               children: myTabs
                   .map((tab) => _buildProductGridView(
-                      categorizedProducts[tab.name] ?? []))
+                  categorizedProducts[tab.name] ?? []))
                   .toList(),
             ),
           ),
@@ -226,8 +242,8 @@ class _HomeSellerPageState extends State<HomeSellerPage>
             label: "Search",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.inbox),
-            label: "Inbox",
+            icon: Icon(Icons.favorite_outlined),
+            label: "Wishlist",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),

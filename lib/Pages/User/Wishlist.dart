@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../Model/Cart and Product/ProductModel.dart';
 import '../../Model/User/WishlistModel.dart';
 import '../Cart and Product/ProductDetail.dart';

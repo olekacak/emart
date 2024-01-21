@@ -56,7 +56,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
     if (userId != -1) {
       isFavorite = await WishlistModel.loadById(userId, widget.product.productId!);
-      print("cubaaaa ${isFavorite}");
       setState(() {});
     }
   }
@@ -130,10 +129,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       List<CartModel> carts = await CartModel.loadAll();
 
       // Find the 'in process' cart
-      CartModel inProcessCart = carts.firstWhere((cart) => cart.status == 'in process', orElse: () => CartModel(status: ''));
+      CartModel inProcessCart = carts.firstWhere((cart) => cart.cartStatus == 'in process', orElse: () => CartModel(cartStatus: ''));
 
       // If an 'in process' cart is found, retrieve its cartId
-      if (inProcessCart.status == 'in process') {
+      if (inProcessCart.cartStatus == 'in process') {
         int? cartId = inProcessCart.cartId;
         print('Retrieved cartId: $cartId');
 
@@ -143,7 +142,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         return cartId;
       } else {
         // If no 'in process' cart exists, create a new one
-        bool cartCreated = await CartModel(userId: userId, status: 'in process').addCart();
+        bool cartCreated = await CartModel(userId: userId, cartStatus: 'in process').addCart();
 
         if (cartCreated) {
           print('New cart created successfully');
@@ -152,7 +151,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           carts = await CartModel.loadAll();
 
           // Retrieve the newly created cart with status 'in process'
-          CartModel newCart = carts.firstWhere((cart) => cart.status == 'in process', orElse: () => CartModel(status: ''));
+          CartModel newCart = carts.firstWhere((cart) => cart.cartStatus == 'in process', orElse: () => CartModel(cartStatus: ''));
           int? cartId = newCart.cartId;
           print('Retrieved cartId: $cartId');
 
@@ -629,6 +628,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                           quantity: selectedQuantity,
                                           totalPrice: widget.product.price * selectedQuantity,
                                           price: widget.product.price,
+                                          status: '',
                                         );
 
                                         // Call the saveCartProduct method on the cartProduct instance
@@ -683,8 +683,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       ),
     );
   }
-
-
 
   Widget _buildReviewListView() {
     return ListView.builder(

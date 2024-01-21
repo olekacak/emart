@@ -18,7 +18,6 @@ class _ReviewDetailsPageState extends State<ReviewDetailsPage> {
   ReportModel? correspondingReport;
   UserLoginModel? reviewUser;
 
-
   @override
   void initState() {
     super.initState();
@@ -31,19 +30,20 @@ class _ReviewDetailsPageState extends State<ReviewDetailsPage> {
 
     // Fetch the review with the selected ID
     List<ReviewModel> reviews = await ReviewModel.loadAll();
-    selectedReview = reviews.firstWhere((review) => review.reviewId == reviewId,
-        //orElse: () => null
-        );
+    selectedReview = reviews.firstWhere(
+          (review) => review.reviewId == reviewId,
+    );
 
     // Fetch the corresponding report
     List<ReportModel> reports = await ReportModel.loadAll();
-    correspondingReport = reports.firstWhere((report) => report.reviewId == reviewId,
-        //orElse: () => null
+    correspondingReport = reports.firstWhere(
+          (report) => report.reviewId == reviewId,
     );
 
     if (selectedReview != null) {
       List<UserLoginModel> users = await UserLoginModel.loadAll();
-      reviewUser = users.firstWhere((user) => user.userId == selectedReview!.userId,
+      reviewUser = users.firstWhere(
+            (user) => user.userId == selectedReview!.userId,
       );
     }
 
@@ -53,7 +53,9 @@ class _ReviewDetailsPageState extends State<ReviewDetailsPage> {
   @override
   Widget build(BuildContext context) {
     Uint8List? imageBytes;
-    if (reviewUser != null && reviewUser!.image != null && reviewUser!.image!.isNotEmpty) {
+    if (reviewUser != null &&
+        reviewUser!.image != null &&
+        reviewUser!.image!.isNotEmpty) {
       imageBytes = base64Decode(reviewUser!.image!);
     }
 
@@ -63,29 +65,50 @@ class _ReviewDetailsPageState extends State<ReviewDetailsPage> {
       ),
       body: selectedReview == null || correspondingReport == null
           ? Center(child: CircularProgressIndicator())
-          : Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text("Report Type: ${correspondingReport!.type}"),
-          Text("Report Reason: ${correspondingReport!.reason}"),
-          SizedBox(height: 20),
-          Text("Review Comment: ${selectedReview!.comment}"),
-          Text("Review Date: ${selectedReview!.reviewDate}"),
-          SizedBox(height: 10),
-          Text("User ID: ${selectedReview!.userId}"),
-
-          Text("User Name: ${reviewUser!.name}"),
-          imageBytes != null
-              ? CircleAvatar(
-            backgroundImage: MemoryImage(imageBytes),
-            radius: 50, // Adjust the size as needed
-          )
-              : CircleAvatar(
-            child: Icon(Icons.person),
-            radius: 50, // Adjust the size as needed
-          ),
-        ],
+          : Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            _buildDetailItem("Report Type", correspondingReport!.type),
+            _buildDetailItem("Report Reason", correspondingReport!.reason),
+            SizedBox(height: 10),
+            _buildDetailItem("Review Comment", selectedReview!.comment),
+            _buildDetailItem("Review Date", selectedReview!.reviewDate),
+            SizedBox(height: 10),
+            _buildDetailItem("User Name", reviewUser!.name),
+            SizedBox(height: 10),
+            //_buildUserAvatar(imageBytes),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildDetailItem(String label, String value) {
+    return ListTile(
+      title: Text(
+        label,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 16.0,
+        ),
+      ),
+      subtitle: Text(
+        value,
+        style: TextStyle(fontSize: 14.0),
+      ),
+    );
+  }
+
+  Widget _buildUserAvatar(Uint8List? imageBytes) {
+    return CircleAvatar(
+      backgroundImage: imageBytes != null
+          ? Image
+          .memory(imageBytes)
+          .image
+          : AssetImage('assets/default_avatar.png'), // Provide a default image
+      radius: 50,
     );
   }
 }
