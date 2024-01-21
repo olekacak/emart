@@ -71,7 +71,6 @@ class _ProductSellerChartPageState extends State<ProductSellerChartPage> {
             'Product Chart',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 2), // Adjusted spacing here
           _buildPieChart(),
           _buildLegend(),
         ],
@@ -109,7 +108,7 @@ class _ProductSellerChartPageState extends State<ProductSellerChartPage> {
                   show: false,
                 ),
                 sectionsSpace: 0,
-                centerSpaceRadius: 40,
+                centerSpaceRadius: 35,
                 sections: showingUserTypeSections(),
               ),
             ),
@@ -190,7 +189,7 @@ class _ProductSellerChartPageState extends State<ProductSellerChartPage> {
 
   Widget _buildPieChart() {
     return AspectRatio(
-      aspectRatio: 1.3,
+      aspectRatio: 2.0,
       child: Row(
         children: <Widget>[
           Expanded(
@@ -213,7 +212,7 @@ class _ProductSellerChartPageState extends State<ProductSellerChartPage> {
                   show: false,
                 ),
                 sectionsSpace: 0,
-                centerSpaceRadius: 40,
+                centerSpaceRadius: 35,
                 sections: showingSections(),
               ),
             ),
@@ -227,33 +226,37 @@ class _ProductSellerChartPageState extends State<ProductSellerChartPage> {
     );
   }
 
+
   Widget _buildLegend() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: categoryCounts.keys.map((category) {
-          return Container(
-            margin: EdgeInsets.symmetric(horizontal: 8),
-            child: Row(
-              children: [
-                Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: _getCategoryColor(category),
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(color: Colors.black),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: categoryCounts.keys.map((category) {
+            return Container(
+              margin: EdgeInsets.only(right: 7), // Adjust the right margin here
+              child: Row(
+                children: [
+                  Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: _getCategoryColor(category),
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(color: Colors.black),
+                    ),
                   ),
-                ),
-                SizedBox(width: 5),
-                Text(category),
-              ],
-            ),
-          );
-        }).toList(),
+                  SizedBox(width: 5),
+                  Text(category),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
       ),
     );
   }
